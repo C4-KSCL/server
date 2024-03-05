@@ -18,20 +18,17 @@ class FriendController {
     }
 
     init(){
-        this.router.get("/get-list/:userEmail",[
-            param('userEmail'),
-            validatorErrorChecker,
+        this.router.get("/get-list",[
         ],this.getList.bind(this));
-        this.router.delete("/delete/:userEmail",[
-            param('userEmail').isEmail(),
-            query('oppEmail').isEmail(),
+        this.router.delete("/delete/:oppEmail",[
+            param('oppEmail').isEmail(),
             validatorErrorChecker,
         ],this.deleteFriend.bind(this));
     }
 
     async getList(req,res,next){
         try{
-            const { userEmail } = req.params;
+            const userEmail = req.user;
 
             const resultFriends = await database.$transaction(async(db)=>{
                 this.service.setDB(db);
@@ -51,9 +48,9 @@ class FriendController {
 
     async deleteFriend(req,res,next){
         try{
-            const { userEmail } = req.params;
+            const userEmail = req.user;
 
-            const oppEmail = req.query.oppEmail;
+            const { oppEmail } = req.param;
 
             await database.$transaction(async(db)=>{
                 this.service.setDB(db);

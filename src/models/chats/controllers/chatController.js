@@ -26,8 +26,7 @@ class ChatController {
             validatorErrorChecker,
         ], this.getChats.bind(this));
 
-        this.router.get("/get-last-chats/:userEmail", [
-            param('userEmail').isEmail(),
+        this.router.get("/get-last-chats/", [
         ], this.getLastChats.bind(this));
     }
 
@@ -56,7 +55,7 @@ class ChatController {
 
     async getLastChats(req, res, next) {
         try {
-            const { userEmail } = req.params;
+            const userEmail = req.user;
 
             const lastChats = await database.$transaction(async (db) => {
                 this.service.setDB(db);

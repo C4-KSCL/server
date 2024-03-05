@@ -1,7 +1,7 @@
 import { SocketService } from "../services/socketService";
-import { ChatService } from "../../models.friends_chats/chats/services/chatService";
-import { CreateChatDTO } from "../../models.friends_chats/chats/dto/create-chat.dto";
-import { RoomService } from "../../models.friends_chats/rooms/services";
+import { ChatService } from "../../models/chats/services/chatService";
+import { CreateChatDTO } from "../../models/chats/dto/create-chat.dto";
+import { RoomService } from "../../models/rooms/services";
 import { RandomChoice } from "../../utils/choiceSmall";
 import { pushAlam } from "../../utils/pushAlam";
 
