@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+
+  node:
+    build:
+      context: .
+      dockerfile: dockerfile_node
+    ports:
+      - "8001:8001"

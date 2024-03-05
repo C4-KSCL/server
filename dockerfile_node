@@ -1,0 +1,11 @@
+FROM node:current-slim
+
+WORKDIR /app
+
+COPY . .
+# package.json에 있는 것들을 설치
+RUN npm install
+#8001포트로
+EXPOSE 8001
+
+CMD [ "npm", "start"]
