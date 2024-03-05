@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,187 +18,171 @@ model UserImage {
 }
 
 model User {
-  userNumber    Int       @id @default(autoincrement())
-  email         String?   @unique(map: "email") @db.VarChar(100)
-  password      String?   @db.VarChar(100)
-  nickname      String?   @unique @db.VarChar(100)
-  phoneNumber   String?   @db.VarChar(100)
-  age     String? @db.VarChar(100)
-  gender        Boolean?
-  myMBTI        String?   @db.VarChar(100)
-  friendMBTI    String?   @db.VarChar(100)
-  myKeyword     String?   @db.VarChar(100)
-  friendKeyword String?   @db.VarChar(100)
-  friendMaxAge Int? @db.Int
-  friendMinAge Int? @db.Int
-  friendGender Boolean? 
-  userCreated   DateTime? @default(now()) @db.DateTime(0)
-  suspend       Boolean?  @default(false)
-  manager       Boolean?  @default(false)
-
-  image         UserImage[]
-  joinRoom JoinRoom[]
-  chattingEmail Chatting[] @relation(name: "chat-user")
-  chattingNickName Chatting[] @relation(name : "chat-nickname")
-  request AddRequest[] @relation(name : "request")
-  receive AddRequest[] @relation(name : "receive")
-  userOne Friend[] @relation(name : "userOne")
-  userTwo Friend[] @relation(name : "userTwo")
-  userSocketToken UserSocketToken?
+  userNumber       Int              @id @default(autoincrement())
+  email            String?          @unique(map: "email") @db.VarChar(100)
+  password         String?          @db.VarChar(100)
+  nickname         String?          @unique @db.VarChar(100)
+  phoneNumber      String?          @db.VarChar(100)
+  age              String?          @db.VarChar(100)
+  gender           Boolean?
+  myMBTI           String?          @db.VarChar(100)
+  friendMBTI       String?          @db.VarChar(100)
+  myKeyword        String?          @db.VarChar(100)
+  friendKeyword    String?          @db.VarChar(100)
+  friendMaxAge     Int?
+  friendMinAge     Int?
+  friendGender     Boolean?
+  userCreated      DateTime?        @default(now()) @db.DateTime(0)
+  suspend          Boolean?         @default(false)
+  manager          Boolean?         @default(false)
+  userImage        String?          @default("https://matchingimage.s3.ap-northeast-2.amazonaws.com/defalut_user.png") @db.VarChar(1000)
+  receive          AddRequest[]     @relation("receive")
+  request          AddRequest[]     @relation("request")
+  chattingNickName Chatting[]       @relation("chat-nickname")
+  chattingEmail    Chatting[]       @relation("chat-user")
+  userOne          Friend[]         @relation("userOne")
+  userTwo          Friend[]         @relation("userTwo")
+  joinRoom         JoinRoom[]
+  image            UserImage[]
+  userSocketToken  UserSocketToken?
 }
 
-//  - 방 고유번호 : chat_room_id
-//  - 방 이름 : room_name
-//  - 참가 인원 : join_count
-//  - 생성일 : createdAt
-//  - 설립 여부 : publishing
-
 model Room {
-  id String @id @db.VarChar(100)
-  name String @db.VarChar(100)
-  joinCount Int @db.Int
-  createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime
-  publishing String @db.VarChar(10) @default("ing")
-
-  joinRoom JoinRoom[]
-  chatting Chatting[]
-  addRequest AddRequest[]
+  id              String            @id @db.VarChar(100)
+  name            String            @db.VarChar(100)
+  joinCount       Int
+  createdAt       DateTime          @default(now()) @db.DateTime(0)
+  publishing      String            @default("ing") @db.VarChar(10)
+  addRequest      AddRequest[]
+  chatting        Chatting[]
+  joinRoom        JoinRoom[]
   userSocketToken UserSocketToken[]
 }
 
-// 요청 테이블
-
-//  - 방 고유번호 : chat_room_id (pk,fk)
-//  - 송신 유저 : req_user (fk)
-//  - 수신 유저 : receive_user (fk)
-
 model AddRequest {
-  id Int @id @default(autoincrement())
-  roomId String? @db.VarChar(100)
-  reqUser String @db.VarChar(50)
-  recUser String @db.VarChar(50)
-  status String @db.VarChar(25) @default("ing")
+  id      Int     @id @default(autoincrement())
+  roomId  String? @db.VarChar(100)
+  reqUser String  @db.VarChar(50)
+  recUser String  @db.VarChar(50)
+  status  String  @default("ing") @db.VarChar(25)
+  receive User    @relation("receive", fields: [recUser], references: [email], onDelete: Cascade)
+  request User    @relation("request", fields: [reqUser], references: [email], onDelete: Cascade)
+  room    Room?   @relation(fields: [roomId], references: [id])
 
-  room Room? @relation(fields: [roomId], references: [id], onDelete : SetNull)
-  request User @relation(name : "request", fields: [reqUser], references: [email], onDelete : Cascade, onUpdate: Cascade)
-  receive User @relation(name : "receive", fields: [recUser], references: [email], onDelete : Cascade, onUpdate: Cascade)
+  @@index([recUser], map: "AddRequest_recUser_fkey")
+  @@index([reqUser], map: "AddRequest_reqUser_fkey")
+  @@index([roomId], map: "AddRequest_roomId_fkey")
 }
 
-// 채팅방 참여 테이블
-
-//  - 아이디 : id (pk)
-//  - 방 고유번호 : chat_room_id (fk)
-//  - 유저 아이디 : user_id (fk)
-
 model JoinRoom {
-  id Int @id @default(autoincrement())
-  roomId String @db.VarChar(100)
+  id        Int    @id @default(autoincrement())
+  roomId    String @db.VarChar(100)
   userEmail String @db.VarChar(50)
+  room      Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
-  user User @relation(fields: [userEmail], references: [email], onDelete : Cascade, onUpdate: Cascade)
-  room Room @relation(fields: [roomId], references: [id], onDelete : Cascade, onUpdate: Cascade)
+  @@index([roomId], map: "JoinRoom_roomId_fkey")
+  @@index([userEmail], map: "JoinRoom_userEmail_fkey")
 }
 
 model Chatting {
-  id Int @id @default(autoincrement())
-  roomId String @db.VarChar(100)
-  nickName String? @db.VarChar(50)
-  userEmail String @db.VarChar(50)
-  createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime
-  content String @db.Text
-  readCount Int @db.Int
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  nickName  String?  @db.VarChar(50)
+  userEmail String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  content   String   @db.Text
+  readCount Int
+  nick      User?    @relation("chat-nickname", fields: [nickName], references: [nickname])
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User     @relation("chat-user", fields: [userEmail], references: [email])
+  event     Event?
 
-  event Event?
-
-  room Room @relation(fields: [roomId], references: [id], onDelete : Cascade, onUpdate: Cascade)
-  user User @relation(name : "chat-user", fields: [userEmail], references: [email], onUpdate: Cascade)
-  nick User? @relation(name : "chat-nickname", fields: [nickName], references: [nickname], onUpdate: Cascade, onDelete: SetNull)
+  @@index([nickName], map: "Chatting_nickName_fkey")
+  @@index([roomId], map: "Chatting_roomId_fkey")
+  @@index([userEmail], map: "Chatting_userEmail_fkey")
 }
 
-// 친구 테이블
-
-//  - 아이디 : id (pk)
-//  - 유저1 아이디 : user1_id (fk)
-//  - 유저2 아이디 : user2_id (fk)
-//  - 생성일 : createdAt
-
 model Friend {
-  id Int @id @default(autoincrement())
-  user1 String @db.VarChar(50)
-  user2 String @db.VarChar(50)
-  createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime
+  id        Int      @id @default(autoincrement())
+  user1     String   @db.VarChar(50)
+  user2     String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  userOne   User     @relation("userOne", fields: [user1], references: [email], onDelete: Cascade)
+  userTwo   User     @relation("userTwo", fields: [user2], references: [email], onDelete: Cascade)
 
-  userOne User @relation(name : "userOne", fields: [user1], references: [email], onDelete : Cascade, onUpdate: Cascade)
-  userTwo User @relation(name : "userTwo", fields: [user2], references: [email], onDelete : Cascade, onUpdate: Cascade)
+  @@index([user1], map: "Friend_user1_fkey")
+  @@index([user2], map: "Friend_user2_fkey")
 }
 
 model BigCategory {
-  name String @id @db.VarChar(50)
-
+  name   String           @id @db.VarChar(50)
   middle MiddleCategory[]
 }
 
 model MiddleCategory {
-  name String @id @db.VarChar(50)
-  bigName String @db.VarChar(50)
+  name        String          @id @db.VarChar(50)
+  bigName     String          @db.VarChar(50)
+  bigCategory BigCategory     @relation(fields: [bigName], references: [name])
+  smalls      SmallCategory[]
 
-  smalls SmallCategory[]
-
-  bigCategory BigCategory @relation(fields: [bigName], references: [name])
+  @@index([bigName], map: "MiddleCategory_bigName_fkey")
 }
 
 model SmallCategory {
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(50)
-  middleName String @db.VarChar(50)
+  id         Int            @id @default(autoincrement())
+  name       String         @db.VarChar(50)
+  middleName String         @db.VarChar(50)
+  event      Event[]
+  images     EventImage[]
+  middle     MiddleCategory @relation(fields: [middleName], references: [name])
 
-  images EventImage[]
-  event Event[]
-
-  middle MiddleCategory @relation(fields: [middleName], references: [name])
+  @@index([middleName], map: "SmallCategory_middleName_fkey")
 }
 
 model EventImage {
-  filename String @id @db.VarChar(255)
-  filepath String @db.VarChar(255)
-  mimetype String @db.VarChar(255)
-  size Int @db.Int
-  smallCategoryId Int @db.Int
+  filename        String         @id @db.VarChar(255)
+  filepath        String         @db.VarChar(255)
+  mimetype        String         @db.VarChar(255)
+  size            Int
+  smallCategoryId Int
+  smallCategory   SmallCategory  @relation(fields: [smallCategoryId], references: [id])
+  event           ImageInEvent[]
 
-  smallCategory SmallCategory @relation(fields: [smallCategoryId], references: [id])
-  event ImageInEvent[]
+  @@index([smallCategoryId], map: "EventImage_smallCategoryId_fkey")
 }
 
 model Event {
-  id Int @id @default(autoincrement())
-  chattingId Int @db.Int @unique
-  category Int @db.Int
-  userContent String? @db.Text
-  oppContent String? @db.Text
+  id            Int            @id @default(autoincrement())
+  chattingId    Int            @unique
+  category      Int
+  userContent   String?        @db.Text
+  oppContent    String?        @db.Text
+  smallCategory SmallCategory  @relation(fields: [category], references: [id])
+  chat          Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
+  image         ImageInEvent[]
 
-
-  chat Chatting @relation(fields: [chattingId], references: [id], onDelete: Cascade)
-  smallCategory SmallCategory @relation(fields: [category], references: [id])
-
-  image ImageInEvent[]
+  @@index([category], map: "Event_category_fkey")
 }
 
 model ImageInEvent {
-  id Int @id @default(autoincrement())
-  eventId Int @db.Int
-  file String @db.VarChar(255)
+  id      Int        @id @default(autoincrement())
+  eventId Int
+  file    String     @db.VarChar(255)
+  event   Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  image   EventImage @relation(fields: [file], references: [filename], onDelete: Cascade)
 
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  image EventImage @relation(fields: [file], references: [filename], onDelete: Cascade, onUpdate: Cascade)
+  @@index([eventId], map: "ImageInEvent_eventId_fkey")
+  @@index([file], map: "ImageInEvent_file_fkey")
 }
 
 model UserSocketToken {
-  userEmail String @id @db.VarChar(50)
-  socket String? @db.VarChar(255)
-  token String? @db.VarChar(255)
+  userEmail     String  @id @db.VarChar(50)
+  socket        String? @db.VarChar(255)
+  token         String? @db.VarChar(255)
   connectRoomId String? @db.VarChar(255)
+  room          Room?   @relation(fields: [connectRoomId], references: [id])
+  user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
-  user User @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
-  room Room? @relation(fields: [connectRoomId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  @@index([connectRoomId], map: "UserSocketToken_connectRoomId_fkey")
 }
-
