@@ -31,25 +31,24 @@ class RequestController {
 
     init(){
         this.router.post("/send", [
-            body('userEmail').isEmail(),
+            // body('userEmail').isEmail(),
             body('oppEmail').isEmail(),
             body('content'),
             validatorErrorChecker
         ],this.sendRequest.bind(this));
 
-        this.router.get("/get-received/:userEmail",[
-            param('userEmail').isEmail(),
-            validatorErrorChecker
+        this.router.get("/get-received",[
+            // param('userEmail').isEmail(),
+            // validatorErrorChecker
         ], this.getReceviedRequests.bind(this));
 
-        this.router.get("/get-sended/:userEmail",[
-            param('userEmail'),
-            validatorErrorChecker
+        this.router.get("/get-sended",[
+            // param('userEmail'),
+            // validatorErrorChecker
         ], this.getSendRequests.bind(this));
 
         this.router.post("/accept",[
             body('requestId'),
-            body('userEmail').isEmail(),
             validatorErrorChecker
         ], this.acceptRequest.bind(this));
 
@@ -66,11 +65,13 @@ class RequestController {
 
      // 이미 보낸 요청이 있는 지 확인한다 그 후, 방을 만든 뒤, 참가 후, 메시지를 입력 후, 요청을 보낸다.
     //  - url : /requests/send
-    //  - 요청 데이터 : user_id, opp_id, message
+     // header에 accessToken
+    //  - 요청 데이터 : opp_id, message
     //  - 반환 데이터 : msg : 성공시 true, 실패 시 false
     async sendRequest(req,res,next){
         try{
-            const { userEmail, oppEmail, content } = req.body;
+            const userEmail = req.user;
+            const { oppEmail, content } = req.body;
 
             await database.$transaction(async(db)=>{
                 this.requestService.setDB(db);
@@ -110,11 +111,10 @@ class RequestController {
     }
     // 받은 요청들을 반환한다.
     // /requests/get-received
-    // req.body = { "userEmail" : "..." }
+     // header에 accessToken
     async getReceviedRequests(req,res,next){
         try{
-            const { userEmail } = req.params;
-
+            const userEmail = req.user;
 
             const resultRequests = await database.$transaction(async(db)=>{
                 this.requestService.setDB(db);
@@ -131,10 +131,10 @@ class RequestController {
     }
 
     // 보낸 요청들을 반환한다.
-    // req.body = { "userEmail" : "..." }
+    // header에 accessToken
     async getSendRequests(req,res,next){
         try{
-            const { userEmail } = req.params;
+            const userEmail = req.user;
 
             const resultRequests = await database.$transaction(async(db) => {
                 this.requestService.setDB(db);
@@ -155,7 +155,8 @@ class RequestController {
     // 요청 아이디로 방 아이디 획득, 친구 추가, 채팅 방에 입장, 채팅 방 publishing을 true로 변환,  요청 삭제
     async acceptRequest(req,res,next){
         try{
-            const { requestId, userEmail } = req.body;
+            const userEmail = req.user;
+            const { requestId } = req.body;
 
             const resultRoom = await database.$transaction(async (db)=>{
                 this.roomService.setDB(db);

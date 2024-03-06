@@ -4,3 +4,4 @@ uploads
 coverage
 .env
 /prisma/migrations
+images/

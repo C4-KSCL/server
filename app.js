@@ -18,6 +18,7 @@ import http from "http";
 import database from "./src/database";
 import Controllers from "./src/controllers.friends-chats";
 import { SocketServer } from "./src/sockets/socket-server";
+import { verifyAccessToken } from "./middleware/auth";
 
 (async () => {
 
@@ -75,7 +76,11 @@ import { SocketServer } from "./src/sockets/socket-server";
   
 
   Controllers.forEach((controller) => {
-    app.use(controller.path, controller.router);
+    if(controller.path === "/users") {
+      app.use(controller.path, controller.router);
+    }else {
+      app.use(controller.path, verifyAccessToken,controller.router);
+    }
   });
 
   app.use((req, res, next) => { // 404 미들웨어
@@ -88,7 +93,7 @@ import { SocketServer } from "./src/sockets/socket-server";
     console.log(err); // 추후 삭제
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== 'production' ? err : {}; // 배포모드일때, 아닐때 구분
-    res.status(err.status || 500);
+    res.status(err.status || 500).json({msg : err.msg || "error"});
     next();
   });
 
@@ -96,4 +101,3 @@ import { SocketServer } from "./src/sockets/socket-server";
     console.log('start server');
   });
 })();
-

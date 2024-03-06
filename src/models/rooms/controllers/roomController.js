@@ -27,30 +27,29 @@ class RoomController {
 
     init(){
         this.router.post("/create-room", [
-            body('userEmail').isEmail(),
             body('oppEmail').isEmail(),
             validatorErrorChecker
         ], this.createRoom.bind(this));
 
-        this.router.get("/get-list/:userEmail", [
-            param('userEmail').isEmail(),
-            validatorErrorChecker
+        this.router.get("/get-list/", [
         ], this.getRooms.bind(this));
 
-        this.router.delete("/leave/:userEmail", [
-            param('userEmail'),
-            query('roomId'),
+        this.router.delete("/leave/:roomId", [
+            param('roomId'),
             validatorErrorChecker
         ], this.leaveRoom.bind(this));
     }
 
     //  방을 만들고, 상대와 나를 참여시킨다.
     //  - url : /rooms/create-room
-    //  - 요청 데이터 : user_id, opp_id
+    // header에 accessToken
+    //  - 요청 데이터 : opp_id
     //  - 반환 데이터 : room_id
     async createRoom(req,res,next){
         try{
-            const { userEmail, oppEmail } = req.body;
+            const userEmail = req.user;
+
+            const { oppEmail } = req.body;
 
             const resultRoom = await database.$transaction(async(db)=>{
                 this.service.setDB(db);
@@ -79,10 +78,10 @@ class RoomController {
 
     // 속해있는 방들을 반환한다.
     // url : /rooms/get-list
-    // req.body = { "userEmail" : "..." }
+    // header에 accessToken
     async getRooms(req,res,next){
         try{
-            const { userEmail } = req.params;
+            const userEmail = req.user;
 
             const resultRooms = await database.$transaction(async (db)=>{
                 this.service.setDB(db);
@@ -99,10 +98,10 @@ class RoomController {
 
     // 속해있는 방을 나간다.
     // 만약 자신 혼자있다면, 방은 삭제된다.
-    // req.body = { "roomId" : "..." , "userEmail" : "..." }
+    // req.query = { "roomId" : "..." }
     async leaveRoom(req,res,next){
         try{
-            const { userEmail } = req.params;
+            const userEmail = req.user;
 
             const { roomId } = req.query;
 

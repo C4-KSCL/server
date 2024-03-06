@@ -59,6 +59,14 @@ model Room {
   addRequest      AddRequest[]
   chatting        Chatting[]
   joinRoom        JoinRoom[]
+  id              String            @id @db.VarChar(100)
+  name            String            @db.VarChar(100)
+  joinCount       Int
+  createdAt       DateTime          @default(now()) @db.DateTime(0)
+  publishing      String            @default("ing") @db.VarChar(10)
+  addRequest      AddRequest[]
+  chatting        Chatting[]
+  joinRoom        JoinRoom[]
   userSocketToken UserSocketToken[]
 }
 
@@ -76,19 +84,54 @@ model AddRequest {
   @@index([reqUser], map: "AddRequest_reqUser_fkey")
   @@index([roomId], map: "AddRequest_roomId_fkey")
 }
+  id      Int     @id @default(autoincrement())
+  roomId  String? @db.VarChar(100)
+  reqUser String  @db.VarChar(50)
+  recUser String  @db.VarChar(50)
+  status  String  @default("ing") @db.VarChar(25)
+  receive User    @relation("receive", fields: [recUser], references: [email], onDelete: Cascade)
+  request User    @relation("request", fields: [reqUser], references: [email], onDelete: Cascade)
+  room    Room?   @relation(fields: [roomId], references: [id])
+
+  @@index([recUser], map: "AddRequest_recUser_fkey")
+  @@index([reqUser], map: "AddRequest_reqUser_fkey")
+  @@index([roomId], map: "AddRequest_roomId_fkey")
+}
 
 model JoinRoom {
+  id        Int    @id @default(autoincrement())
+  roomId    String @db.VarChar(100)
   id        Int    @id @default(autoincrement())
   roomId    String @db.VarChar(100)
   userEmail String @db.VarChar(50)
   room      Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  room      Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
+  @@index([roomId], map: "JoinRoom_roomId_fkey")
+  @@index([userEmail], map: "JoinRoom_userEmail_fkey")
   @@index([roomId], map: "JoinRoom_roomId_fkey")
   @@index([userEmail], map: "JoinRoom_userEmail_fkey")
 }
 
 model Chatting {
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  nickName  String?  @db.VarChar(50)
+  userEmail String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  content   String   @db.Text
+  readCount Int
+  nick      User?    @relation("chat-nickname", fields: [nickName], references: [nickname])
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User     @relation("chat-user", fields: [userEmail], references: [email])
+  event     Event?
+
+  @@index([nickName], map: "Chatting_nickName_fkey")
+  @@index([roomId], map: "Chatting_roomId_fkey")
+  @@index([userEmail], map: "Chatting_userEmail_fkey")
+}
   id        Int      @id @default(autoincrement())
   roomId    String   @db.VarChar(100)
   nickName  String?  @db.VarChar(50)
@@ -116,14 +159,30 @@ model Friend {
 
   @@index([user1], map: "Friend_user1_fkey")
   @@index([user2], map: "Friend_user2_fkey")
+  id        Int      @id @default(autoincrement())
+  user1     String   @db.VarChar(50)
+  user2     String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  userOne   User     @relation("userOne", fields: [user1], references: [email], onDelete: Cascade)
+  userTwo   User     @relation("userTwo", fields: [user2], references: [email], onDelete: Cascade)
+
+  @@index([user1], map: "Friend_user1_fkey")
+  @@index([user2], map: "Friend_user2_fkey")
 }
 
 model BigCategory {
+  name   String           @id @db.VarChar(50)
   name   String           @id @db.VarChar(50)
   middle MiddleCategory[]
 }
 
 model MiddleCategory {
+  name        String          @id @db.VarChar(50)
+  bigName     String          @db.VarChar(50)
+  bigCategory BigCategory     @relation(fields: [bigName], references: [name])
+  smalls      SmallCategory[]
+
+  @@index([bigName], map: "MiddleCategory_bigName_fkey")
   name        String          @id @db.VarChar(50)
   bigName     String          @db.VarChar(50)
   bigCategory BigCategory     @relation(fields: [bigName], references: [name])
@@ -141,9 +200,26 @@ model SmallCategory {
   middle     MiddleCategory @relation(fields: [middleName], references: [name])
 
   @@index([middleName], map: "SmallCategory_middleName_fkey")
+  id         Int            @id @default(autoincrement())
+  name       String         @db.VarChar(50)
+  middleName String         @db.VarChar(50)
+  event      Event[]
+  images     EventImage[]
+  middle     MiddleCategory @relation(fields: [middleName], references: [name])
+
+  @@index([middleName], map: "SmallCategory_middleName_fkey")
 }
 
 model EventImage {
+  filename        String         @id @db.VarChar(255)
+  filepath        String         @db.VarChar(255)
+  mimetype        String         @db.VarChar(255)
+  size            Int
+  smallCategoryId Int
+  smallCategory   SmallCategory  @relation(fields: [smallCategoryId], references: [id])
+  event           ImageInEvent[]
+
+  @@index([smallCategoryId], map: "EventImage_smallCategoryId_fkey")
   filename        String         @id @db.VarChar(255)
   filepath        String         @db.VarChar(255)
   mimetype        String         @db.VarChar(255)
@@ -166,9 +242,27 @@ model Event {
   image         ImageInEvent[]
 
   @@index([category], map: "Event_category_fkey")
+  id            Int            @id @default(autoincrement())
+  chattingId    Int            @unique
+  category      Int
+  userContent   String?        @db.Text
+  oppContent    String?        @db.Text
+  smallCategory SmallCategory  @relation(fields: [category], references: [id])
+  chat          Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
+  image         ImageInEvent[]
+
+  @@index([category], map: "Event_category_fkey")
 }
 
 model ImageInEvent {
+  id      Int        @id @default(autoincrement())
+  eventId Int
+  file    String     @db.VarChar(255)
+  event   Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  image   EventImage @relation(fields: [file], references: [filename], onDelete: Cascade)
+
+  @@index([eventId], map: "ImageInEvent_eventId_fkey")
+  @@index([file], map: "ImageInEvent_file_fkey")
   id      Int        @id @default(autoincrement())
   eventId Int
   file    String     @db.VarChar(255)
@@ -183,9 +277,15 @@ model UserSocketToken {
   userEmail     String  @id @db.VarChar(50)
   socket        String? @db.VarChar(255)
   token         String? @db.VarChar(255)
+  userEmail     String  @id @db.VarChar(50)
+  socket        String? @db.VarChar(255)
+  token         String? @db.VarChar(255)
   connectRoomId String? @db.VarChar(255)
   room          Room?   @relation(fields: [connectRoomId], references: [id])
   user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  room          Room?   @relation(fields: [connectRoomId], references: [id])
+  user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
+  @@index([connectRoomId], map: "UserSocketToken_connectRoomId_fkey")
   @@index([connectRoomId], map: "UserSocketToken_connectRoomId_fkey")
 }

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 const accessTokenExpiryTime = '30m'; // Access Token 유효기간
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+
 exports.verifyAccessToken = (req, res, next) => {
     try { 
         //Access 토큰 유효성 검사
