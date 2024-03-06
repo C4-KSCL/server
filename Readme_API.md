@@ -40,12 +40,44 @@
   - 401 : 회원가입 실패(중복 이메일) -> 비밀번호 찾기 유도   
   - 500 : 회원가입 실패(서버 에러)   
 
-> 4. 이미지 저장
+> 4. 프로필 사진 저장
+- URL : signup/profile (POST)
+- 요청 값 : files(file타입), email(text타입) ★Form-Data 형식★
+- 반환 값 : -   
+  - 200 : 이미지 저장 성공
+  - 500~503 : 이미지 저장 실패(서버 에러)
+
+> 5. 이미지 저장
 - URL : signup/image (POST)
 - 요청 값 : files(file타입), email(text타입) ★Form-Data 형식★
 - 반환 값 : -   
   - 200 : 이미지 저장 성공
   - 500~503 : 이미지 저장 실패(서버 에러)
+
+
+-----
+### 토큰 관련
+> 1. AccessToken만 전송
+  > 1-1. AccessToken 만료 X
+  - 정상적으로 진행
+  > 1-2. AccessToekn 만료 O, Refresh 토큰 전송하지 않음
+  - 응답상태 코드 : 401
+  - 2번으로 시도해야함
+> 2. AccessToken,RefreshToken만 전송
+  > 2-1. AccessToekn 만료 O , RefreshToekn 만료 X
+  - 응답상태 코드 : 300
+  - 반환 값 : 새로운 AccessToken
+  - 해당 AccessToken으로 갱신 후 다시 전송해야함
+  > 2-2. AccessToekn 만료 O , RefreshToekn 만료 O
+  - 응답상태 코드 : 402
+  - 다시 로그인 시도해야함
+> 3. 예외 사항
+  > 3.1 accessToken 오류
+  - 응답상태코드 : 411
+  > 3.2 refreshToken 오류
+  - 응답상태코드 : 412
+-----
+
 
 -----
 ### 비밀번호 찾기
@@ -71,8 +103,9 @@
 > 1. 친구 매칭
 - URL : findfriend/friend-matching (GET)
 - 요청 값 : 헤더 - accesstoken
-- 반환 값 : users 객체, images 객체
+- 반환 값 : users 객체, images 객체(성공시) / requestTime(실패시)
   - 200 : 매칭 성공 
+  - 400 : 매칭 시간 제한
   - 401 : 해당 친구 없음
   - 500 : 매칭 실패(서버 에러)   
 
@@ -85,14 +118,30 @@
 
 -----
 ### 회원정보(프로필 사진) 수정
-> 1. 이미지 삭제
+> 1. 프로필 사진 삭제
+- URL : edit/deleteprofile (POST)
+- 요청 값 : 헤더 - accesstoken, 바디 - deletepath 
+- 반환 값 : -
+  - 200 : 삭제 성공
+  - 500 : S3에서 이미지 삭제 실패
+  - 501 : DB에서 이미지 삭제 실패  
+
+> 2. 프로필 사진 추가
+- URL : edit/addprofile (POST)
+- 요청 값 : 헤더 - accesstoken, 바디 - files ★Form-Data 형식★
+- 반환 값 : -
+  - 200 : 이미지 저장 성공
+  - 500~503 : 이미지 저장 실패(서버 에러)
+
+> 3. 이미지 삭제
 - URL : edit/deleteimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - deletepath 
 - 반환 값 : -
   - 200 : 삭제 성공
   - 500 : S3에서 이미지 삭제 실패
   - 501 : DB에서 이미지 삭제 실패   
-> 2. 이미지 추가
+
+> 4. 이미지 추가
 - URL : edit/addimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - files ★Form-Data 형식★
 - 반환 값 : -
@@ -107,11 +156,9 @@
   - 200 : 업데이트 성공
   - 500~501 : 업데이트 실패(서버 에러)
 
-
-2월 해야할 리스트
-- docker-compose 관련하여 시간 설정 알아보기
 3월 해야할 리스트
-- 친구매칭시 나이 조건 추가, 매칭 횟수 파악
+- 친구매칭시 나이 조건 추가
+- docker-compose 관련하여 시간 설정 알아보기
 - 백엔드 코드 병합
 - nginx 설정
 

@@ -31,9 +31,17 @@ exports.friendMatching = (req, res) => {
                     console.error('Error while querying:', err);
                     return res.status(500).send('서버 에러');
                 }
-                return res.status(200).json({
-                    users: userResults,
-                    images: imageResults
+                const now = getCurrentDateTime();
+                const updateQuery = `UPDATE User SET requestTime = ? WHERE email = ?`;
+                req.mysqlConnection.query(updateQuery, [now, userEmail], (err, results) => {
+                    if (err) {
+                        console.error('Error while updating:', err);
+                        return res.status(500).send('서버 에러');
+                    }
+                    return res.status(200).json({
+                        users: userResults,
+                        images: imageResults
+                    });
                 });
             });
         });
@@ -51,4 +59,17 @@ exports.setting = (req, res) => {
         }
         return res.status(200).send('설정 완료');
     });
+}
+
+//시간 형식 설정 함수
+function getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return formattedDateTime;
 }

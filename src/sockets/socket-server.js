@@ -1,17 +1,17 @@
 import { Server } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
-import { createClient } from "redis";
+// import { createAdapter } from "@socket.io/redis-adapter";
+// import { createClient } from "redis";
 import { SocketController } from "./controllers/socketController";
 
 export const SocketServer = async (httpServer) => {
     const io = new Server(httpServer);
 
-    const pubClient = createClient({ host: 'localhost', port: 6379 });
-    const subClient = pubClient.duplicate();
+    // const pubClient = createClient({ host: 'localhost', port: 6379 });
+    // const subClient = pubClient.duplicate();
 
-    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-        io.adapter(createAdapter(pubClient, subClient));
-    });
+    // Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+    //     io.adapter(createAdapter(pubClient, subClient));
+    // });
 
     io.on('connection', async (socket) => {
         const controller = new SocketController(io, socket);

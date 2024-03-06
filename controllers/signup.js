@@ -53,7 +53,7 @@ exports.checknickname = (req, res) => {
 
 // 회원 DB 등록
 exports.register = (req, res) => {
-    const { email, password, nickname, phoneNumber, age, gender, myMBTI, myKeyword, friendKeyword, friendMBTI,friendMaxAge, friendMinage, friendGender } = req.body;
+    const { email, password, nickname, phoneNumber, age, gender, myMBTI, myKeyword, friendKeyword, friendMBTI,friendMaxAge, friendMinAge, friendGender } = req.body;
     // 데이터베이스에 사용자 정보 저장
     const checkemailQuery = `SELECT * FROM User WHERE email = ?`;
     req.mysqlConnection.query(checkemailQuery, [email], (err, results) => {
@@ -77,7 +77,7 @@ exports.register = (req, res) => {
                 friendKeyword: friendKeyword,
                 friendMBTI: friendMBTI,
                 friendMaxAge: friendMaxAge,
-                friendMinAge: friendMinage,
+                friendMinAge: friendMinAge,
                 friendGender: friendGender,
             };
             const insertQuery = 'INSERT INTO User SET ?'; // 사용자 정보 추가 쿼리문

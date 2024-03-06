@@ -1,6 +1,6 @@
 const aws = require('aws-sdk');
 
-exports.deleteImage = (req, res) => {
+exports.imagedelete = (req, res) => {
     const deletePath = req.body.deletepath;
     // 이미지 삭제를 위한 S3 설정
     const s3 = new aws.S3({
