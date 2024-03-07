@@ -8,6 +8,6 @@ RUN npm install1
 RUN npx prisma generate
 RUN npx prisma migrate dev
 #8001포트로
-EXPOSE 8001
+EXPOSE 8000
 
 CMD [ "npm", "run","dev"]

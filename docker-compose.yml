@@ -7,4 +7,4 @@ services:
       context: .
       dockerfile: dockerfile_node
     ports:
-      - "8001:8001"
+      - "8000:8000"
