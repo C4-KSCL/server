@@ -17,6 +17,7 @@
 친구최대나이|friendMinAge|INT|||
 친구성별|friendGender|bool|||
 회원_생성일|userCreated|TIMESTAMP||dafault CURRENT_TIMESTAMP|
+요청시간|requestTime|TIMESTAMP||dafault '2000-01-01 00:00:00'|
 정지여부|suspend|bool||default false|
 관리자여부|manager|bool||default false|
 ### 2.이미지 테이블 (UserImage)

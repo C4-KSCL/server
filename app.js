@@ -46,7 +46,9 @@ import { verifyAccessToken } from "./middleware/auth";
     host: process.env.DB_IP,
     user: 'admin',
     password: process.env.DB_PW,
-    database: 'matching'
+    database: 'matching',
+    timezone:"Asia/Seoul",
+    dateStrings: true
   });
 
   connection.connect((err) => {
