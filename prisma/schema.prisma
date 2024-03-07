@@ -93,6 +93,7 @@ model Chatting {
   createdAt DateTime @default(now()) @db.DateTime(0)
   content   String   @db.Text
   readCount Int
+  
   nick      User?    @relation("chat-nickname", fields: [nickName], references: [nickname])
   room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user      User     @relation("chat-user", fields: [userEmail], references: [email])
