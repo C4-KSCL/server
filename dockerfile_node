@@ -4,9 +4,10 @@ WORKDIR /app
 
 COPY . .
 # package.json에 있는 것들을 설치
+RUN apt-get update -y && apt-get install -y openssl
 RUN npm install1
 RUN npx prisma generate
-RUN npx prisma migrate dev
+RUN npx prisma migrate deploy
 #8001포트로
 EXPOSE 8000
 
