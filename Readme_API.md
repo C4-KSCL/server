@@ -124,7 +124,7 @@
   - 500 : S3에서 이미지 삭제 실패
   - 501 : DB에서 이미지 삭제 실패  
   - 502 : 서버 에러 
-  
+
 > 2. 프로필 사진 추가
 - URL : edit/addprofile (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - files ★Form-Data 형식★
@@ -149,7 +149,7 @@
   - 500~503 : 이미지 저장 실패(서버 에러)
 
 ### 회원정보(개인 정보) 수정
-> 1. 개인정보 수정
+> 1. 개인정보 수정 -> 닉네임 수정시 닉네임 확인하는 API 거쳐야함
 - URL : edit/info (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - password, nickname, phoneNumber, birthdate, gender, myMBTI, myKeyword, friendKeyword
 - 반환 값 : User 객체
