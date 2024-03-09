@@ -14,7 +14,7 @@ exports.imagedelete = (req, res) => {
     req.mysqlConnection.query(findKeyQuery, [deletePath], (error, results) => {
         if (error) {
             console.error('Error deleting image from database:', error);
-            return res.status(500).send('데이터베이스에서 이미지 정보 조회에 실패하였습니다');
+            return res.status(502).send('데이터베이스에서 이미지 정보 조회에 실패하였습니다');
         }
 
         // 이미지 키 설정
