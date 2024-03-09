@@ -59,7 +59,7 @@ exports.register = (req, res) => {
     req.mysqlConnection.query(checkemailQuery, [email], (err, results) => {
         if (err) {
             console.error('Error while querying:', err);
-            return res.status(401).send('존재하는 이메일입니다.');
+            return res.status(500).send('서버 에러');
         }
         if (results.length !== 0) {
             return res.status(401).send('존재하는 이메일입니다.');
