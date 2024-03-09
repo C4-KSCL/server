@@ -157,6 +157,7 @@
   - 500~501 : 업데이트 실패(서버 에러)
 
 ### 회원 삭제
+순서대로 진행
 > 1. 이미지 삭제
 - URL : edit/deleteimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - deletepath 
