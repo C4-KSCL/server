@@ -19,9 +19,6 @@ exports.check = (req, res, next) => {
 function isAllowed(requestTime) {
     const koreaNow = getCurrentDateTime();
     const differenceInMinutes = calculateTimeDifference(koreaNow, requestTime);
-    console.log(koreaNow);
-    console.log(requestTime);
-    console.log(differenceInMinutes);
     return differenceInMinutes >= 10; //10분 차이로 설정
 }
 
