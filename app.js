@@ -13,6 +13,7 @@ const authRouter = require('./routes/auth');
 const signupRouter = require('./routes/signup');
 const findfriendRouter = require('./routes/findfriend');
 const editRouter = require('./routes/edit');
+const deleteRouter = require('./routes/delete');
 
 import http from "http";
 import database from "./src/database";
@@ -73,6 +74,7 @@ import { verifyAccessToken } from "./middleware/auth";
   app.use('/signup', signupRouter); //회원가입
   app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)
   app.use('/edit', editRouter); //정보 수정
+  app.use('/delete', deleteRouter); //정보 수정
   
 
   Controllers.forEach((controller) => {
