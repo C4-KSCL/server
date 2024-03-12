@@ -126,6 +126,14 @@ export class ChatService {
                     room: {
                         include: {
                             joinRoom: {
+                                select : {
+                                    user : {
+                                        select : {
+                                            email : true,
+                                            nickname : true,
+                                        }
+                                    }
+                                },
                                 where: {
                                     NOT: {
                                         userEmail: join.userEmail,
@@ -136,9 +144,23 @@ export class ChatService {
                     }
                 }
             });
+
+            const count = await this.db.chatting.count({
+                where : {
+                    roomId : join.roomId,
+                    readCount : 1,
+                    NOT : {
+                        userEmail : userEmail,
+                    }
+                }
+            });
+
+            chat.notReadCounts = count;
+
             chats.push(chat);
         }
         return chats;
+
 
 
     }

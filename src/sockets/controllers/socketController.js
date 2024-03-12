@@ -36,7 +36,9 @@ export class SocketController {
                 return await this.socketService.updateChatReadCount(payload);
             })
 
-            this.io.to(payload.roomId).emit("update read count", { ids: res });
+            // this.io.to(payload.roomId).emit("update read count", { ids: res });
+
+            this.io.to(payload.roomId).emit("user join in room", { userEmail : payload.userEmail});
 
         } catch (err) {
             console.log(err);
