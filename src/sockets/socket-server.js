@@ -1,9 +1,10 @@
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
+
 import { promisify } from "util";
+
 import { SocketController } from "./controllers/socketController";
-import { verfiyForSocket } from "../../middleware/auth";
 
 export const SocketServer = async (httpServer) => {
     const io = new Server(httpServer);
@@ -28,23 +29,8 @@ export const SocketServer = async (httpServer) => {
         // Redis 연결이 완료되면 어댑터 설정
         io.adapter(createAdapter(pubClient, subClient));
 
-        io.use(async (socket, next) => {
-            try {
-                console.log("1.", socket.handshake.query.token);
-
-                socket.userEmail = await verfiyForSocket(socket.handshake.query.token);
-
-                if (!socket.userEmail) {
-                    throw { msg: "denied verfication" };
-                }
-                next();
-            } catch (err) {
-                next(err);
-            }
-        }).on('connection', async (socket) => {
+        io.on('connection', async (socket) => {
             const controller = new SocketController(io, socket);
-
-            controller.setRoomId.bind(controller);
 
             socket.broadcast.emit('hello', 'to all clients except sender');
 
@@ -61,5 +47,9 @@ export const SocketServer = async (httpServer) => {
     } catch (error) {
         console.error(`Redis 연결 오류: ${error}`);
     }
-};
+}
+
+
+
+
 
