@@ -1,14 +1,17 @@
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
+import dotenv from "dotenv";
+
 import { promisify } from "util";
+
 import { SocketController } from "./controllers/socketController";
-import { verfiyForSocket } from "../../middleware/auth";
 
 export const SocketServer = async (httpServer) => {
     const io = new Server(httpServer);
 
-    const pubClient = createClient({ legacyMode: false, host: 'localhost', port: 6379 });
+    // url: 'redis://redis:6379' 
+    const pubClient = createClient({ legacyMode: false, host: 'localhost', port: 6379});
     const subClient = pubClient.duplicate();
 
     // Redis 클라이언트에 대한 오류 이벤트 핸들러 추가
@@ -30,20 +33,19 @@ export const SocketServer = async (httpServer) => {
 
         io.use(async (socket, next) => {
             try {
+                console.log("1.", socket.handshake.query.token);
+
                 socket.userEmail = await verfiyForSocket(socket.handshake.query.token);
 
                 if (!socket.userEmail) {
                     throw { msg: "denied verfication" };
                 }
-
                 next();
             } catch (err) {
                 next(err);
             }
         }).on('connection', async (socket) => {
             const controller = new SocketController(io, socket);
-
-            controller.setRoomId.bind(controller);
 
             socket.broadcast.emit('hello', 'to all clients except sender');
 
@@ -60,5 +62,9 @@ export const SocketServer = async (httpServer) => {
     } catch (error) {
         console.error(`Redis 연결 오류: ${error}`);
     }
-};
+}
+
+
+
+
 
