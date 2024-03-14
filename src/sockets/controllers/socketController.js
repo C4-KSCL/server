@@ -21,12 +21,28 @@ export class SocketController {
         this.chatService = new ChatService();
         this.roomService = new RoomService();
     }
+
+    setRoomId(){
+        if(this.socket.size > 1){
+            this.socket.emit("err", { msg : "have more than one connection"});
+            return;
+        }
+        let id = "";
+        for(const roomId of this.socket.rooms){
+            id = roomId;
+        }
+
+        this.socket.roomId = id;
+    }
+
     // 방에 조인 후, 자신이 읽지 않은 모든 메시지의 리드 카운트를 줄여야 한다.
     // 또한 UserSocketToken에서 Socket을 업데이트 해줘야 한다.
     // payload : roomId, userEmail
     async joinRoom(payload) {
         try {
             this.socket.join(payload.roomId);
+
+            payload.userEmail = this.socket.userEmail;
 
             const res = await database.$transaction(async (db) => {
                 this.socketService.setDB(db);
@@ -35,6 +51,8 @@ export class SocketController {
 
                 return await this.socketService.updateChatReadCount(payload);
             })
+
+            this.setRoomId();
 
             // this.io.to(payload.roomId).emit("update read count", { ids: res });
 
@@ -51,7 +69,8 @@ export class SocketController {
     // payload : roomId, userEmail,content
     async newMessage(payload) {
         try {
-            const userEmail = payload.userEmail;
+            const userEmail = this.socket.userEmail;
+            payload.roomId = this.socket.roomId;
 
             let oppSocket;
 
@@ -93,6 +112,9 @@ export class SocketController {
 
     // payload : roomId, userEmail, chatId
     async deleteMsg(payload) {
+        payload.roomId = this.socket.roomId;
+        payload.userEmail = this.socket.userEmail;
+        
         try {
             const msg = await database.$transaction(async (db) => {
                 this.socketService.setDB(db);
@@ -114,6 +136,9 @@ export class SocketController {
     // 스몰 카테고리를 무작위로 선택하는 로직 필요. ( 이거는 utils에서 수행. ) 
     // payload : userEmail, middleName, roomId
     async newEvent(payload) {
+        payload.roomId = this.socket.roomId;
+        payload.userEmail = this.socket.userEmail;
+
         try {
             const middleName = payload.middleName;
 

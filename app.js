@@ -48,7 +48,7 @@ import { verifyAccessToken } from "./middleware/auth";
     user: 'admin',
     password: process.env.DB_PW,
     database: 'matching',
-    timezone:"Asia/Seoul",
+    // timezone:"Asia/Seoul",
     dateStrings: true
   });
 
