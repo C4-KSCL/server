@@ -68,19 +68,14 @@ exports.verifyAccessToken = (req, res, next) => {
 };
 
 export const verfiyForSocket = async (token) =>{
-
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        console.log("2", decoded.email);
 
         const user = await database.user.findUnique({
             where: {
                 email: decoded.email,
             }
         });
-
-        console.log(user);
 
         if (!user) throw { status: 404, msg: "not found : user" };
 

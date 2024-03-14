@@ -119,7 +119,7 @@ class RequestController {
             const resultRequests = await database.$transaction(async(db)=>{
                 this.requestService.setDB(db);
                 
-                const requests = await this.requestService.getRequests({userEmail : userEmail, recUser : true, status : "ing"});
+                const requests = await this.requestService.getRequests({userEmail : userEmail, recUser : userEmail, status : "ing"});
                 
                 return requests;
             });
@@ -139,7 +139,7 @@ class RequestController {
             const resultRequests = await database.$transaction(async(db) => {
                 this.requestService.setDB(db);
                 
-                const requests = await this.requestService.getRequests({userEmail : userEmail, reqUser : true, status : "ing"});
+                const requests = await this.requestService.getRequests({userEmail : userEmail, reqUser : userEmail, status : "ing"});
                 
                 return requests;
             });
