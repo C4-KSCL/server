@@ -3,8 +3,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const accessTokenExpiryTime = '30m'; // Access Token 유효기간
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
-import database from "../src/database";
-
 exports.verifyAccessToken = (req, res, next) => {
     try { 
         //Access 토큰 유효성 검사
@@ -66,32 +64,3 @@ exports.verifyAccessToken = (req, res, next) => {
         });
     }
 };
-
-export const verfiyForSocket = async (token) =>{
-    try {
-        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        console.log("2.", decoded);
-
-        const user = await database.user.findUnique({
-            where: {
-                email: decoded.email,
-            }
-        });
-
-        if (!user) throw { status: 404, msg: "not found : user" };
-
-        return user.email;
-
-    } catch (error) {
-        // 인증 실패
-        // 유효시간이 초과된 경우
-        if (error.name === "TokenExpiredError") {
-            console.log(err);
-        }
-        // 토큰의 비밀키가 일치하지 않는 경우
-        if (error.name === "JsonWebTokenError") {
-            console.log(err);
-        }
-    }
-}

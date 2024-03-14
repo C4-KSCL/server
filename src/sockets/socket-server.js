@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { promisify } from "util";
 
 import { SocketController } from "./controllers/socketController";
+import { verfiyForSocket } from "../middlewares/auth";
 
 export const SocketServer = async (httpServer) => {
     const io = new Server(httpServer);
@@ -36,6 +37,8 @@ export const SocketServer = async (httpServer) => {
                 console.log("1.", socket.handshake.query.token);
 
                 socket.userEmail = await verfiyForSocket(socket.handshake.query.token);
+
+                console.log("3.", socket.userEmail);
 
                 if (!socket.userEmail) {
                     throw { msg: "denied verfication" };
