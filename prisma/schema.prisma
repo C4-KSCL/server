@@ -119,6 +119,7 @@ model Room {
   joinCount       Int
   createdAt       DateTime          @default(now()) @db.DateTime(0)
   publishing      String            @default("ing") @db.VarChar(10)
+  
   AddRequest      AddRequest[]
   Chatting        Chatting[]
   JoinRoom        JoinRoom[]
