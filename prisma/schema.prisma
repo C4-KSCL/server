@@ -13,8 +13,8 @@ model AddRequest {
   reqUser                       String  @db.VarChar(50)
   recUser                       String  @db.VarChar(50)
   status                        String  @default("ing") @db.VarChar(25)
-  user_AddRequest_recUserToUser User    @relation("AddRequest_recUserToUser", fields: [recUser], references: [email], onDelete: Cascade)
-  user_AddRequest_reqUserToUser User    @relation("AddRequest_reqUserToUser", fields: [reqUser], references: [email], onDelete: Cascade)
+  request User    @relation("request", fields: [recUser], references: [email], onDelete: Cascade)
+  receive User    @relation("receive", fields: [reqUser], references: [email], onDelete: Cascade)
   room                          Room?   @relation(fields: [roomId], references: [id])
 
   @@index([recUser], map: "AddRequest_recUser_fkey")
@@ -35,9 +35,9 @@ model Chatting {
   createdAt                     DateTime @default(now()) @db.DateTime(0)
   content                       String   @db.Text
   readCount                     Int
-  User_Chatting_nickNameToUser  User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname])
+  nick  User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname])
   room                          Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  User_Chatting_userEmailToUser User     @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email])
+  user User     @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email])
   event                         Event?
 
   @@index([nickName], map: "Chatting_nickName_fkey")
@@ -75,8 +75,8 @@ model Friend {
   user1                   String   @db.VarChar(50)
   user2                   String   @db.VarChar(50)
   createdAt               DateTime @default(now()) @db.DateTime(0)
-  User_Friend_user1ToUser User     @relation("Friend_user1ToUser", fields: [user1], references: [email], onDelete: Cascade)
-  User_Friend_user2ToUser User     @relation("Friend_user2ToUser", fields: [user2], references: [email], onDelete: Cascade)
+  userOne User     @relation("userOne", fields: [user1], references: [email], onDelete: Cascade)
+  userTwo User     @relation("userTwo", fields: [user2], references: [email], onDelete: Cascade)
 
   @@index([user1], map: "Friend_user1_fkey")
   @@index([user2], map: "Friend_user2_fkey")
@@ -158,12 +158,12 @@ model User {
   requestTime                         DateTime?        @default(dbgenerated("'2000-01-01 00:00:00'")) @db.DateTime(0)
   manager                             Boolean?         @default(false)
   suspend                             Boolean?         @default(false)
-  AddRequest_AddRequest_recUserToUser AddRequest[]     @relation("AddRequest_recUserToUser")
-  AddRequest_AddRequest_reqUserToUser AddRequest[]     @relation("AddRequest_reqUserToUser")
-  Chatting_Chatting_nickNameToUser    Chatting[]       @relation("Chatting_nickNameToUser")
-  Chatting_Chatting_userEmailToUser   Chatting[]       @relation("Chatting_userEmailToUser")
-  Friend_Friend_user1ToUser           Friend[]         @relation("Friend_user1ToUser")
-  Friend_Friend_user2ToUser           Friend[]         @relation("Friend_user2ToUser")
+  request AddRequest[]     @relation("request")
+  receive AddRequest[]     @relation("receive")
+  chattingEmail    Chatting[]       @relation("Chatting_nickNameToUser")
+  chattingNickName   Chatting[]       @relation("Chatting_userEmailToUser")
+  userOne           Friend[]         @relation("userOne")
+  userTwo           Friend[]         @relation("userTwo")
   joinRoom                            JoinRoom[]
   UserImage                           UserImage[]
   userSocketToken                     UserSocketToken?
