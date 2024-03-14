@@ -149,8 +149,8 @@ model User {
   myKeyword                           String?          @db.VarChar(100)
   friendMBTI                          String?          @db.VarChar(100)
   friendKeyword                       String?          @db.VarChar(100)
-  friendMaxAge                        Int?
-  friendMinAge                        Int?
+  friendMaxAge                        String?
+  friendMinAge                        String?
   friendGender                        String?          @db.VarChar(100)
   userCreated                         DateTime?        @default(now()) @db.DateTime(0)
   userImage                           String?          @default("https://matchingimage.s3.ap-northeast-2.amazonaws.com/defalut_user.png") @db.VarChar(1000)
