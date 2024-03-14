@@ -37,7 +37,7 @@ export class RequestService {
                     status: payload.status,
                 },
                 include: {
-                    Room: true
+                    room: true
                 }
             });
         } else if (payload.recUser) {
@@ -47,7 +47,7 @@ export class RequestService {
                     status: payload.status
                 },
                 include: {
-                    Room: true
+                    room: true
                 }
             });
         }
