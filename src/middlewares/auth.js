@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import data from "../database";
+
+import database from "../database";
 
 export const verfiyForSocket = async (token) =>{
     try {

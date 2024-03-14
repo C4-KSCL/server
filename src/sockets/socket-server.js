@@ -52,6 +52,8 @@ export const SocketServer = async (httpServer) => {
 
             socket.broadcast.emit('hello', 'to all clients except sender');
 
+            controller.setRoomId.bind(controller);
+
             socket.on("join room", controller.joinRoom.bind(controller));
 
             socket.on("send message", controller.newMessage.bind(controller));
