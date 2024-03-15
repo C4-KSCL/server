@@ -6,6 +6,9 @@ exports.check = (req, res, next) => {
             console.error('Error while updating:', err);
             return res.status(500).send('서버 에러');
         }
+        if (results.length === 0) {
+            return res.status(500).send('해당 사용자는 없습니다.');
+        }
         if (isAllowed(results[0].requestTime) == true) {//10분이상 차이남
             return next();
         }
