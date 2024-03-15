@@ -8,7 +8,6 @@ const wait = promisify(setTimeout);
 
 export const SocketServer = async (httpServer) => {
     const io = new Server(httpServer);
-/*
     const pubClient = createClient({ legacyMode: false, url: 'redis://redis:6379' });
     const subClient = pubClient.duplicate();
 
@@ -47,6 +46,5 @@ export const SocketServer = async (httpServer) => {
     } catch (error) {
         console.error(`Redis 연결 오류: ${error}`);
     }
-    */
 };
 
