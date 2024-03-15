@@ -13,8 +13,8 @@
 본인_키워드|myKeyword|STRING|||
 친구_키워드|friendKeyword|STRING|||
 친구_mbti|friendMbti|STRING|||
-친구최소나이|friendMaxAge|INT|||
-친구최대나이|friendMinAge|INT|||
+친구최소나이|friendMaxAge|STRING|||
+친구최대나이|friendMinAge|STRING|||
 친구성별|friendGender|bool|||
 회원_생성일|userCreated|TIMESTAMP||dafault CURRENT_TIMESTAMP|
 요청시간|requestTime|TIMESTAMP||dafault '2000-01-01 00:00:00'|
