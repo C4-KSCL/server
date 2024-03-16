@@ -10,6 +10,7 @@ export class RequestService {
         this.getRequest.bind(this);
         this.getRequests.bind(this);
         this.deleteRequest.bind(this);
+        this.checkUser.bind(this);
         this.setDB.bind(this);
     }
     // roomId String @id @db.VarChar(100)
@@ -25,6 +26,16 @@ export class RequestService {
             },
         });
         return request;
+    }
+
+    async checkUser(userEmail){
+        const user = await this.db.user.findUnique({
+            where : {
+                email : userEmail,
+            }
+        });
+
+        if(!user) throw {status : 404, msg : "not found : user"};
     }
 
     async getRequests(payload) {
