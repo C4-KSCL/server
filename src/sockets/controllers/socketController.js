@@ -109,7 +109,7 @@ export class SocketController {
     }
 
 
-    // payload : roomId, userEmail, chatId
+    // payload : chatId
     async deleteMsg(payload) {
         try {
             payload.userEmail = this.socket.userEmail;
