@@ -94,6 +94,7 @@
 - 반환 값 : -   
 - 응답상태 코드  
   - 200 : 비밀번호 변경 성공   
+  - 404 : 올바르지 않은 값을 보낸 경우(해당 이메일이 없는 경우)
   - 500 : 비밀번호 변경 실패(서버 에러)   
 
 -----
@@ -151,9 +152,11 @@
 ### 회원정보(개인 정보) 수정
 > 1. 개인정보 수정 -> 닉네임 수정시 닉네임 확인하는 API 거쳐야함
 - URL : edit/info (POST)
-- 요청 값 : 헤더 - accesstoken, 바디 - password, nickname, phoneNumber, birthdate, gender, myMBTI, myKeyword, friendKeyword
+- 요청 값 : 헤더 - accesstoken, 바디 - password, nickname, phoneNumber, birthdate, gender, myMBTI, myKeyword, friendKeyword - 특정 값은 변경하지 않더라도 기존 값을 보내줘야함
 - 반환 값 : User 객체
   - 200 : 업데이트 성공
+  - 400 : 값을 보내지 않은 경우
+  - 404 : 올바르지 않은 값을 보낸 경우
   - 500~501 : 업데이트 실패(서버 에러)
 
 ### 회원 삭제
@@ -181,7 +184,9 @@
 - 요청 값 : 헤더 - accesstoken
 - 반환 값 : -
   - 200 : 회원 삭제 성공
+  - 404 : 올바르지 않은 값을 보낸 경우
   - 500 : 서버 에러
+
 
 3월 해야할 리스트
 - 친구매칭시 나이 조건 추가
