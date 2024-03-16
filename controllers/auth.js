@@ -5,6 +5,7 @@ const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 const accessTokenExpiryTime = '30m'; // Access Token 유효기간
 const refreshTokenExpiryTime = '50m'; // Refresh Token 유효기간
 const nodemailer = require('nodemailer');
+
 // 로그인 처리 컨트롤러 함수
 exports.login = (req, res) => {
     const { email, password } = req.body;
@@ -50,6 +51,7 @@ exports.login = (req, res) => {
     });
 };
 
+// 비밀번호 찾기 처리 컨트롤러 함수
 exports.findpw = (req, res) => {
     const { email } = req.body;
     const query = `SELECT * FROM User WHERE email = ?`;
@@ -94,6 +96,8 @@ exports.findpw = (req, res) => {
         }
     });
 }
+
+//비밀번호 변경 처리 컨트롤러 함수
 exports.setpw = (req, res) => {
     const { email, password } = req.body;
     const query = `UPDATE User SET password = ? WHERE email = ?`; //비밀번호를 수정하는 쿼리문
@@ -101,6 +105,10 @@ exports.setpw = (req, res) => {
         if (err) {
             console.error('Error while querying:', err);
             return res.status(500).send('서버 에러');
+        }
+        if (results.affectedRows === 0) {
+            // 쿼리가 실행되었지만 영향을 받은 행이 없는 경우
+            return res.status(404).send('해당 이메일을 가진 사용자를 찾을 수 없습니다.');
         }
         res.status(200).send('비밀번호 변경이 완료되었습니다.');
     });

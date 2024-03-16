@@ -57,6 +57,9 @@ exports.setting = (req, res) => {
             console.error('Error while updating:', err);
             return res.status(500).send('서버 에러');
         }
+        if (results.affectedRows === 0) {
+            return res.status(404).send('사용자를 찾을 수 없습니다.');
+        }
         return res.status(200).send('설정 완료');
     });
 }
