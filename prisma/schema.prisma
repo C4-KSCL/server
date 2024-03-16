@@ -160,13 +160,13 @@ model User {
   suspend                             Boolean?         @default(false)
   request AddRequest[]     @relation("request")
   receive AddRequest[]     @relation("receive")
-  chattingEmail     Chatting[]       @relation("Chatting_nickNameToUser")
-  chattingNickName  Chatting[]       @relation("Chatting_userEmailToUser")
+  chattingEmail    Chatting[]       @relation("Chatting_nickNameToUser")
+  chattingNickName   Chatting[]       @relation("Chatting_userEmailToUser")
   userOne           Friend[]         @relation("userOne")
   userTwo           Friend[]         @relation("userTwo")
-  joinRoom          JoinRoom[]
-  UserImage         UserImage[]
-  userSocketToken   UserSocketToken?
+  joinRoom                            JoinRoom[]
+  UserImage                           UserImage[]
+  userSocketToken                     UserSocketToken?
 }
 
 model UserImage {
