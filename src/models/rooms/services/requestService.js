@@ -37,8 +37,26 @@ export class RequestService {
                     status: payload.status,
                 },
                 include: {
-                    room: true
-                }
+                    room: {
+                        include : {
+                            chatting : {
+                                select : {
+                                    content : true,
+                                }
+                            },
+                        }
+                    },
+                    receive : {
+                        select : {
+                            myMBTI : true,
+                            myKeyword : true,
+                            nickname : true,
+                            userImage : true,
+                            age : true,
+                        }
+                    }
+                },
+                
             });
         } else if (payload.recUser) {
             requests = await this.db.addRequest.findMany({
@@ -47,8 +65,25 @@ export class RequestService {
                     status: payload.status
                 },
                 include: {
-                    room: true
-                }
+                    room: {
+                        include : {
+                            chatting : {
+                                select : {
+                                    content : true,
+                                }
+                            },
+                        }
+                    },
+                    request : {
+                        select : {
+                            myMBTI : true,
+                            myKeyword : true,
+                            nickname : true,
+                            userImage : true,
+                            age : true,
+                        }
+                    }
+                },
             });
         }
         return requests;

@@ -47,10 +47,10 @@ exports.imageupload = (req, res) => {
                     if (error) {
                         console.error('Error while finding member ID by email:', error);
                         reject('회원 번호 조회 중 오류가 발생했습니다.');
-                    }
-
+                    } 
                     if (results.length === 0) {
                         reject('해당 이메일로 등록된 회원이 없습니다.');
+                        return;
                     }
                     const number = results[0].userNumber;
 
