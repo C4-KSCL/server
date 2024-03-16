@@ -11,6 +11,8 @@ export class RequestService {
         this.getRequests.bind(this);
         this.deleteRequest.bind(this);
         this.checkUser.bind(this);
+        this.checkReceivedRequest.bind(this);
+        this.checkSendedRequest.bind(this);
         this.setDB.bind(this);
     }
     // roomId String @id @db.VarChar(100)
@@ -26,6 +28,35 @@ export class RequestService {
             },
         });
         return request;
+    }
+
+    
+    // userEmail, requestId
+    async checkReceivedRequest(payload){
+
+        const request = await this.db.addRequest.findUnique({
+            where : {
+                id : payload.requestId,
+                recUser : payload.userEmail,
+            }
+        });
+
+        if(!request) throw { status : 400, msg : "don't have credential" };
+
+    }
+
+    // userEmail, requestId
+    async checkSendedRequest(payload){
+
+        const request = await this.db.addRequest.findUnique({
+            where : {
+                id : payload.requestId,
+                reqUser : payload.userEmail,
+            }
+        });
+
+        if(!request) throw { status : 400, msg : "don't have credential" };
+
     }
 
     async checkUser(userEmail){

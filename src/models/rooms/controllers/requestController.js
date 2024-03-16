@@ -79,6 +79,8 @@ class RequestController {
                 this.chatService.setDB(db);
                 this.socketService.setDB(db);
 
+                await this.requestService.checkUser(oppEmail);
+
                 // 요청 존재 확인
                 await this.requestService.checkRequest({reqUser : userEmail, recUser : oppEmail});
 
@@ -167,6 +169,8 @@ class RequestController {
                 // requestId로 request 획득 -> request.roomId로 방 아이디 획득 가능.
                 const request = await this.requestService.getRequest(requestId);
 
+                await this.requestService.checkReceivedRequest({userEmail : userEmail, requestId : request.id});
+
                 // 친구 생성 
                 const friend = await this.friendService.createFriend({userEmail : request.reqUser, oppEmail : request.recUser});
                 if(!friend) throw { status : 500, msg: "fail to create friend" };
@@ -201,6 +205,7 @@ class RequestController {
     // 방 삭제, 요청 삭제
     async rejectRequest(req,res,next){
         try{
+            const userEmail = req.user;
             const { requestId } = req.body;
 
             await database.$transaction(async(db)=>{
@@ -208,6 +213,8 @@ class RequestController {
                 this.roomService.setDB(db);
 
                 const request = await this.requestService.getRequest(requestId);
+
+                await this.requestService.checkReceivedRequest({userEmail : userEmail, requestId : request.id});
 
                 if(request.status === "rejected" || request.status === "accepted") throw { status : 400, msg : "already succeeded : request"};
     
@@ -225,6 +232,7 @@ class RequestController {
 
     async deleteRequest(req,res,next){
         try{
+            const userEmail = req.user;
             const { requestId } = req.params;
 
             const id = Number(requestId);
@@ -235,6 +243,8 @@ class RequestController {
 
                 const request = await this.requestService.getRequest(id);
     
+                await this.requestService.checkSendedRequest({userEmail : userEmail, requestId : id});
+
                 await this.roomService.deleteRoom(request);
 
                 await this.requestService.deleteRequest(id);
