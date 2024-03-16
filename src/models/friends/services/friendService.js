@@ -25,8 +25,62 @@ export class FriendService {
                             user2 : userEmail,
                         }
                     ]
-                }
+                },
             });
+
+            for(const friend of friends){
+                if(friend.user1 === userEmail){
+                    friend.friend = await this.db.user.findUnique({
+                        where : {
+                            email : friend.user2
+                        },
+                        select : {
+                            myMBTI : true,
+                            myKeyword : true,
+                            nickname : true,
+                            userImage : true,
+                            age : true,
+                        }
+                    });
+                } else if (friend.user2 === userEmail){
+                    friend.friend = await this.db.user.findUnique({
+                        where : {
+                            email : friend.user1
+                        },
+                        select : {
+                            myMBTI : true,
+                            myKeyword : true,
+                            nickname : true,
+                            userImage : true,
+                            age : true,
+                        }
+                    });
+                }
+                const request = await this.db.addRequest.findFirst({
+                    where : {
+                        status : "accepted",
+                        OR : [
+                            {
+                                reqUser : friend.user1,
+                                recUser : friend.user2
+                            },
+                            {
+                                reqUser : friend.user2,
+                                recUser : friend.user1
+                            }
+                        ]
+                    }
+                });
+
+                const room = await this.db.room.findUnique({
+                    where : {
+                        id : request.roomId
+                    }
+                }); 
+
+                friend.room = room;
+            }
+
             return friends;
         }catch(err){
             throw err;
