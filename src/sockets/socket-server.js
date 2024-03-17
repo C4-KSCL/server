@@ -34,8 +34,8 @@ export const SocketServer = async (httpServer) => {
 
         io.use(async (socket, next) => {
             try {
-                // const token = socket.handshake.auth.token;
-                const token = socket.handshake.query.token;
+                const token = socket.handshake.auth.token;
+                // const token = socket.handshake.query.token;
 
                 socket.userEmail = await verfiyForSocket(token);
 
