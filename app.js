@@ -119,8 +119,8 @@ loadBalancer.listen(80, err => {
 const httpServer1 = http.createServer(app);
 const httpServer2 = http.createServer(app);
 httpServer1.listen(8000, () => {
-  console.log('start server');
+  console.log('8000 start server');
 });
 httpServer2.listen(8001, () => {
-  console.log('start server');
+  console.log('8001 start server');
 });
