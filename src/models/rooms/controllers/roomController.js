@@ -38,6 +38,12 @@ class RoomController {
             param('roomId'),
             validatorErrorChecker
         ], this.leaveRoom.bind(this));
+        
+        this.router.patch("/update-room-name/:roomId",[
+            param("roomId"),
+            body("name"),
+            validatorErrorChecker
+        ], this.updateRoomName.bind(this));
     }
 
     //  방을 만들고, 상대와 나를 참여시킨다.
@@ -103,7 +109,7 @@ class RoomController {
         try{
             const userEmail = req.user;
 
-            const { roomId } = req.query;
+            const { roomId } = req.param;
 
             await database.$transaction(async (db)=>{
                 this.service.setDB(db);
@@ -123,6 +129,26 @@ class RoomController {
 
             res.status(200).json({msg : "success"});
         }catch(err){    
+            next(err);
+        }
+    }
+
+    async updateRoomName(req,res,next){
+        try{
+            const { roomId } = req.params;
+
+            const { name } = req.body;
+
+            const room = await database.$transaction(async(db)=>{
+                this.service.setDB(db);
+
+                const room = await this.service.updateRoom({roomId : roomId, name : name});
+
+                return room;
+            });
+
+            res.status(200).json({room : room});
+        }catch(err){
             next(err);
         }
     }

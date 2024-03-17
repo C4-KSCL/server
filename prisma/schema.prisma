@@ -13,8 +13,8 @@ model AddRequest {
   reqUser                       String  @db.VarChar(50)
   recUser                       String  @db.VarChar(50)
   status                        String  @default("ing") @db.VarChar(25)
-  request User    @relation("request", fields: [recUser], references: [email], onDelete: Cascade)
-  receive User    @relation("receive", fields: [reqUser], references: [email], onDelete: Cascade)
+  request User    @relation("request", fields: [reqUser], references: [email], onDelete: Cascade)
+  receive User    @relation("receive", fields: [recUser], references: [email], onDelete: Cascade)
   room                          Room?   @relation(fields: [roomId], references: [id])
 
   @@index([recUser], map: "AddRequest_recUser_fkey")
@@ -160,13 +160,13 @@ model User {
   suspend                             Boolean?         @default(false)
   request AddRequest[]     @relation("request")
   receive AddRequest[]     @relation("receive")
-  chattingEmail     Chatting[]       @relation("Chatting_nickNameToUser")
-  chattingNickName  Chatting[]       @relation("Chatting_userEmailToUser")
+  chattingEmail    Chatting[]       @relation("Chatting_nickNameToUser")
+  chattingNickName   Chatting[]       @relation("Chatting_userEmailToUser")
   userOne           Friend[]         @relation("userOne")
   userTwo           Friend[]         @relation("userTwo")
-  joinRoom          JoinRoom[]
-  UserImage         UserImage[]
-  userSocketToken   UserSocketToken?
+  joinRoom                            JoinRoom[]
+  UserImage                           UserImage[]
+  userSocketToken                     UserSocketToken?
 }
 
 model UserImage {

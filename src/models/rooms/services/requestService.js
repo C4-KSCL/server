@@ -10,6 +10,9 @@ export class RequestService {
         this.getRequest.bind(this);
         this.getRequests.bind(this);
         this.deleteRequest.bind(this);
+        this.checkUser.bind(this);
+        this.checkReceivedRequest.bind(this);
+        this.checkSendedRequest.bind(this);
         this.setDB.bind(this);
     }
     // roomId String @id @db.VarChar(100)
@@ -27,6 +30,45 @@ export class RequestService {
         return request;
     }
 
+    
+    // userEmail, requestId
+    async checkReceivedRequest(payload){
+
+        const request = await this.db.addRequest.findUnique({
+            where : {
+                id : payload.requestId,
+                recUser : payload.userEmail,
+            }
+        });
+
+        if(!request) throw { status : 400, msg : "don't have credential" };
+
+    }
+
+    // userEmail, requestId
+    async checkSendedRequest(payload){
+
+        const request = await this.db.addRequest.findUnique({
+            where : {
+                id : payload.requestId,
+                reqUser : payload.userEmail,
+            }
+        });
+
+        if(!request) throw { status : 400, msg : "don't have credential" };
+
+    }
+
+    async checkUser(userEmail){
+        const user = await this.db.user.findUnique({
+            where : {
+                email : userEmail,
+            }
+        });
+
+        if(!user) throw {status : 404, msg : "not found : user"};
+    }
+
     async getRequests(payload) {
         let requests;
 
@@ -37,8 +79,26 @@ export class RequestService {
                     status: payload.status,
                 },
                 include: {
-                    room: true
-                }
+                    room: {
+                        include : {
+                            chatting : {
+                                select : {
+                                    content : true,
+                                }
+                            },
+                        }
+                    },
+                    receive : {
+                        select : {
+                            myMBTI : true,
+                            myKeyword : true,
+                            nickname : true,
+                            userImage : true,
+                            age : true,
+                        }
+                    }
+                },
+                
             });
         } else if (payload.recUser) {
             requests = await this.db.addRequest.findMany({
@@ -47,8 +107,25 @@ export class RequestService {
                     status: payload.status
                 },
                 include: {
-                    room: true
-                }
+                    room: {
+                        include : {
+                            chatting : {
+                                select : {
+                                    content : true,
+                                }
+                            },
+                        }
+                    },
+                    request : {
+                        select : {
+                            myMBTI : true,
+                            myKeyword : true,
+                            nickname : true,
+                            userImage : true,
+                            age : true,
+                        }
+                    }
+                },
             });
         }
         return requests;

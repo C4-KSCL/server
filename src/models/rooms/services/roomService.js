@@ -93,7 +93,6 @@ export class RoomService {
                                 select: {
                                     email: true,
                                     nickname: true,
-                                    image: true,
                                 }
                             }
 

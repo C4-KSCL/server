@@ -88,11 +88,11 @@ export class ChatService {
                 event: {
                     include: {
                         smallCategory: true,
-                        image: true,
+                        imageInEvent: true,
                     }
                 },
                 user: {
-                    select: { image: true }
+                    select: { UserImage: true }
                 }
             },
             skip: payload.skip,
@@ -111,6 +111,17 @@ export class ChatService {
                 userEmail: userEmail,
             }
         });
+
+        const requests = await this.db.addRequest.findMany({
+            where : {
+                recUser : userEmail,
+                status : "ing"
+            }
+        });
+
+        for (const request of requests){
+            joins.push(request);
+        }
 
         if (joins.length === 0) throw { status: 404, msg: "not found : join" };
 
