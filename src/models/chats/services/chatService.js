@@ -85,7 +85,6 @@ export class ChatService {
                 createdAt: true,
                 content: true,
                 readCount: true,
-                userImage: true,
                 event: {
                     include: {
                         smallCategory: true,
