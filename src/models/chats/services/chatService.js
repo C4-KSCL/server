@@ -112,6 +112,17 @@ export class ChatService {
             }
         });
 
+        const requests = await this.db.addRequest.findMany({
+            where : {
+                recUser : userEmail,
+                status : "ing"
+            }
+        });
+
+        for (const request of requests){
+            joins.push(request);
+        }
+
         if (joins.length === 0) throw { status: 404, msg: "not found : join" };
 
         for (const join of joins) {
