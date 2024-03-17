@@ -85,6 +85,7 @@ export class ChatService {
                 createdAt: true,
                 content: true,
                 readCount: true,
+                userImage: true,
                 event: {
                     include: {
                         smallCategory: true,
@@ -113,13 +114,13 @@ export class ChatService {
         });
 
         const requests = await this.db.addRequest.findMany({
-            where : {
-                recUser : userEmail,
-                status : "ing"
+            where: {
+                recUser: userEmail,
+                status: "ing"
             }
         });
 
-        for (const request of requests){
+        for (const request of requests) {
             joins.push(request);
         }
 
@@ -137,11 +138,12 @@ export class ChatService {
                     room: {
                         include: {
                             joinRoom: {
-                                select : {
-                                    user : {
-                                        select : {
-                                            email : true,
-                                            nickname : true,
+                                select: {
+                                    user: {
+                                        select: {
+                                            email: true,
+                                            nickname: true,
+                                            userImage: true,
                                         }
                                     }
                                 },
@@ -150,6 +152,22 @@ export class ChatService {
                                         userEmail: join.userEmail,
                                     }
                                 },
+                            },
+                            addRequest: {
+                                select: {
+                                    reqUser : true,
+                                    receive: {
+                                        select: {
+                                            email: true,
+                                            nickname: true,
+                                            userImage: true,
+                                        }
+                                    }
+                                },
+                                where: {
+                                    status: "ing",
+                                    reqUser: userEmail,
+                                }
                             }
                         }
                     }
@@ -157,11 +175,11 @@ export class ChatService {
             });
 
             const count = await this.db.chatting.count({
-                where : {
-                    roomId : join.roomId,
-                    readCount : 1,
-                    NOT : {
-                        userEmail : userEmail,
+                where: {
+                    roomId: join.roomId,
+                    readCount: 1,
+                    NOT: {
+                        userEmail: userEmail,
                     }
                 }
             });
