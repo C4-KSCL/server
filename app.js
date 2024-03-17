@@ -1,105 +1,126 @@
 const dotenv = require('dotenv');
 dotenv.config(); // process.env
-// 위의 두줄은 최상단에 위치해야함
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
-const helmet = require('helmet');// 보안 취약점 보호
-const hpp = require('hpp');// 보안 취약점 보호
+const helmet = require('helmet');
+const hpp = require('hpp');
 const authRouter = require('./routes/auth');
 const signupRouter = require('./routes/signup');
 const findfriendRouter = require('./routes/findfriend');
 const editRouter = require('./routes/edit');
 const deleteRouter = require('./routes/delete');
+const http = require('http');
+const axios = require('axios');
 
-import http from "http";
-import database from "./src/database";
-import Controllers from "./src/controllers.friends-chats";
-import { SocketServer } from "./src/sockets/socket-server";
-import { verifyAccessToken } from "./middleware/auth";
+const app = express();
 
-(async () => {
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('combined'));
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(hpp());
+} else {
+  app.use(morgan('dev'));
+}
 
-  const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
-  const httpServer = http.createServer(app);
+const mysql = require('mysql');
 
-  if (process.env.NODE_ENV === 'production') {
-    app.use(morgan('combined')); //로깅하는 것을 배포모드
-    app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
-    app.use(hpp()); //보안 취약점 보호
-  } else {
-    app.use(morgan('dev')); //로깅하는 것을 개발모드
+const connection = mysql.createConnection({
+  host: process.env.DB_IP,
+  user: 'admin',
+  password: process.env.DB_PW,
+  database: 'matching',
+  dateStrings: true
+});
+
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to database:', err);
+    return;
   }
+  console.log('Connected to database');
+});
 
+app.use((req, res, next) => {
+  req.mysqlConnection = connection;
+  next();
+});
 
-  app.use(express.static(path.join(__dirname, 'public'))); // public 폴더를 static으로
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser(process.env.COOKIE_SECRET));
+app.get("/", (req, res) => {
+  const clientPort = req.get('host').split(':')[1]; // 클라이언트의 포트 번호
+  res.send(`Hello World! 현재 포트 : ${clientPort}`);
+});
 
-  const mysql = require('mysql');
+app.use('/auth', authRouter);
+app.use('/signup', signupRouter);
+app.use('/findfriend', findfriendRouter);
+app.use('/edit', editRouter);
+app.use('/delete', deleteRouter);
 
-  const connection = mysql.createConnection({
-    host: process.env.DB_IP,
-    user: 'admin',
-    password: process.env.DB_PW,
-    database: 'matching',
-    // timezone:"Asia/Seoul",
-    dateStrings: true
+app.use((req, res, next) => {
+  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
+  error.status = 404;
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.locals.message = err.message;
+  res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
+  res.status(err.status || 500).json({ msg: err.msg || "error" });
+  next();
+});
+
+const serverList = [
+  'http://127.0.0.1:8000',
+  'http://127.0.0.1:8001'
+];
+let idx = 0;
+
+const loadBalancer = express();
+
+loadBalancer.get('/favicon.ico', (req, res) => {
+  res.status(204);
+});
+
+loadBalancer.all("*", (req, res) => {
+  const { method, protocol, originalUrl } = req;
+  const target = serverList[idx++];
+  if (idx >= serverList.length) idx = 0;
+  const requestUrl = `${target}${originalUrl}`;
+  axios.request(requestUrl, {
+    method
+  })
+  .then(result => {
+    res.set({ ...result.headers });
+    res.send(result.data);
+  })
+  .catch(error => {
+    res.set({ ...error.headers });
+    res.send(error);
   });
+});
 
-  connection.connect((err) => {
-    if (err) {
-      console.error('Error connecting to database:', err);
-      return;
-    }
-    console.log('Connected to database');
-  });
+loadBalancer.listen(80, err => {
+  err ?
+    console.log('로드 밸런서 80번 포트에서 시작 실패') :
+    console.log('로드 밸런서 80번 포트에서 시작');
+});
 
-  await database.$connect();
-
-  SocketServer(httpServer);
-
-  app.use((req, res, next) => {
-    req.mysqlConnection = connection;
-    next();
-  });
-
-  app.get("/", (req, res) => res.send("Hello World!")); //동작 확인용
-  app.use('/auth', authRouter); //로그인
-  app.use('/signup', signupRouter); //회원가입
-  app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)
-  app.use('/edit', editRouter); //정보 수정
-  app.use('/delete', deleteRouter); //정보 수정
-  
-
-  Controllers.forEach((controller) => {
-    if(controller.path === "/users") {
-      app.use(controller.path, controller.router);
-    }else {
-      app.use(controller.path, verifyAccessToken,controller.router);
-    }
-  });
-
-  app.use((req, res, next) => { // 404 미들웨어
-    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
-    error.status = 404;
-    next(error);
-  });
-
-  app.use((err, req, res, next) => { // 에러처리 미들웨어
-    console.log(err); // 추후 삭제
-    res.locals.message = err.message;
-    res.locals.error = process.env.NODE_ENV !== 'production' ? err : {}; // 배포모드일때, 아닐때 구분
-    res.status(err.status || 500).json({msg : err.msg || "error"});
-    next();
-  });
-
-  httpServer.listen(8000, () => {
-    console.log('start server');
-  });
-})();
+const httpServer1 = http.createServer(app);
+const httpServer2 = http.createServer(app);
+httpServer1.listen(8000, () => {
+  console.log('start server');
+});
+httpServer2.listen(8001, () => {
+  console.log('start server');
+});
