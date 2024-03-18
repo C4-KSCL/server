@@ -124,6 +124,9 @@ class RoomController {
                 // 방 퇴장
                 await this.service.deleteJoin({userEmail, roomId});
 
+                // 만약 요청있으면 삭제
+                await this.service.deleteRequestWithLeaveRoom({userEmail, roomId});
+
                 if(joinCount === 1) await this.service.deleteRoom({userEmail , roomId});
             });
 

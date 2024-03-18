@@ -151,7 +151,7 @@ export class RequestService {
 
         if (isExist) {
 
-            if (isExist.status === "rejected") return;
+            if (isExist.status === "rejected" || isExist.status === "accepted" || isExist.status === "deleted") return;
 
             throw { status: 400, msg: "already exist : request" };
         }
