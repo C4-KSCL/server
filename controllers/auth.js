@@ -11,6 +11,7 @@ exports.login = (req, res) => {
     const clientPort = req.get('host').split(':')[1]; // 클라이언트의 포트 번호
     console.log(`Hello World! 현재 포트 : ${clientPort}`);
     const { email, password } = req.body;
+    console.log(email, password);
     const findInfoQuery = `SELECT * FROM User WHERE email = ? AND password = ?`;
     req.mysqlConnection.query(findInfoQuery, [email, password], (err, userResults) => {
         if (err) {

@@ -9,6 +9,7 @@ import { SocketController } from "./controllers/socketController";
 import { verfiyForSocket } from "../middlewares/auth";
 
 export const SocketServer = async (httpServer) => {
+    /*
     const io = new Server(httpServer);
     //
     // const pubClient = createClient({ legacyMode: false, host: 'localhost', port: 6379});
@@ -23,6 +24,7 @@ export const SocketServer = async (httpServer) => {
     subClient.on("error", (err) => {
         console.error(`subClient 오류: ${err}`);
     });
+    */
 
     try {
         // Redis 클라이언트 연결
