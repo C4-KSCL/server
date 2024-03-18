@@ -26,6 +26,7 @@ import { verifyAccessToken } from "./middleware/auth";
   const app = express();
 
   const httpServer = http.createServer(app);
+  const httpServer2 = http.createServer(app);
 
   if (process.env.NODE_ENV === 'production') {
     app.use(morgan('combined')); //로깅하는 것을 배포모드
@@ -100,6 +101,9 @@ import { verifyAccessToken } from "./middleware/auth";
   });
 
   httpServer.listen(8000, () => {
-    console.log('start server');
+    console.log('start server 8000');
+  });
+  httpServer2.listen(8001, () => {
+    console.log('start server 8001');
   });
 })();
