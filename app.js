@@ -70,7 +70,11 @@ import { verifyAccessToken } from "./middleware/auth";
     next();
   });
 
-  app.get("/", (req, res) => res.send("Hello World!")); //동작 확인용
+  app.get("/", (req, res) => {
+    const clientPort = req.get('host').split(':')[1]; // 클라이언트의 포트 번호
+    console.log(`Hello World! 현재 포트 : ${clientPort}`);
+    res.send(`Hello World! 현재 포트 : ${clientPort}`);
+  }); //동작 확인용
   app.use('/auth', authRouter); //로그인
   app.use('/signup', signupRouter); //회원가입
   app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)
