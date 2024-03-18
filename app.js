@@ -71,7 +71,8 @@ import { verifyAccessToken } from "./middleware/auth";
   });
 
   app.get("/", (req, res) => {
-    const clientPort = req.get('host').split(':')[1]; // 클라이언트의 포트 번호
+    const hostHeader = req.headers.host;
+    const clientPort = hostHeader ? hostHeader.split(':')[1] : null; // 호스트 헤더가 있는 경우에만 분할
     console.log(`Hello World! 현재 포트 : ${clientPort}`);
     res.send(`Hello World! 현재 포트 : ${clientPort}`);
   }); //동작 확인용
