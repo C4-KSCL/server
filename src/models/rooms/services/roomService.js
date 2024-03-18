@@ -14,6 +14,7 @@ export class RoomService {
         this.deleteJoin.bind(this);
         this.deleteRoom.bind(this);
         this.updateRoom.bind(this);
+        this.deleteRequestWithLeaveRoom.bind(this);
         this.setDB.bind(this);
     }
 
@@ -204,7 +205,26 @@ export class RoomService {
 
         return room;
 
+    }
 
+    async deleteRequestWithLeaveRoom(payload){
+        const isExist = await this.db.addRequest.findFirst({
+            where : {
+                reqUser : payload.userEmail,
+                roomId : payload.roomId
+            }
+        });
+
+        if(isExist){
+            await this.db.addRequest.update({
+                where : {
+                    id : isExist.id,
+                },
+                data : {
+                    status : "deleted",
+                }
+            });
+        }
     }
 
 }

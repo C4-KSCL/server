@@ -109,7 +109,7 @@ class RoomController {
         try{
             const userEmail = req.user;
 
-            const { roomId } = req.param;
+            const { roomId } = req.params;
 
             await database.$transaction(async (db)=>{
                 this.service.setDB(db);
@@ -123,6 +123,9 @@ class RoomController {
 
                 // 방 퇴장
                 await this.service.deleteJoin({userEmail, roomId});
+
+                // 만약 요청있으면 삭제
+                await this.service.deleteRequestWithLeaveRoom({userEmail, roomId});
 
                 if(joinCount === 1) await this.service.deleteRoom({userEmail , roomId});
             });
