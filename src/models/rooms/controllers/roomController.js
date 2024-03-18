@@ -109,7 +109,7 @@ class RoomController {
         try{
             const userEmail = req.user;
 
-            const { roomId } = req.param;
+            const { roomId } = req.params;
 
             await database.$transaction(async (db)=>{
                 this.service.setDB(db);
