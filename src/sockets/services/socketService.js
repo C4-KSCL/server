@@ -1,20 +1,9 @@
 import database from "../../database";
 
 export class SocketService {
-    db;
-
-    setDB(db) {
-        this.db = db;
-        this.updateChatReadCount.bind(this);
-        this.updateNoContent.bind(this);
-        this.createEvent.bind(this);
-        this.setDB.bind(this);
-    }
-
     // payload : roomId, userEmail, limit
     async updateChatReadCount(payload) {
-
-        const updatedChats = await this.db.chatting.updateMany({
+        const updatedChats = await database.chatting.updateMany({
             where: {
                 roomId: payload.roomId,
                 userEmail: { not: payload.userEmail },
@@ -25,24 +14,11 @@ export class SocketService {
             },
         });
 
-        const chats = await this.db.chatting.findMany({
-            select: {
-                id: true,
-                readCount: true,
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-            take: updatedChats.count,
-        })
-
-        return chats;
-
     }
 
     async updateNoContent(payload) {
 
-        const isExist = await this.db.chatting.findUnique({
+        const isExist = await database.chatting.findUnique({
             where: {
                 id: payload.chatId,
             }
@@ -50,7 +26,7 @@ export class SocketService {
 
         if (!isExist) return undefined;
 
-        const msg = await this.db.chatting.update({
+        const msg = await database.chatting.update({
             where: {
                 id: isExist.id,
             },
@@ -60,9 +36,33 @@ export class SocketService {
         });
 
         return msg;
-
     }
 
+    async createChat(payload) {
+
+        const chat = await database.chatting.create({
+            data: {
+                roomId: payload.roomId,
+                content: payload.content,
+                userEmail: payload.userEmail,
+                readCount: payload.readCount,
+            }
+        });
+
+        return chat;
+    }
+
+    async getJoinCount(payload) {
+        const isExist = await database.room.findUnique({
+            where: {
+                id: payload.roomId,
+            }
+        });
+
+        if (!isExist) throw { status: 404, msg: "not found : room" };
+
+        return isExist.joinCount;
+    }
 
     // id Int @id @default(autoincrement())
     // chattingId Int @db.Int 
@@ -73,49 +73,53 @@ export class SocketService {
     // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
     async createEvent(payload) {
 
-        const user = await this.db.user.findUnique({
-            where: {
-                email: payload.userEmail
-            }
-        });
-
-        const msg = await this.db.chatting.create({
-            data: {
-                content: "content-is-random-event",
-                userEmail: payload.userEmail,
-                roomId: payload.roomId,
-                readCount: payload.readCount,
-                userName: payload.userName,
-            }
-        });
-
-
-        const event = await this.db.event.create({
-            data: {
-                chattingId: msg.id,
-                category: payload.categoryId,
-            }
-        });
-
-        const images = await this.db.eventImage.findMany({
-            where: {
-                smallCategoryId: payload.categoryId,
-            }
-        });
-
-        images.forEach(async (image) => {
-            const imageEvent = await this.db.imageInEvent.create({
-                data: {
-                    file: image.filename,
-                    eventId: event.id,
+        const message = await database.$transaction(async (db) => {
+            const user = await db.user.findUnique({
+                where: {
+                    email: payload.userEmail
                 }
             });
+
+            const msg = await db.chatting.create({
+                data: {
+                    content: "content-is-random-event",
+                    userEmail: payload.userEmail,
+                    roomId: payload.roomId,
+                    readCount: payload.readCount,
+                    userName: payload.userName,
+                }
+            });
+
+
+            const event = await db.event.create({
+                data: {
+                    chattingId: msg.id,
+                    category: payload.categoryId,
+                }
+            });
+
+            const images = await db.eventImage.findMany({
+                where: {
+                    smallCategoryId: payload.categoryId,
+                }
+            });
+
+            images.forEach(async (image) => {
+                const imageEvent = await db.imageInEvent.create({
+                    data: {
+                        file: image.filename,
+                        eventId: event.id,
+                    }
+                });
+            });
+            return msg;
         });
 
+        if(!message) throw { status : 404, msg : "not created : msg"};
 
-        const msgWithEvent = await this.db.chatting.findUnique({
+        const msgWithEvent = database.chatting.findUnique({
             where: {
-                id: msg.id,
+                id: message.id,
             },
             include: {
                 event: {
@@ -132,21 +136,22 @@ export class SocketService {
     }
 
     async createOrUpdateSocket(payload) {
-        const isExist = await this.db.userSocketToken.findFirst({
+
+        const isExist = await database.userSocketToken.findFirst({
             where: {
                 userEmail: payload.userEmail,
             }
         });
 
         if (!isExist) {
-            await this.db.userSocketToken.create({
+            await database.userSocketToken.create({
                 data: {
                     userEmail: payload.userEmail,
                     socket: payload.socket,
                 }
             });
         } else {
-            await this.db.userSocketToken.update({
+            await database.userSocketToken.update({
                 where: {
                     userEmail: isExist.userEmail,
                 },
@@ -160,7 +165,7 @@ export class SocketService {
 
     async updateUserSocketToNull(payload) {
 
-        const isExist = await this.db.userSocketToken.findFirst({
+        const isExist = await database.userSocketToken.findFirst({
             where: {
                 socket: payload.socket,
             }
@@ -170,7 +175,7 @@ export class SocketService {
             console.log("존재하지 않는다.");
         }
 
-        await this.db.userSocketToken.update({
+        await database.userSocketToken.update({
             where: {
                 userEmail: isExist.userEmail,
             },
@@ -187,7 +192,7 @@ export class SocketService {
     // payload : roomId, userEmail
     async getOppSocket(payload) {
 
-        const opp = await this.db.joinRoom.findFirst({
+        const opp = await database.joinRoom.findFirst({
             where: {
                 roomId: payload.roomId,
                 NOT: {
@@ -196,9 +201,9 @@ export class SocketService {
             }
         });
 
-        if (!opp) return null;
+        if (!opp) return undefined;
 
-        const socketToken = await this.db.userSocketToken.findUnique({
+        const socketToken = await database.userSocketToken.findUnique({
             where: {
                 userEmail: opp.userEmail,
                 connectRoomId: payload.roomId

@@ -1,7 +1,5 @@
 import { SocketService } from "../services/socketService";
-import { ChatService } from "../../models/chats/services/chatService";
 import { CreateChatDTO } from "../../models/chats/dto/create-chat.dto";
-import { RoomService } from "../../models/rooms/services";
 import { RandomChoice } from "../../utils/choiceSmall";
 import { pushAlam } from "../../utils/pushAlam";
 
@@ -10,16 +8,12 @@ import database from "../../database";
 export class SocketController {
     io;
     socket;
-    socketService;
-    chatService;
-    roomService;
+    service;
 
     constructor(io, socket) {
         this.io = io;
         this.socket = socket;
-        this.socketService = new SocketService();
-        this.chatService = new ChatService();
-        this.roomService = new RoomService();
+        this.service = new SocketService();
     }
 
     setRoomId() {
@@ -43,15 +37,9 @@ export class SocketController {
             this.socket.join(payload.roomId);
             payload.userEmail = this.socket.userEmail;
 
-            const res = await database.$transaction(async (db) => {
-                this.socketService.setDB(db);
+            await this.service.createOrUpdateSocket({ socket: this.socket.id, ...payload });
 
-                await this.socketService.createOrUpdateSocket({ socket: this.socket.id, ...payload });
-
-                return await this.socketService.updateChatReadCount(payload);
-            })
-
-            // this.io.to(payload.roomId).emit("update read count", { ids: res });
+            await this.service.updateChatReadCount(payload);
 
             this.setRoomId();
 
@@ -65,35 +53,26 @@ export class SocketController {
 
     // 메시지를 받으면 메시지 생성 후, 메시지를 사용자에게 보낸다.
     // 현재 접속해 있는 유저의 수에 채팅방안에 있는 유저의 수를 뺀다.
-    // payload : roomId, userEmail,content
+    // payload : content
     async newMessage(payload) {
         try {
             payload.userEmail = this.socket.userEmail;
             payload.roomId = this.socket.roomId;
 
-            let oppSocket;
+            let joinCount = await this.service.getJoinCount({ roomId: payload.roomId });
 
-            const message = await database.$transaction(async (db) => {
-                this.roomService.setDB(db);
-                this.chatService.setDB(db);
-                this.socketService.setDB(db);
+            const oppSocket = await this.service.getOppSocket(payload);
 
-                let joinCount = await this.roomService.getJoinCount({ roomId: payload.roomId });
+            if (oppSocket) joinCount--;
 
-                oppSocket = await this.socketService.getOppSocket(payload);
+            // roomId, userEmail, content
+            const msg = await this.service.createChat(new CreateChatDTO({
+                roomId: payload.roomId,
+                userEmail: payload.userEmail,
+                content: payload.content,
+                readCount: joinCount - 1,
+            }));
 
-                if (oppSocket) joinCount--;
-
-                // roomId, userEmail, content
-                const msg = await this.chatService.createChat(new CreateChatDTO({
-                    roomId: payload.roomId,
-                    userEmail: payload.userEmail,
-                    content: payload.content,
-                    readCount: joinCount - 1,
-                }));
-
-                return msg;
-            });
 
             // if(oppSocket){
             //     const oppTokens = getTokens({roomId, userEmail});
@@ -101,7 +80,7 @@ export class SocketController {
             //     pushAlam({tokens : oppTokens, ...message});
             // }
 
-            this.io.to(payload.roomId).emit("new message", { msg: message });
+            this.io.to(payload.roomId).emit("new message", { msg: msg });
 
         } catch (err) {
             console.log(err);
@@ -115,11 +94,8 @@ export class SocketController {
             payload.userEmail = this.socket.userEmail;
             payload.roomId = this.socket.roomId;
 
-            const msg = await database.$transaction(async (db) => {
-                this.socketService.setDB(db);
-
-                return await this.socketService.updateNoContent(payload);
-            })
+            // update chatting
+            const msg = await this.service.updateNoContent(payload);
 
             if (!msg) this.socket.emit("failed", { msg: "failed to requests" });
 
@@ -143,34 +119,25 @@ export class SocketController {
             // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
             const smallCategory = await RandomChoice(middleName);
 
-            console.log(smallCategory);
+            // joinCount 확인
+            // oppSocket 확인
+            // 메시지 생성
 
-            let joinCount;
+            let joinCount = await this.service.getJoinCount({ roomId: payload.roomId });
 
-            let oppSocket;
+            const oppSocket = await this.service.getOppSocket(payload);
 
-            const message = await database.$transaction(async (db) => {
-                this.roomService.setDB(db);
-                this.socketService.setDB(db);
+            if (oppSocket) joinCount--;
 
-                joinCount = await this.roomService.getJoinCount({ roomId: payload.roomId });
-
-                oppSocket = await this.socketService.getOppSocket(payload);
-
-                if (oppSocket) joinCount--;
-
-                const msg = await this.socketService.createEvent({
-                    roomId: payload.roomId,
-                    userEmail: payload.userEmail,
-                    categoryId: smallCategory.id,
-                    readCount: --joinCount,
-                });
-
-                return msg;
+            const msg = await this.service.createEvent({
+                roomId: payload.roomId,
+                userEmail: payload.userEmail,
+                categoryId: smallCategory.id,
+                readCount: --joinCount,
             });
 
 
-            if (!message) this.socket.emit("failed", { msg: "failed to requests" });
+            if (!msg) this.socket.emit("failed", { msg: "failed to requests" });
 
             // if(oppSocket){
             //     const oppTokens = getTokens({roomId, userEmail});
@@ -178,7 +145,7 @@ export class SocketController {
             //     pushAlam({tokens : oppTokens, ...message});
             // }
 
-            this.io.to(payload.roomId).emit("new event", message);
+            this.io.to(payload.roomId).emit("new event", msg);
 
         } catch (err) {
             console.log(err);
@@ -188,11 +155,9 @@ export class SocketController {
     // 소켓 연결이 끊기면 UserSocketToken 테이블에 데이터 삭제
     async disconnecting() {
         try {
-            await database.$transaction(async (db) => {
-                this.socketService.setDB(db);
 
-                await this.socketService.updateUserSocketToNull({ socket: this.socket.id });
-            });
+            await this.service.updateUserSocketToNull({ socket: this.socket.id });
+            
         } catch (err) {
             console.log(err);
         }

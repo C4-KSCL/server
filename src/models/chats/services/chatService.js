@@ -1,17 +1,6 @@
-import { TimeSeriesBucketTimestamp } from "redis";
 import database from "../../../database";
 
 export class ChatService {
-    db;
-
-    setDB(db) {
-        this.db = db;
-        this.createChat.bind(this);
-        this.deleteChat.bind(this);
-        this.getChats.bind(this);
-        this.getLastChats.bind(this);
-        this.setDB.bind(this);
-    }
 
     // id Int @id @default(autoincrement())
     // roomId String @db.VarChar(100)
@@ -20,62 +9,31 @@ export class ChatService {
     // createdAt DateTime @default(now())
     // content String @db.Text
     // readCount Int @db.Int
-    async createChat(payload) {
-
-        const user = await this.db.user.findUnique({
-            where: {
-                email: payload.userEmail,
-            },
-        });
-
-        const chat = await this.db.chatting.create({
-            data: {
-                roomId: payload.roomId,
-                nickName: user.nickname,
-                userEmail: user.email,
-                content: payload.content,
-                readCount: payload.readCount,
-            },
-        });
-        return chat;
-
-    }
-
-    async deleteChat(payload) {
-
-        const isExist = await this.db.chatting.findUnique({
-            where: {
-                id: payload.id
-            }
-        });
-
-        if (!isExist) throw { status: 404, msg: "not found : chat" };
-
-        await this.db.chatting.delete({
-            where: {
-                id: isExist.id,
-            }
-        });
-
-
-    }
 
     async getChats(payload) {
 
-        const isExist = await this.db.room.findUnique({
+        const isExist = await database.room.findUnique({
             where: {
                 id: payload.roomId,
             }
         });
 
-        if (!isExist) throw { status: 404, msg: "not found : join" };
+        const join = await database.joinRoom.findFirst({
+            where : {
+                roomId : isExist.id,
+                userEmail : payload.userEmail,
+                join : true,
+            }
+        });
 
-        const chats = await this.db.chatting.findMany({
+        if(!join) throw { status : 404, msg : "not found : join in get-chats" };
+
+        const chats = await database.chatting.findMany({
             orderBy: {
                 createdAt: "desc",
             },
             where: {
-                roomId: payload.roomId,
+                roomId: isExist.id,
             },
             select: {
                 id: true,
@@ -92,7 +50,7 @@ export class ChatService {
                     }
                 },
                 user: {
-                    select: { UserImage: true }
+                    select: { userImage: true }
                 }
             },
             skip: payload.skip,
@@ -106,13 +64,15 @@ export class ChatService {
 
         const chats = [];
 
-        const joins = await this.db.joinRoom.findMany({
+        const joins = await database.joinRoom.findMany({
             where: {
                 userEmail: userEmail,
+                join : true,
             }
         });
 
-        const requests = await this.db.addRequest.findMany({
+
+        const requests = await database.addRequest.findMany({
             where: {
                 recUser: userEmail,
                 status: "ing"
@@ -123,112 +83,76 @@ export class ChatService {
             joins.push(request);
         }
 
-        if (joins.length === 0) throw { status: 404, msg: "not found : join" };
+        // if (joins.length === 0) throw { status: 404, msg: "not found : join" };
 
-        for (const join of joins) {
-            const chat = await this.db.chatting.findFirst({
-                orderBy: {
-                    createdAt: "desc",
-                },
-                where: {
-                    roomId: join.roomId,
-                },
-                include: {
-                    room: {
-                        include: {
-                            joinRoom: {
-                                select: {
-                                    user: {
-                                        select: {
-                                            email: true,
-                                            nickname: true,
-                                            userImage: true,
+        const lastChats = await database.$transaction(async(db)=>{
+            for (const join of joins) {
+                const chat = await db.chatting.findFirst({
+                    orderBy: {
+                        createdAt: "desc",
+                    },
+                    where: {
+                        roomId: join.roomId,
+                    },
+                    include: {
+                        room: {
+                            include: {
+                                joinRoom: {
+                                    select: {
+                                        user: {
+                                            select: {
+                                                email: true,
+                                                nickname: true,
+                                                userImage: true,
+                                            }
                                         }
-                                    }
-                                },
-                                where: {
-                                    NOT: {
-                                        userEmail: join.userEmail,
-                                    }
-                                },
-                            },
-                            addRequest: {
-                                select: {
-                                    reqUser : true,
-                                    receive: {
-                                        select: {
-                                            email: true,
-                                            nickname: true,
-                                            userImage: true,
+                                    },
+                                    where: {
+                                        NOT: {
+                                            userEmail: join.userEmail,
                                         }
-                                    }
+                                    },
                                 },
-                                where: {
-                                    status: "ing",
-                                    reqUser: userEmail,
+                                addRequest: {
+                                    select: {
+                                        reqUser : true,
+                                        receive: {
+                                            select: {
+                                                email: true,
+                                                nickname: true,
+                                                userImage: true,
+                                            }
+                                        }
+                                    },
+                                    where: {
+                                        status: "ing",
+                                        reqUser: userEmail,
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-
-            const count = await this.db.chatting.count({
-                where: {
-                    roomId: join.roomId,
-                    readCount: 1,
-                    NOT: {
-                        userEmail: userEmail,
+                });
+    
+                const count = await db.chatting.count({
+                    where: {
+                        roomId: join.roomId,
+                        readCount: 1,
+                        NOT: {
+                            userEmail: userEmail,
+                        }
                     }
-                }
-            });
-
-            chat.notReadCounts = count;
-
-            chats.push(chat);
-        }
-        return chats;
-
-
-
-    }
-
-    async updateChatById(payload) {
-
-        const isExist = await this.db.chatting.findUnique({
-            where: {
-                id: payload.chatId,
+                });
+    
+                chat.notReadCounts = count;
+    
+                chats.push(chat);
             }
+            return chats;
+
         });
 
-        if (!isExist) return null;
-
-        if (isExist.readCount === 0) return isExist;
-
-        const chat = await this.db.chatting.update({
-            where: {
-                id: isExist.id
-            },
-            data: {
-                readCount: isExist.readCount - 1
-            }
-        });
-
-        return chat;
-
-
-    }
-
-    async checkMyChatByIdUserEmail(payload) {
-
-        const isExist = await this.db.chatting.findUnique({
-            where: {
-                id: payload.chatId,
-                userEmail: payload.userEmail
-            }
-        });
-
-        return isExist;
+        return lastChats;
 
     }
 }

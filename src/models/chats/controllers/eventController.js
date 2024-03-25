@@ -77,12 +77,7 @@ class EventController {
     // 이벤트 빅 카테고리 반환
     async getBigs(req, res, next) {
         try {
-
-            const categories = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.getBigCategories();
-            });
+            const categories = await this.service.getBigCategories();
 
             res.status(200).json({ categories: categories });
         } catch (err) {
@@ -94,11 +89,7 @@ class EventController {
         try {
             const { bigName } = req.params;
 
-            const middleCategories = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.getMiddleCategories(bigName);
-            });
+            const middleCategories = await this.service.getMiddleCategories(bigName);
 
             res.status(200).json({ categories: middleCategories })
         } catch (err) {
@@ -110,11 +101,7 @@ class EventController {
         try {
             const { middleName } = req.params;
 
-            const smallCategories = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.getSmallCategories(middleName);
-            });
+            const smallCategories = await this.service.getSmallCategories(middleName);
 
             res.status(200).json({ categories: smallCategories });
         } catch (err) {
@@ -126,11 +113,7 @@ class EventController {
         const { categoryId } = req.params;
 
         try {
-            const images = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
-            });
+            const images = await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
 
             if (!images) throw { status: 500, msg: "fail to upload image" };
 
@@ -150,11 +133,8 @@ class EventController {
         try {
             const { filename } = req.params;
 
-            const image = await database.$transaction(async (db) => {
-                this.service.setDB(db);
+            const image = await this.service.getImageByFilename(filename);
 
-                return await this.service.getImageByFilename(filename);
-            });
 
             if (!image) throw { status: 404, msg: "not found" };
 
@@ -173,11 +153,7 @@ class EventController {
         try {
             const { id } = req.params;
 
-            const event = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.getEvent({ id: Number(id) });
-            });
+            const event = await this.service.getEvent({ id: Number(id) });
 
             res.status(200).json({ event: event });
         } catch (err) {
@@ -189,11 +165,7 @@ class EventController {
         try {
             const { big } = req.body;
 
-            await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                await this.service.createBig(big);
-            });
+            await this.service.createBig(big);
 
             res.status(201).json({ msg: "true" });
         } catch (err) {
@@ -205,11 +177,8 @@ class EventController {
         try {
             const { big, middle } = req.body;
 
-            await database.$transaction(async (db) => {
-                this.service.setDB(db);
+            await this.service.createMiddle({ big: big, middle: middle });
 
-                await this.service.createMiddle({ big: big, middle: middle });
-            });
 
             res.status(201).json({ msg: "true" });
         } catch (err) {
@@ -221,11 +190,7 @@ class EventController {
         try {
             const { middle, small } = req.body;
 
-            await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                await this.service.createSmall({ middle: middle, small: small });
-            });
+            await this.service.createSmall({ middle: middle, small: small });
 
             res.status(201).json({ msg: "true" });
         } catch (err) {

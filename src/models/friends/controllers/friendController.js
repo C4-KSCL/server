@@ -11,56 +11,45 @@ class FriendController {
     router;
     service;
 
-    constructor(){
+    constructor() {
         this.router = Router();
         this.service = new FriendService();
         this.init();
     }
 
-    init(){
-        this.router.get("/get-list",[
-        ],this.getList.bind(this));
-        this.router.delete("/delete/:oppEmail",[
+    init() {
+        this.router.get("/get-list", [
+        ], this.getList.bind(this));
+        this.router.delete("/delete/:oppEmail", [
             param('oppEmail').isEmail(),
             validatorErrorChecker,
-        ],this.deleteFriend.bind(this));
+        ], this.deleteFriend.bind(this));
     }
 
-    async getList(req,res,next){
-        try{
+    async getList(req, res, next) {
+        try {
             const userEmail = req.user;
 
-            const resultFriends = await database.$transaction(async(db)=>{
-                this.service.setDB(db);
+            const friends = await this.service.getFriendsByEmail(userEmail);
 
-                const friends = await this.service.getFriendsByEmail(userEmail);
+            res.status(200).json({ friends: friends });
 
-                return friends;
-            });
-
-
-            res.status(200).json({friends : resultFriends});
-
-        }catch(err){
+        } catch (err) {
             next(err);
         }
     }
 
-    async deleteFriend(req,res,next){
-        try{
+    async deleteFriend(req, res, next) {
+        try {
             const userEmail = req.user;
 
-            const { oppEmail } = req.param;
+            const { oppEmail } = req.params;
 
-            await database.$transaction(async(db)=>{
-                this.service.setDB(db);
-
-                await this.service.deleteFriend({userEmail, oppEmail});
-            });
+            await this.service.deleteFriend({ userEmail, oppEmail });
 
             res.status(204).json({});
 
-        }catch(err){
+        } catch (err) {
             next(err);
         }
     }
