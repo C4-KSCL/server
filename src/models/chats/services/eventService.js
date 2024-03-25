@@ -103,7 +103,7 @@ export class EventService {
                 id: payload.id
             },
             include: {
-                image: true,
+                imageInEvent: true,
             }
         });
 

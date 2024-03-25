@@ -36,7 +36,6 @@ export class SocketService {
         });
 
         return msg;
-
     }
 
     async createChat(payload) {

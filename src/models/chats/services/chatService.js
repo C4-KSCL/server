@@ -46,11 +46,11 @@ export class ChatService {
                 event: {
                     include: {
                         smallCategory: true,
-                        image: true,
+                        imageInEvent: true,
                     }
                 },
                 user: {
-                    select: { UserImage: true }
+                    select: { userImage: true }
                 }
             },
             skip: payload.skip,

@@ -147,8 +147,6 @@ export class RoomService {
     // {userEmail, roomId, joinCount, joinId}
     async leaveRoom(payload){
 
-        console.log(payload.joinCount);
-
         await database.$transaction(async(db)=>{
             await db.joinRoom.update({
                 where : {

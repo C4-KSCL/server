@@ -316,20 +316,32 @@ export class RequestService {
 
     //
     async deleteRoomAndRequest(payload) {
-        await database.$transaction(async (db) => {
-
-            await db.room.delete({
-                where: {
+        let room;
+        
+        if(!payload.request.roomId){
+            room = null;
+        }else{
+            room = await database.room.findUnique({
+                where : {
                     id: payload.request.roomId
                 }
             });
+        }
+
+        await database.$transaction(async (db) => {
+            if(room){
+                await db.room.delete({
+                    where: {
+                        id: room.id,
+                    }
+                });
+            }            
 
             await db.addRequest.delete({
                 where: {
                     id: payload.request.id
                 }
             });
-
         });
     }
 }

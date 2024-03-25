@@ -1,5 +1,5 @@
 import { SocketService } from "../services/socketService";
-import { CreateChatDTO } from "../../models.friends_chats/chats/dto/create-chat.dto"; 
+import { CreateChatDTO } from "../../models/chats/dto/create-chat.dto";
 import { RandomChoice } from "../../utils/choiceSmall";
 import { pushAlam } from "../../utils/pushAlam";
 
@@ -95,7 +95,7 @@ export class SocketController {
             payload.roomId = this.socket.roomId;
 
             // update chatting
-            await this.service.updateNoContent(payload);
+            const msg = await this.service.updateNoContent(payload);
 
             if (!msg) this.socket.emit("failed", { msg: "failed to requests" });
 
