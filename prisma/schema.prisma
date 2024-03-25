@@ -97,6 +97,8 @@ model JoinRoom {
   id        Int    @id @default(autoincrement())
   roomId    String @db.VarChar(100)
   userEmail String @db.VarChar(50)
+  join Boolean @default(true)
+  
   room      Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
