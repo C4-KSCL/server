@@ -33,18 +33,18 @@ class ChatController {
 
     async getChats(req, res, next) {
         try {
+            const userEmail = req.user;
+
             const { roomId } = req.params;
 
             const { page, limit } = req.query;
 
             const { skip, take } = pagination(page, limit);
 
-
-            const chats = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.getChats({ roomId, skip, take });
-            });
+            // room 존재 확인
+            // room join 확인하기
+            // 채팅 받아오기
+            const chats = await this.service.getChats({ userEmail, roomId, skip, take });
 
             res.status(200).json({ chats: chats });
 
@@ -53,15 +53,13 @@ class ChatController {
         }
     }
 
+    
     async getLastChats(req, res, next) {
         try {
             const userEmail = req.user;
 
-            const lastChats = await database.$transaction(async (db) => {
-                this.service.setDB(db);
-
-                return await this.service.getLastChats(userEmail);
-            });
+            // 마지막 채팅들 받아오기
+            const lastChats = await this.service.getLastChats(userEmail);
 
             res.status(200).json({ lastChats: lastChats });
         } catch (err) {

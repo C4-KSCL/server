@@ -2,20 +2,9 @@ import database from "../../../database";
 
 export class FriendService {
 
-    db;
-
-    setDB(db){
-        this.db = db;
-        this.getFriendsByEmail.bind(this);
-        this.deleteFriend.bind(this);
-        this.createFriend.bind(this);
-        this.checkFriend.bind(this);
-        this.setDB.bind(this);
-    }
-
     async getFriendsByEmail(userEmail){
         try{
-            const friends = await this.db.friend.findMany({
+            const friends = await database.friend.findMany({
                 where : {
                     OR : [
                         {
@@ -28,60 +17,73 @@ export class FriendService {
                 },
             });
 
-            for(const friend of friends){
-                if(friend.user1 === userEmail){
-                    friend.friend = await this.db.user.findUnique({
-                        where : {
-                            email : friend.user2
-                        },
-                        select : {
-                            myMBTI : true,
-                            myKeyword : true,
-                            nickname : true,
-                            userImage : true,
-                            age : true,
-                        }
-                    });
-                } else if (friend.user2 === userEmail){
-                    friend.friend = await this.db.user.findUnique({
-                        where : {
-                            email : friend.user1
-                        },
-                        select : {
-                            myMBTI : true,
-                            myKeyword : true,
-                            nickname : true,
-                            userImage : true,
-                            age : true,
-                        }
-                    });
-                }
-                const request = await this.db.addRequest.findFirst({
-                    where : {
-                        status : "accepted",
-                        OR : [
-                            {
-                                reqUser : friend.user1,
-                                recUser : friend.user2
+            if(friends.length === 0) return friends;
+
+            const userFriends = await database.$transaction(async(db)=>{
+                for(const friend of friends){
+                    if(friend.user1 === userEmail){
+                        friend.friend = await db.user.findUnique({
+                            where : {
+                                email : friend.user2
                             },
-                            {
-                                reqUser : friend.user2,
-                                recUser : friend.user1
+                            select : {
+                                myMBTI : true,
+                                myKeyword : true,
+                                nickname : true,
+                                // userImage : true,
+                                age : true,
                             }
-                        ]
+                        });
+                    } else if (friend.user2 === userEmail){
+                        friend.friend = await db.user.findUnique({
+                            where : {
+                                email : friend.user1
+                            },
+                            select : {
+                                myMBTI : true,
+                                myKeyword : true,
+                                nickname : true,
+                                // userImage : true,
+                                age : true,
+                            }
+                        });
                     }
-                });
 
-                const room = await this.db.room.findUnique({
-                    where : {
-                        id : request.roomId
+                    const request = await db.addRequest.findFirst({
+                        where : {
+                            status : "accepted",
+                            OR : [
+                                {
+                                    reqUser : friend.user1,
+                                    recUser : friend.user2
+                                },
+                                {
+                                    reqUser : friend.user2,
+                                    recUser : friend.user1
+                                }
+                            ]
+                        }
+                    });
+
+                    if(request){
+                        const room = await db.room.findUnique({
+                            where : {
+                                id : request.roomId
+                            },
+                            select : {
+                                id : true
+                            }
+                        }); 
+                        friend.room = room;
                     }
-                }); 
+    
+                }
+    
+                return friends;
 
-                friend.room = room;
-            }
+            });
 
-            return friends;
+            return userFriends;
         }catch(err){
             throw err;
         }
@@ -90,7 +92,7 @@ export class FriendService {
     
     async deleteFriend(payload){
         try{
-            const isExist = await this.db.friend.findFirst({
+            const isExist = await database.friend.findFirst({
                 where : {
                     OR : [
                         {
@@ -107,76 +109,57 @@ export class FriendService {
             
             if(!isExist) throw { status : 404, msg : "not found : friend" };
     
-            await database.friend.delete({
-                where : {
-                    id : isExist.id,
-                }
-            });
-        }catch(err){
-            throw err;
-        }
-        
-    }
-
-    // id Int @id @default(autoincrement())
-    // user1 String @db.VarChar(50)
-    // user2 String @db.VarChar(50)
-    // createdAt DateTime @default(now())
-    async createFriend(payload){
-        try{
-            const isExist = await this.db.friend.findFirst({
+            const request = await database.addRequest.findFirst({
                 where : {
                     OR : [
                         {
-                            user1 : payload.userEmail,
-                            user2 : payload.oppEmail,
+                            reqUser : payload.oppEmail,
+                            recUser : payload.userEmail,
                         },
                         {
-                            user1 : payload.oppEmail,
-                            user2 : payload.userEmail,
+                            recUser : payload.oppEmail,
+                            reqUser : payload.userEmail,
                         }
-                    ]
+                    ],
+                    NOT : {
+                        status : "ing",
+                    }
                 }
             });
-    
-            if(isExist) throw { status : 400, msg : "already exists : friend" };
-    
-    
-            const friend = await this.db.friend.create({
-                data : {
-                    user1 : payload.userEmail,
-                    user2 : payload.oppEmail,
+
+            // 내가 왜 여기서 복수형을 택했을까?
+            const joinRoom = await database.joinRoom.findFirst({
+                where : {
+                    userEmail : payload.userEmail,
+                    roomId : request.roomId,
                 },
             });
-            return friend;
 
-        }catch(err){
-            throw err;
-        }
-    }
+            await database.$transaction(async(db)=>{
+                await db.friend.delete({
+                    where : {
+                        id : isExist.id,
+                    }
+                });
 
-    async checkFriend(payload){
-        try{
-            const isExist = await this.db.friend.findFirst({
-                where : {
-                    OR : [
-                        {
-                            user1 : payload.userEmail,
-                            user2 : payload.oppEmail,
-                        },
-                        {
-                            user1 : payload.oppEmail,
-                            user2 : payload.userEmail,
+                if(joinRoom){
+                    await db.joinRoom.delete({
+                        where : {
+                            id : joinRoom.id,
                         }
-                    ]
+                    });
                 }
+
+                await db.addRequest.delete({
+                    where : {
+                        id : request.id,
+                    }
+                });
             });
-    
-            if(isExist) throw { status : 400, msg : "already exists : friend" };
+
         }catch(err){
             throw err;
         }
         
     }
-
 }

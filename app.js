@@ -103,7 +103,4 @@ import { verifyAccessToken } from "./middleware/auth";
   httpServer.listen(8000, () => {
     console.log('start server 8000');
   });
-  httpServer2.listen(8001, () => {
-    console.log('start server 8001');
-  });
 })();

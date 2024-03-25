@@ -2,38 +2,16 @@ import database from "../../../database";
 
 export class EventService {
 
-    db;
-
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        this.getBigCategories.bind(this);
-        this.getMiddleCategories.bind(this);
-        this.getSmallCategories.bind(this);
-        this.getImageByFilename.bind(this);
-        this.createImage.bind(this);
-        this.createBig.bind(this);
-        this.createMiddle.bind(this);
-        this.createSmall.bind(this);
-        this.setDB.bind(this);
-    }
-
-    setDB(db) {
-        this.db = db;
-    }
-
     async getBigCategories() {
         // 임시 
-        const categories = await this.db.bigCategory.findMany({});
+        const categories = await database.bigCategory.findMany({});
 
         return categories;
     }
 
     async getMiddleCategories(bigCategory) {
         // 임시
-        const isExist = await this.db.bigCategory.findUnique({
+        const isExist = await database.bigCategory.findUnique({
             where: {
                 name: bigCategory,
             },
@@ -42,7 +20,7 @@ export class EventService {
         if (!isExist) throw { status: 404, msg: "not found" };
 
         // bigCategory 검사;
-        const categories = await this.db.middleCategory.findMany({
+        const categories = await database.middleCategory.findMany({
             where: {
                 bigName: isExist.name,
             }
@@ -54,7 +32,7 @@ export class EventService {
     // 이 서비스는 socket에서 활용
     async getSmallCategories(middleCategory) {
 
-        const isExist = await this.db.middleCategory.findUnique({
+        const isExist = await database.middleCategory.findUnique({
             where: {
                 name: middleCategory,
             }
@@ -63,7 +41,7 @@ export class EventService {
         if (!isExist) throw { status: 404, msg: "not found" };
         // middleCategory 검사;
 
-        const categories = await this.db.smallCategory.findMany({
+        const categories = await database.smallCategory.findMany({
             where: {
                 middleName: isExist.name,
             }
@@ -76,7 +54,7 @@ export class EventService {
 
     async getImageByFilename(filename) {
 
-        const image = await this.db.eventImage.findUnique({
+        const image = await database.eventImage.findUnique({
             where: {
                 filename: filename,
             }
@@ -89,7 +67,7 @@ export class EventService {
 
     async createImage(payload) {
 
-        const isExist = await this.db.smallCategory.findUnique({
+        const isExist = await database.smallCategory.findUnique({
             where: {
                 id: payload.categoryId
             }
@@ -97,35 +75,30 @@ export class EventService {
 
         if (!isExist) throw { status: 404, msg: "not found : smallCategory ", categoryId: payload.categoryId };
 
-        payload.files.forEach(async (file) => {
-            const image = await this.db.eventImage.create({
-                data: {
-                    filename: file.filename,
-                    filepath: file.path,
-                    mimetype: file.mimetype,
-                    size: file.size,
-                    smallCategoryId: payload.categoryId,
-                }
+        await database.$transaction(async(db)=>{
+            payload.files.forEach(async (file) => {
+                const image = await db.eventImage.create({
+                    data: {
+                        filename: file.filename,
+                        filepath: file.path,
+                        mimetype: file.mimetype,
+                        size: file.size,
+                        smallCategoryId: payload.categoryId,
+                    }
+                });
             });
-
         });
-
         const images = await this.db.eventImage.findMany({
-
             where: {
                 smallCategoryId: payload.categoryId,
             }
-
         });
-
         return images;
-
-
     }
 
     async getEvent(payload) {
 
-        const event = await this.db.event.findUnique({
+        const event = await database.event.findUnique({
             where: {
                 id: payload.id
             },
@@ -141,7 +114,7 @@ export class EventService {
 
     async createBig(big) {
 
-        const isExist = await this.db.bigCategory.findUnique({
+        const isExist = await database.bigCategory.findUnique({
             where: {
                 name: big
             }
@@ -149,7 +122,7 @@ export class EventService {
 
         if (isExist) throw { status: 400, msg: "already exists : BigCategory" };
 
-        await this.db.bigCategory.create({
+        await database.bigCategory.create({
             data: {
                 name: big
             }
@@ -158,7 +131,7 @@ export class EventService {
 
     // big, middle
     async createMiddle(payload) {
-        const isExist = await this.db.middleCategory.findUnique({
+        const isExist = await database.middleCategory.findUnique({
             where: {
                 name: payload.middle,
                 bigName: payload.big
@@ -167,7 +140,7 @@ export class EventService {
 
         if (isExist) throw { status: 400, msg: "already exists : middle" };
 
-        await this.db.middleCategory.create({
+        await database.middleCategory.create({
             data: {
                 name: payload.middle,
                 bigName: payload.big
@@ -178,7 +151,7 @@ export class EventService {
     // middle, small
     async createSmall(payload) {
 
-        const isExist = await this.db.smallCategory.findFirst({
+        const isExist = await database.smallCategory.findFirst({
             where: {
                 name: payload.small,
                 middleName: payload.middle
@@ -187,7 +160,7 @@ export class EventService {
 
         if (isExist) throw { status: 400, msg: "already exists : small" };
 
-        await this.db.smallCategory.create({
+        await database.smallCategory.create({
             data: {
                 name: payload.small,
                 middleName: payload.middle
