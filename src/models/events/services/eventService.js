@@ -9,26 +9,6 @@ export class EventService {
         return categories;
     }
 
-    async getMiddleCategories(bigCategory) {
-        // 임시
-        const isExist = await database.bigCategory.findUnique({
-            where: {
-                name: bigCategory,
-            },
-        });
-
-        if (!isExist) throw { status: 404, msg: "not found" };
-
-        // bigCategory 검사;
-        const categories = await database.middleCategory.findMany({
-            where: {
-                bigName: isExist.name,
-            }
-        });
-
-        return categories;
-    }
-
     // 이 서비스는 socket에서 활용
     async getSmallCategories(middleCategory) {
 

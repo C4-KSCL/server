@@ -24,7 +24,7 @@ model AddRequest {
 
 model BigCategory {
   name           String           @id @db.VarChar(50)
-  middleCategory MiddleCategory[]
+  smallCategory  SmallCategory[]
 }
 
 model Chatting {
@@ -53,7 +53,7 @@ model Event {
   oppContent    String?        @db.Text
   smallCategory SmallCategory  @relation(fields: [category], references: [id])
   chatting      Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
-  imageInEvent  ImageInEvent[]
+  image         ImageInEvent[]      
 
   @@index([category], map: "Event_category_fkey")
 }
@@ -106,19 +106,18 @@ model JoinRoom {
   @@index([userEmail], map: "JoinRoom_userEmail_fkey")
 }
 
-model MiddleCategory {
-  name          String          @id @db.VarChar(50)
-  bigName       String          @db.VarChar(50)
-  bigCategory   BigCategory     @relation(fields: [bigName], references: [name])
-  smallCategory SmallCategory[]
+// model MiddleCategory {
+//   name          String          @id @db.VarChar(50)
+//   bigName       String          @db.VarChar(50)
+//   bigCategory   BigCategory     @relation(fields: [bigName], references: [name])
+//   smallCategory SmallCategory[]
 
-  @@index([bigName], map: "MiddleCategory_bigName_fkey")
-}
+//   @@index([bigName], map: "MiddleCategory_bigName_fkey")
+// }
 
 model Room {
   id              String            @id @db.VarChar(100)
   name            String            @db.VarChar(100)
-  joinCount       Int
   createdAt       DateTime          @default(now()) @db.DateTime(0)
   publishing      String            @default("ing") @db.VarChar(10)
   
@@ -131,12 +130,12 @@ model Room {
 model SmallCategory {
   id             Int            @id @default(autoincrement())
   name           String         @db.VarChar(50)
-  middleName     String         @db.VarChar(50)
+  bigName        String         @db.VarChar(50)
   event          Event[]
   eventImage     EventImage[]
-  middleCategory MiddleCategory @relation(fields: [middleName], references: [name])
+  bigCategory BigCategory @relation(fields: [bigName], references: [name], onDelete: Cascade, onUpdate: Cascade)
 
-  @@index([middleName], map: "SmallCategory_middleName_fkey")
+  @@index([bigName], map: "BigCategory_bigName_fkey")
 }
 
 model User {
