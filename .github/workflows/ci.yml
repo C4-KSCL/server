@@ -46,7 +46,6 @@ jobs:    # 작업들을 정의
           sudo apt-get update
           sudo apt install docker-compose
           docker compose up -d
-
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 

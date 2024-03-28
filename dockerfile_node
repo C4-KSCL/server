@@ -3,6 +3,11 @@ FROM node:current-slim
 WORKDIR /app
 
 COPY . .
+
+# 환경 변수 설정
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 # package.json에 있는 것들을 설치
 RUN apt-get update -y && apt-get install -y openssl
 RUN npm install
