@@ -4,6 +4,9 @@ on:    # 이벤트 트리거를 정의
   push:    # push 이벤트에 반응
     branches:    # 특정 브랜치에 push가 발생할 때만 반응
       - main    # main 브랜치가 해당
+  pull_request:  # pull request 이벤트에 대해서도 실행하려면 이 섹션을 추가합니다.
+    branches: 
+      - main 
 
 jobs:    # 작업들을 정의
   deploy:    # 배포 작업의 이름
