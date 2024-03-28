@@ -36,15 +36,36 @@ jobs:    # 작업들을 정의
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env 
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
           echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}" >> .env
+
       - name: Replace IP Address in nginx.conf
         run: |
           sed -i 's/MY_IP/${{ secrets.MY_IP }}/g' nginx.conf
+
       - name: Install Docker Compose    # Docker Compose를 설치
         run: | # |의 의미는 여러 줄을 수행가능
           sudo apt-get update
           sudo apt install docker-compose
           docker compose up -d
 
+      - name: Build and run Docker containers
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+        env:
+          PORT: ${{ secrets.PORT }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          SEND_MAIL_ID: ${{ secrets.SEND_MAIL_ID }}
+          SEND_MAIL_PW: ${{ secrets.SEND_MAIL_PW }}
+          DB_IP: ${{ secrets.DB_IP }}
+          DB_PW: ${{ secrets.DB_PW }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE: ${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}
 
 
         
