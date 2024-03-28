@@ -107,7 +107,7 @@ export class RoomService {
                                     select: {
                                         email: true,
                                         nickname: true,
-                                        // userImage : true,
+                                        userImage : true,
                                     }
                                 },
                             }
@@ -128,7 +128,7 @@ export class RoomService {
                                     select : {
                                         email : true,
                                         nickname : true,
-                                        // userImage : true,
+                                        userImage : true,
                                     }
                                 }
                             }

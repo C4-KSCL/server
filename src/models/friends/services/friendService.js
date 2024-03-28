@@ -30,7 +30,7 @@ export class FriendService {
                                 myMBTI : true,
                                 myKeyword : true,
                                 nickname : true,
-                                // userImage : true,
+                                userImage : true,
                                 age : true,
                             }
                         });
@@ -43,7 +43,7 @@ export class FriendService {
                                 myMBTI : true,
                                 myKeyword : true,
                                 nickname : true,
-                                // userImage : true,
+                                userImage : true,
                                 age : true,
                             }
                         });
