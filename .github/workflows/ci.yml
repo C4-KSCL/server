@@ -38,7 +38,7 @@ jobs:    # 작업들을 정의
           echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}" >> .env
       - name: Replace IP Address in nginx.conf
         run: |
-          sed -i 's/MY_IP/${{ secrets.MY_IP }}/g' path/to/nginx.conf
+          sed -i 's/MY_IP/${{ secrets.MY_IP }}/g' server/nginx.conf
       - name: Install Docker Compose    # Docker Compose를 설치
         run: | # |의 의미는 여러 줄을 수행가능
           sudo apt-get update
