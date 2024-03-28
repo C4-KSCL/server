@@ -44,7 +44,7 @@ jobs:    # 작업들을 정의
       - name: Install Docker Compose    # Docker Compose를 설치
         run: | # |의 의미는 여러 줄을 수행가능
           sudo apt-get update
-          sudo apt install docker-compose
+          sudo install -y docker-compose
           docker compose up -d
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
