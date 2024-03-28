@@ -1,0 +1,47 @@
+name: Node.js Server Deployment    # 워크플로우의 이름을 설정
+
+on:    # 이벤트 트리거를 정의
+  push:    # push 이벤트에 반응
+    branches:    # 특정 브랜치에 push가 발생할 때만 반응
+      - main    # main 브랜치가 해당
+
+jobs:    # 작업들을 정의
+  deploy:    # 배포 작업의 이름
+    runs-on: ubuntu-latest    # 이 작업이 실행될 가상 환경(운영체제)
+
+    steps:    # 작업의 단계들을 정의
+      - name: Checkout repository    # 리포지토리 코드를 체크아웃
+        uses: actions/checkout@v2
+  
+              # .env 파일 생성
+      - name: Load env file
+        run: |
+          touch .env
+          echo "PORT=${{ secrets.PORT }}" >> .env
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "COOKIE_SECRET=${{ secrets.COOKIE_SECRET }}" >> .env
+          echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
+          echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
+          echo "SEND_MAIL_ID=${{ secrets.SEND_MAIL_ID }}" >> .env
+          echo "SEND_MAIL_PW=${{ secrets.SEND_MAIL_PW }}" >> .env
+          echo "DB_IP=${{ secrets.DB_IP }}" >> .env
+          echo "DB_PW=${{ secrets.DB_PW }}" >> .env
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+          echo "S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}" >> .env
+          echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env 
+          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+          echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}" >> .env
+      - name: Replace IP Address in nginx.conf
+        run: |
+          sed -i 's/MY_IP/${{ secrets.MY_IP }}/g' path/to/nginx.conf
+      - name: Install Docker Compose    # Docker Compose를 설치
+        run: | # |의 의미는 여러 줄을 수행가능
+          sudo apt-get update
+          sudo apt install docker-compose
+          docker compose up -d
+
+
+
+        
