@@ -117,7 +117,7 @@ export class SocketController {
             payload.roomId = this.socket.roomId;
 
             // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
-            await this.service.checkSmall({small : payload.smallCategory});
+            const smallCategory = await this.service.checkSmall({small : payload.smallCategory});
             // joinCount 확인
             // oppSocket 확인
             // 메시지 생성
@@ -131,7 +131,6 @@ export class SocketController {
             const msg = await this.service.createEvent({
                 roomId: payload.roomId,
                 userEmail: payload.userEmail,
-                oppEmail : oppSocket.userEmail,
                 categoryId: smallCategory.id,
                 readCount: --joinCount,
             });

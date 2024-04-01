@@ -45,8 +45,15 @@ export class ChatService {
                 readCount: true,
                 event: {
                     include: {
-                        smallCategory: true,
-                        imageInEvent: true,
+                        smallCategory: {
+                            include : {
+                                eventImage : {
+                                    select : {
+                                        filepath : true,
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 user: {

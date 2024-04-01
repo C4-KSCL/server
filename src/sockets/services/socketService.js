@@ -75,6 +75,14 @@ export class SocketService {
     async createEvent(payload) {
 
         const message = await database.$transaction(async (db) => {
+            const oppUser = await db.joinRoom.findFirst({
+                where : {
+                    roomId : payload.roomId,
+                    NOT : {
+                        userEmail : payload.userEmail,
+                    }
+                },
+            });
 
             const msg = await db.chatting.create({
                 data: {
@@ -86,22 +94,21 @@ export class SocketService {
                 }
             });
 
-
             const event = await db.event.create({
                 data: {
                     chattingId: msg.id,
                     category: payload.categoryId,
                     user1 : payload.userEmail,
-                    user2 : payload.oppEmail,
+                    user2 : oppUser.userEmail,
                 }
             });
 
             if (!msg) throw { status: 500, msg: "not created : msg" };
             if (!event) throw { status : 500, msg : "not created : event" };
 
-            const msgWithEvent = database.chatting.findUnique({
+            const msgWithEvent = await db.chatting.findUnique({
                 where: {
-                    id: message.id,
+                    id: msg.id,
                 },
                 include: {
                     event: {
@@ -115,21 +122,20 @@ export class SocketService {
                                     }
                                 }
                             },
-                            image: true,
-                        },
-                        eventUser1 : {
-                            select : {
-                                email : true,
-                                nickname : true,
-                                userImage : true,
-                            }
-                        },
-                        eventUser2 : {
-                            select : {
-                                email : true,
-                                nickname : true,
-                                userImage : true,
-                            }
+                            eventUser1 : {
+                                select : {
+                                    email : true,
+                                    nickname : true,
+                                    userImage : true,
+                                }
+                            },
+                            eventUser2 : {
+                                select : {
+                                    email : true,
+                                    nickname : true,
+                                    userImage : true,
+                                }
+                            },
                         },
                     },
                 }
@@ -139,7 +145,6 @@ export class SocketService {
         });
 
         return message;
-
     }
 
     async createOrUpdateSocket(payload) {
@@ -229,5 +234,7 @@ export class SocketService {
         });
 
         if(!small) throw { status : 404, msg: "not found : smallCategory" };
+
+        return small;
     }
 }
