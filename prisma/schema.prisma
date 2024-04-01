@@ -24,7 +24,7 @@ model AddRequest {
 
 model BigCategory {
   name           String           @id @db.VarChar(50)
-  middleCategory MiddleCategory[]
+  smallCategory  SmallCategory[]
 }
 
 model Chatting {
@@ -49,11 +49,15 @@ model Event {
   id            Int            @id @default(autoincrement())
   chattingId    Int            @unique
   category      Int
-  userContent   String?        @db.Text
-  oppContent    String?        @db.Text
+  user1 String? @db.VarChar(100)
+  user2 String? @db.VarChar(100)
+  user1Choice String? @db.VarChar(100) 
+  user2Choice String? @db.VarChar(100)
+
   smallCategory SmallCategory  @relation(fields: [category], references: [id])
   chatting      Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
-  imageInEvent  ImageInEvent[]
+  eventUser1    User?          @relation(name : "event-user-one",fields: [user1], references: [email], onDelete: SetNull, onUpdate: Cascade)
+  eventUser2    User?          @relation(name : "event-user-two", fields: [user2], references: [email], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([category], map: "Event_category_fkey")
 }
@@ -64,8 +68,8 @@ model EventImage {
   mimetype        String         @db.VarChar(255)
   size            Int
   smallCategoryId Int
+
   smallCategory   SmallCategory  @relation(fields: [smallCategoryId], references: [id])
-  imageInEvent    ImageInEvent[]
 
   @@index([smallCategoryId], map: "EventImage_smallCategoryId_fkey")
 }
@@ -82,17 +86,6 @@ model Friend {
   @@index([user2], map: "Friend_user2_fkey")
 }
 
-model ImageInEvent {
-  id         Int        @id @default(autoincrement())
-  eventId    Int
-  file       String     @db.VarChar(255)
-  event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  eventImage EventImage @relation(fields: [file], references: [filename], onDelete: Cascade)
-
-  @@index([eventId], map: "ImageInEvent_eventId_fkey")
-  @@index([file], map: "ImageInEvent_file_fkey")
-}
-
 model JoinRoom {
   id        Int    @id @default(autoincrement())
   roomId    String @db.VarChar(100)
@@ -106,19 +99,9 @@ model JoinRoom {
   @@index([userEmail], map: "JoinRoom_userEmail_fkey")
 }
 
-model MiddleCategory {
-  name          String          @id @db.VarChar(50)
-  bigName       String          @db.VarChar(50)
-  bigCategory   BigCategory     @relation(fields: [bigName], references: [name])
-  smallCategory SmallCategory[]
-
-  @@index([bigName], map: "MiddleCategory_bigName_fkey")
-}
-
 model Room {
   id              String            @id @db.VarChar(100)
   name            String            @db.VarChar(100)
-  joinCount       Int
   createdAt       DateTime          @default(now()) @db.DateTime(0)
   publishing      String            @default("ing") @db.VarChar(10)
   
@@ -130,13 +113,16 @@ model Room {
 
 model SmallCategory {
   id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar(50)
-  middleName     String         @db.VarChar(50)
+  name           String         @db.VarChar(50) @unique
+  bigName        String         @db.VarChar(50)
+  selectOne      String         @db.VarChar(100)
+  selectTwo      String         @db.VarChar(100)
+
   event          Event[]
   eventImage     EventImage[]
-  middleCategory MiddleCategory @relation(fields: [middleName], references: [name])
+  bigCategory BigCategory @relation(fields: [bigName], references: [name], onDelete: Cascade, onUpdate: Cascade)
 
-  @@index([middleName], map: "SmallCategory_middleName_fkey")
+  @@index([bigName], map: "BigCategory_bigName_fkey")
 }
 
 model User {
@@ -169,6 +155,8 @@ model User {
   joinRoom                            JoinRoom[]
   UserImage                           UserImage[]
   userSocketToken                     UserSocketToken?
+  eventUser1       Event[]  @relation("event-user-one")
+  eventUser2       Event[]  @relation("event-user-two")
 }
 
 model UserImage {

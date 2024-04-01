@@ -12,7 +12,7 @@ import { deleteFiles } from "../../../utils/deleteFiles";
 
 
 class EventController {
-    path = "/chats/events";
+    path = "/events";
     router;
     service;
 
@@ -25,13 +25,8 @@ class EventController {
     init() {
         this.router.get("/get-big", this.getBigs.bind(this));
 
-        this.router.get("/get-middle/:bigName", [
+        this.router.get("/get-small/:bigName", [
             param('bigName'),
-            validatorErrorChecker
-        ], this.getMiddles.bind(this));
-
-        this.router.get("/get-small/:middleName", [
-            param('middleName'),
             validatorErrorChecker,
         ]
             , this.getSmalls.bind(this));
@@ -56,22 +51,13 @@ class EventController {
             validatorErrorChecker,
         ], this.postBigEvent.bind(this));
 
-        this.router.post("/create-middle-event", [
-            body("big"),
-            body("middle"),
-            validatorErrorChecker
-        ], this.postMiddleEvent.bind(this));
-
         this.router.post("/create-small-event", [
-            body("middle"),
             body("small"),
+            body("big"),
+            body("selectOne"),
+            body("selectTwo"),
             validatorErrorChecker,
         ], this.postSmallEvent.bind(this));
-
-        this.router.get("/get-event-page/:id", [
-            param("id"),
-            validatorErrorChecker,
-        ], this.getEventPage.bind(this));
     }
 
     // 이벤트 빅 카테고리 반환
@@ -85,23 +71,11 @@ class EventController {
         }
     }
 
-    async getMiddles(req, res, next) {
+    async getSmalls(req, res, next) {
         try {
             const { bigName } = req.params;
 
-            const middleCategories = await this.service.getMiddleCategories(bigName);
-
-            res.status(200).json({ categories: middleCategories })
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    async getSmalls(req, res, next) {
-        try {
-            const { middleName } = req.params;
-
-            const smallCategories = await this.service.getSmallCategories(middleName);
+            const smallCategories = await this.service.getSmallCategories(bigName);
 
             res.status(200).json({ categories: smallCategories });
         } catch (err) {
@@ -173,24 +147,11 @@ class EventController {
         }
     }
 
-    async postMiddleEvent(req, res, next) {
-        try {
-            const { big, middle } = req.body;
-
-            await this.service.createMiddle({ big: big, middle: middle });
-
-
-            res.status(201).json({ msg: "true" });
-        } catch (err) {
-            next(err);
-        }
-    }
-
     async postSmallEvent(req, res, next) {
         try {
-            const { middle, small } = req.body;
+            const { big, small, selectOne, selectTwo } = req.body;
 
-            await this.service.createSmall({ middle: middle, small: small });
+            await this.service.createSmall({ big: big, small: small, selectOne : selectOne, selectTwo : selectTwo });
 
             res.status(201).json({ msg: "true" });
         } catch (err) {

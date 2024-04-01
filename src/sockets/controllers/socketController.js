@@ -109,7 +109,7 @@ export class SocketController {
 
     // 스몰 카테고리와 이미지를 제공
     // 스몰 카테고리를 무작위로 선택하는 로직 필요. ( 이거는 utils에서 수행. ) 
-    // payload : userEmail, middleName, roomId
+    // payload : userEmail, small, roomId
     async newEvent(payload) {
         try {
             const middleName = payload.middleName;
@@ -117,8 +117,7 @@ export class SocketController {
             payload.roomId = this.socket.roomId;
 
             // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
-            const smallCategory = await RandomChoice(middleName);
-
+            await this.service.checkSmall({small : payload.smallCategory});
             // joinCount 확인
             // oppSocket 확인
             // 메시지 생성
@@ -132,6 +131,7 @@ export class SocketController {
             const msg = await this.service.createEvent({
                 roomId: payload.roomId,
                 userEmail: payload.userEmail,
+                oppEmail : oppSocket.userEmail,
                 categoryId: smallCategory.id,
                 readCount: --joinCount,
             });

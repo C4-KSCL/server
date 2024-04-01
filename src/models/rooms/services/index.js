@@ -1,2 +1,2 @@
 export * from "./roomService";
-export * from "./requestService";
+export * from "../../requests/services/requestService";
