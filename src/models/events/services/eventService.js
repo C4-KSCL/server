@@ -12,7 +12,7 @@ export class EventService {
     // 이 서비스는 socket에서 활용
     async getSmallCategories(bigCategory) {
 
-        const isExist = await database.big.findUnique({
+        const isExist = await database.bigCategory.findUnique({
             where: {
                 name: bigCategory,
             }
@@ -23,7 +23,7 @@ export class EventService {
 
         const categories = await database.smallCategory.findMany({
             where: {
-                middleName: isExist.name,
+                bigName: isExist.name,
             }
         });
 
