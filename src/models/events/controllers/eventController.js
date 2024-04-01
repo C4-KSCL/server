@@ -52,15 +52,12 @@ class EventController {
         ], this.postBigEvent.bind(this));
 
         this.router.post("/create-small-event", [
-            body("middle"),
+            body("small"),
             body("big"),
+            body("selectOne"),
+            body("selectTwo"),
             validatorErrorChecker,
         ], this.postSmallEvent.bind(this));
-
-        this.router.get("/get-event-page/:id", [
-            param("id"),
-            validatorErrorChecker,
-        ], this.getEventPage.bind(this));
     }
 
     // 이벤트 빅 카테고리 반환
@@ -152,9 +149,9 @@ class EventController {
 
     async postSmallEvent(req, res, next) {
         try {
-            const { big, small } = req.body;
+            const { big, small, selectOne, selectTwo } = req.body;
 
-            await this.service.createSmall({ middle: middle, small: small });
+            await this.service.createSmall({ big: big, small: small, selectOne : selectOne, selectTwo : selectTwo });
 
             res.status(201).json({ msg: "true" });
         } catch (err) {
