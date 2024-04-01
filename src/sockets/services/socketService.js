@@ -53,15 +53,16 @@ export class SocketService {
     }
 
     async getJoinCount(payload) {
-        const isExist = await database.room.findUnique({
+        const isExist = await database.joinRoom.count({
             where: {
-                id: payload.roomId,
+                roomId : payload.roomId,
+                join : true,
             }
         });
 
         if (!isExist) throw { status: 404, msg: "not found : room" };
 
-        return isExist.joinCount;
+        return isExist;
     }
 
     // id Int @id @default(autoincrement())
