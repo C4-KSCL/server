@@ -146,8 +146,9 @@ export class RequestService {
                             myMBTI: true,
                             myKeyword: true,
                             nickname: true,
-                            // userImage : true,
+                            userImage : true,
                             age: true,
+                            gender : true,
                         }
                     }
                 },
@@ -174,8 +175,9 @@ export class RequestService {
                             myMBTI: true,
                             myKeyword: true,
                             nickname: true,
-                            // userImage : true,
+                            userImage : true,
                             age: true,
+                            gender : true,
                         }
                     }
                 },
