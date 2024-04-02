@@ -58,6 +58,11 @@ class EventController {
             body("selectTwo"),
             validatorErrorChecker,
         ], this.postSmallEvent.bind(this));
+
+        this.router.patch("/update-event-answer/:id", [
+            param("id"),
+            body("content"),
+        ], this.patchEventAnswer.bind(this));
     }
 
     // 이벤트 빅 카테고리 반환
@@ -109,7 +114,6 @@ class EventController {
 
             const image = await this.service.getImageByFilename(filename);
 
-
             if (!image) throw { status: 404, msg: "not found" };
 
             const dirname = path.resolve();
@@ -155,6 +159,22 @@ class EventController {
 
             res.status(201).json({ msg: "true" });
         } catch (err) {
+            next(err);
+        }
+    }
+
+    async patchEventAnswer(req,res,next){
+        try{
+            const { content } = req.body;
+
+            const { id } = req.params;
+
+            const user = req.user;
+
+            const event = await this.service.updateAnswer({content : content, id : Number(id), userEmail : user});
+
+            res.status(200).json({event : event});
+        }catch(err){
             next(err);
         }
     }

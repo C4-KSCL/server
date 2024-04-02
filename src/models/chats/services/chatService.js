@@ -122,6 +122,7 @@ export class ChatService {
                                 },
                                 addRequest: {
                                     select: {
+                                        id : true,
                                         reqUser : true,
                                         receive: {
                                             select: {
