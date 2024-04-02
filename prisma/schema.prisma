@@ -24,7 +24,11 @@ model AddRequest {
 
 model BigCategory {
   name           String           @id @db.VarChar(50)
+  imageId        Int?              @unique
+
   smallCategory  SmallCategory[]
+
+  eventImage EventImage? @relation(name: "big-images", fields: [imageId],references: [id],onDelete: SetNull, onUpdate: Cascade)
 }
 
 model Chatting {
@@ -56,22 +60,20 @@ model Event {
 
   smallCategory SmallCategory  @relation(fields: [category], references: [id])
   chatting      Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
-  eventUser1    User?          @relation(name : "event-user-one",fields: [user1], references: [email], onDelete: SetNull, onUpdate: Cascade)
-  eventUser2    User?          @relation(name : "event-user-two", fields: [user2], references: [email], onDelete: SetNull, onUpdate: Cascade)
+  eventUser1    User?          @relation(name : "event-user-one",fields: [user1], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
+  eventUser2    User?          @relation(name : "event-user-two", fields: [user2], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([category], map: "Event_category_fkey")
 }
 
 model EventImage {
-  filename        String         @id @db.VarChar(255)
-  filepath        String         @db.VarChar(255)
-  mimetype        String         @db.VarChar(255)
-  size            Int
-  smallCategoryId Int
+  id              Int         @id @default(autoincrement())
+  filekey         String      @db.VarChar(255)
+  filepath        String      @db.VarChar(255)
+  createdAt       DateTime    @default(now()) @db.DateTime(0)
 
-  smallCategory   SmallCategory  @relation(fields: [smallCategoryId], references: [id])
-
-  @@index([smallCategoryId], map: "EventImage_smallCategoryId_fkey")
+  smallCategory   SmallCategory? @relation(name: "small-images")
+  bigCategory     BigCategory? @relation(name: "big-images")
 }
 
 model Friend {
@@ -117,9 +119,10 @@ model SmallCategory {
   bigName        String         @db.VarChar(50)
   selectOne      String         @db.VarChar(100)
   selectTwo      String         @db.VarChar(100)
+  imageId        Int?           @unique
 
   event          Event[]
-  eventImage     EventImage[]
+  eventImage     EventImage?     @relation(name: "small-images",fields: [imageId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   bigCategory BigCategory @relation(fields: [bigName], references: [name], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([bigName], map: "BigCategory_bigName_fkey")

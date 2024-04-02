@@ -1,24 +1,27 @@
 import multer from "multer";
-import fs from "fs";
+const multer_s3 = require('multer-s3');
 
-export const imageUpload = multer({
-    storage: multer.diskStorage(
-        {
-            destination: function (req, file, cb) {
-                const dir = `images/${req.params.categoryId}`;
-                // dir이 없으면 생성
-                !fs.existsSync(dir) && fs.mkdirSync(dir);
+const aws = require('aws-sdk');
 
-                cb(null, dir);
-            },
-            filename: function (req, file, cb) {
-                cb(
-                    null,
-                    new Date().valueOf() + 
-                    '_' +
-                    file.originalname
-                );
-            }
-        }
-    ),
+const s3 = new aws.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+});
+
+const storage = multer_s3({
+    s3: s3,
+    bucket: process.env.S3_BUCKET_NAME, // 자신의 s3 버킷 이름
+    contentType: multer_s3.AUTO_CONTENT_TYPE,
+    acl: 'public-read', // 버킷에서 acl 관련 설정을 풀어줘야 사용할 수 있다.
+    metadata: function (req, file, cb) {
+        cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+        cb(null, `contents/${Date.now()}_${file.originalname}`);
+    }
+})
+
+export const upload = multer({
+    storage: storage // storage를 multer_s3 객체로 지정
 })

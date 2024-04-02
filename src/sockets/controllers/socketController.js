@@ -18,7 +18,7 @@ export class SocketController {
 
     setRoomId() {
         if (this.socket.size > 1) {
-            this.socket.emit("err", { msg: "have more than one connection" });
+            this.socket.emit("err", { msg: "have more connection than one" });
             return;
         }
         let id = "";
