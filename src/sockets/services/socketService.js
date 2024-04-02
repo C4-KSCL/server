@@ -53,15 +53,16 @@ export class SocketService {
     }
 
     async getJoinCount(payload) {
-        const isExist = await database.room.findUnique({
+        const isExist = await database.joinRoom.count({
             where: {
-                id: payload.roomId,
+                roomId : payload.roomId,
+                join : true,
             }
         });
 
         if (!isExist) throw { status: 404, msg: "not found : room" };
 
-        return isExist.joinCount;
+        return isExist;
     }
 
     // id Int @id @default(autoincrement())
@@ -74,10 +75,13 @@ export class SocketService {
     async createEvent(payload) {
 
         const message = await database.$transaction(async (db) => {
-            const user = await db.user.findUnique({
-                where: {
-                    email: payload.userEmail
-                }
+            const oppUser = await db.joinRoom.findFirst({
+                where : {
+                    roomId : payload.roomId,
+                    NOT : {
+                        userEmail : payload.userEmail,
+                    }
+                },
             });
 
             const msg = await db.chatting.create({
@@ -90,49 +94,57 @@ export class SocketService {
                 }
             });
 
-
             const event = await db.event.create({
                 data: {
                     chattingId: msg.id,
                     category: payload.categoryId,
+                    user1 : payload.userEmail,
+                    user2 : oppUser.userEmail,
                 }
             });
 
-            const images = await db.eventImage.findMany({
+            if (!msg) throw { status: 500, msg: "not created : msg" };
+            if (!event) throw { status : 500, msg : "not created : event" };
+
+            const msgWithEvent = await db.chatting.findUnique({
                 where: {
-                    smallCategoryId: payload.categoryId,
+                    id: msg.id,
+                },
+                include: {
+                    event: {
+                        include: {
+                            smallCategory: {
+                                include : {
+                                    eventImage : {
+                                        select : {
+                                            filepath : true,
+                                        }
+                                    }
+                                }
+                            },
+                            eventUser1 : {
+                                select : {
+                                    email : true,
+                                    nickname : true,
+                                    userImage : true,
+                                }
+                            },
+                            eventUser2 : {
+                                select : {
+                                    email : true,
+                                    nickname : true,
+                                    userImage : true,
+                                }
+                            },
+                        },
+                    },
                 }
             });
 
-            images.forEach(async (image) => {
-                const imageEvent = await db.imageInEvent.create({
-                    data: {
-                        file: image.filename,
-                        eventId: event.id,
-                    }
-                });
-            });
-            return msg;
+            return msgWithEvent;
         });
 
-        if(!message) throw { status : 404, msg : "not created : msg"};
-
-        const msgWithEvent = database.chatting.findUnique({
-            where: {
-                id: message.id,
-            },
-            include: {
-                event: {
-                    include: {
-                        smallCategory: true,
-                        image: true,
-                    }
-                },
-            }
-        });
-
-        return msgWithEvent;
-
+        return message;
     }
 
     async createOrUpdateSocket(payload) {
@@ -212,5 +224,17 @@ export class SocketService {
 
         return socketToken;
 
+    }
+
+    async checkSmall(payload){
+        const small = await database.smallCategory.findUnique({
+            where : {
+                name : payload.small
+            }
+        });
+
+        if(!small) throw { status : 404, msg: "not found : smallCategory" };
+
+        return small;
     }
 }

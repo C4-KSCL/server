@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { RequestService } from "../services";
+import { RequestService } from "../../rooms/services";
 import { CreateChatDTO } from "../../chats/dto/create-chat.dto";
-import { CreateRoomDTO } from "../dto/createRoom.dto";
+import { CreateRoomDTO } from "../../rooms/dto/createRoom.dto";
 import database from "../../../database";
 
 import { validatorErrorChecker } from "../../../middlewares/validator";

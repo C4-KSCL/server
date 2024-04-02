@@ -91,11 +91,12 @@ import { verifyAccessToken } from "./middleware/auth";
     }
   });
 
-  app.use((req, res, next) => { // 404 미들웨어
-    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
-    error.status = 404;
-    next(error);
-  });
+  // app.use((err, req, res, next) => { // 404 미들웨어
+  //   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
+  //   error.status = 404;
+  //   error.msg = err.msg;
+  //   next(error);
+  // });
 
   app.use((err, req, res, next) => { // 에러처리 미들웨어
     console.log(err); // 추후 삭제

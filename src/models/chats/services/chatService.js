@@ -45,8 +45,15 @@ export class ChatService {
                 readCount: true,
                 event: {
                     include: {
-                        smallCategory: true,
-                        imageInEvent: true,
+                        smallCategory: {
+                            include : {
+                                eventImage : {
+                                    select : {
+                                        filepath : true,
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 user: {
@@ -143,11 +150,23 @@ export class ChatService {
                         }
                     }
                 });
-    
+
+                const joinCount = await db.joinRoom.count({
+                    where : {
+                        roomId : join.roomId
+                    }
+                });
+
+                
                 chat.notReadCounts = count;
     
+                chat.room.joinCount = joinCount;
+
                 chats.push(chat);
             }
+
+            chats.sort((chat)=>(chat.createdAt)).reverse();
+
             return chats;
 
         });

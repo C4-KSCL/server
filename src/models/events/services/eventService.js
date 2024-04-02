@@ -9,41 +9,21 @@ export class EventService {
         return categories;
     }
 
-    async getMiddleCategories(bigCategory) {
-        // 임시
+    // 이 서비스는 socket에서 활용
+    async getSmallCategories(bigCategory) {
+
         const isExist = await database.bigCategory.findUnique({
             where: {
                 name: bigCategory,
-            },
-        });
-
-        if (!isExist) throw { status: 404, msg: "not found" };
-
-        // bigCategory 검사;
-        const categories = await database.middleCategory.findMany({
-            where: {
-                bigName: isExist.name,
             }
         });
 
-        return categories;
-    }
-
-    // 이 서비스는 socket에서 활용
-    async getSmallCategories(middleCategory) {
-
-        const isExist = await database.middleCategory.findUnique({
-            where: {
-                name: middleCategory,
-            }
-        });
-
-        if (!isExist) throw { status: 404, msg: "not found" };
+        if (!isExist) throw { status: 404, msg: "not found : bigCategory" };
         // middleCategory 검사;
 
         const categories = await database.smallCategory.findMany({
             where: {
-                middleName: isExist.name,
+                bigName: isExist.name,
             }
         });
 
@@ -154,7 +134,7 @@ export class EventService {
         const isExist = await database.smallCategory.findFirst({
             where: {
                 name: payload.small,
-                middleName: payload.middle
+                bigName: payload.big
             }
         });
 
@@ -163,7 +143,9 @@ export class EventService {
         await database.smallCategory.create({
             data: {
                 name: payload.small,
-                middleName: payload.middle
+                bigName: payload.big,
+                selectOne : payload.selectOne,
+                selectTwo : payload.selectTwo,
             }
         });
 
