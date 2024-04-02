@@ -88,20 +88,20 @@ export class EventService {
                         eventImage : true,
                     }
                 },
-                eventUser1 : {
-                    select : {
-                        nickname : true,
-                        email : true,
-                        userImage : true,
-                    }
-                },
-                eventUser2 : {
-                    select : {
-                        nickname : true,
-                        email : true,
-                        userImage : true,
-                    }
-                }
+                // eventUser1 : {
+                //     select : {
+                //         nickname : true,
+                //         email : true,
+                //         userImage : true,
+                //     }
+                // },
+                // eventUser2 : {
+                //     select : {
+                //         nickname : true,
+                //         email : true,
+                //         userImage : true,
+                //     }
+                // }
             }
         });
 
@@ -194,20 +194,20 @@ export class EventService {
                             eventImage : true,
                         }
                     },
-                    eventUser1 : {
-                        select : {
-                            nickname : true,
-                            email : true,
-                            userImage : true,
-                        }
-                    },
-                    eventUser2 : {
-                        select : {
-                            nickname : true,
-                            email : true,
-                            userImage : true,
-                        }
-                    }
+                    // eventUser1 : {
+                    //     select : {
+                    //         nickname : true,
+                    //         email : true,
+                    //         userImage : true,
+                    //     }
+                    // },
+                    // eventUser2 : {
+                    //     select : {
+                    //         nickname : true,
+                    //         email : true,
+                    //         userImage : true,
+                    //     }
+                    // }
                 }
             });
     
