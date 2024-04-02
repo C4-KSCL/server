@@ -33,8 +33,7 @@ exports.editInfo = (req, res) => {
                 }
                 // Refresh Token을 클라이언트로 전송하고, Access Token을 JSON 응답에 포함하여 반환
                 return res.status(200).json({
-                    user : userResults[0],
-                    images : imageResults,
+                    user : userResults[0]
                     // 필요한 사용자 정보를 추가로 반환할 수 있음
                 });
             });
