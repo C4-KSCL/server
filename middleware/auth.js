@@ -36,30 +36,30 @@ exports.verifyAccessToken = (req, res, next) => {
             catch (error){
                 if(req.headers.refreshtoken != undefined) { //우선 refresh 토큰을 보냈는지 확인
                     if(error.name === 'TokenExpiredError'){
-                        return res.status(492).json({
+                        return res.status(402).json({
                             //Access 토큰 만료, Refresh 토큰 만료
-                            code: 492,
+                            code: 402,
                             message: 'refresh 토큰이 만료되었습니다.'
                         });
                     }
                     if(error.name === 'JsonWebTokenError'){
-                        return res.status(492).json({
+                        return res.status(402).json({
                             //refresh 토큰 오류
-                            code: 492,
+                            code: 402,
                             message: '유효하지 않은 Refresh 토큰입니다.'
                         });
                     }
                 }
             }
-            return res.status(491).json({
+            return res.status(401).json({
                 //Access 토큰 만료, Refresh 토큰 헤더에 없음
-                code: 491,
+                code: 401,
                 message: 'access 토큰이 만료되었습니다.'
             });
         }
-        return res.status(491).json({
+        return res.status(401).json({
             //Access 토큰 오류
-            code: 491,
+            code: 411,
             message: '유효하지 않은 Access 토큰입니다.'
         });
     }
