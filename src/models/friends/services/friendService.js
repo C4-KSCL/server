@@ -32,6 +32,7 @@ export class FriendService {
                                 nickname : true,
                                 userImage : true,
                                 age : true,
+                                gender : true,
                             }
                         });
                     } else if (friend.user2 === userEmail){
@@ -45,6 +46,7 @@ export class FriendService {
                                 nickname : true,
                                 userImage : true,
                                 age : true,
+                                gender : true,
                             }
                         });
                     }

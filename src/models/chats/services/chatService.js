@@ -57,7 +57,9 @@ export class ChatService {
                     }
                 },
                 user: {
-                    select: { userImage: true }
+                    select: { 
+                        userImage: true,
+                    }
                 }
             },
             skip: payload.skip,
@@ -111,6 +113,7 @@ export class ChatService {
                                                 email: true,
                                                 nickname: true,
                                                 userImage: true,
+                                                gender : true,
                                             }
                                         }
                                     },
@@ -129,6 +132,7 @@ export class ChatService {
                                                 email: true,
                                                 nickname: true,
                                                 userImage: true,
+                                                gender : true,
                                             }
                                         }
                                     },
