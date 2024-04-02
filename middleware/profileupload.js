@@ -57,7 +57,31 @@ exports.profileupload = (req, res) => {
             });
         }))
         .then(successMessages => {
-            res.status(200).send(successMessages);
+            const email = req.body.email || req.headers.email;
+            const findInfoQuery = `SELECT * FROM User WHERE email = ?`;
+            req.mysqlConnection.query(findInfoQuery, [email], (err, userResults) => {
+                if (err) {
+                    console.error('Error while querying:', err);
+                    return res.status(500).send('서버 에러');
+                }
+                if (userResults.length === 0) {
+                    return res.status(401).send('아이디 또는 비밀번호가 올바르지 않습니다.');
+                }
+                const userNumber = userResults[0].userNumber; // 첫 번째 결과값을 사용자 정보로 설정
+                const findImageQuery = `SELECT * FROM UserImage WHERE userNumber = ?`;
+                req.mysqlConnection.query(findImageQuery, [userNumber], (err, imageResults) => {
+                    if (err) {
+                        console.error('Error while querying:', err);
+                        return res.status(500).send('서버 에러');
+                    }
+                    // Refresh Token을 클라이언트로 전송하고, Access Token을 JSON 응답에 포함하여 반환
+                    return res.status(200).json({
+                        user : userResults[0],
+                        images : imageResults,
+                        // 필요한 사용자 정보를 추가로 반환할 수 있음
+                    });
+                });
+            });
         })
         .catch(errorMessage => {
             res.status(500).send(errorMessage);

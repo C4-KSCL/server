@@ -14,15 +14,30 @@ exports.editInfo = (req, res) => {
         if (results.affectedRows === 0) {
             return res.status(404).send('해당 이메일의 사용자가 존재하지 않거나 변경된 내용이 없습니다.');
         }
-        const selectQuery = `SELECT * FROM User WHERE email = ?`;
-        req.mysqlConnection.query(selectQuery, [email], (selectErr, selectResults) => {
-            if (selectErr) {
-                console.error('Error while querying user information:', selectErr);
-                return res.status(501).send('서버 에러');
+        const email = req.body.email || req.headers.email;
+        const findInfoQuery = `SELECT * FROM User WHERE email = ?`;
+        req.mysqlConnection.query(findInfoQuery, [email], (err, userResults) => {
+            if (err) {
+                console.error('Error while querying:', err);
+                return res.status(500).send('서버 에러');
             }
-            // 변경된 사용자 정보 반환
-            const updatedUserInfo = selectResults[0];
-            res.status(200).json(updatedUserInfo);
+            if (userResults.length === 0) {
+                return res.status(401).send('아이디 또는 비밀번호가 올바르지 않습니다.');
+            }
+            const userNumber = userResults[0].userNumber; // 첫 번째 결과값을 사용자 정보로 설정
+            const findImageQuery = `SELECT * FROM UserImage WHERE userNumber = ?`;
+            req.mysqlConnection.query(findImageQuery, [userNumber], (err, imageResults) => {
+                if (err) {
+                    console.error('Error while querying:', err);
+                    return res.status(500).send('서버 에러');
+                }
+                // Refresh Token을 클라이언트로 전송하고, Access Token을 JSON 응답에 포함하여 반환
+                return res.status(200).json({
+                    user : userResults[0],
+                    images : imageResults,
+                    // 필요한 사용자 정보를 추가로 반환할 수 있음
+                });
+            });
         });
     }
     );
