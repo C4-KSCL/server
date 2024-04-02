@@ -39,7 +39,18 @@ exports.profiledelete = (req, res) => {
                     console.error('Error deleting image from database:', error);
                     return res.status(501).send('데이터베이스에서 이미지 정보 삭제에 실패했습니다.');
                 }
+                const email = req.body.email || req.headers.email;
+                const selectQuery = `SELECT * FROM User WHERE email = ?`;
+                req.mysqlConnection.query(selectQuery, [email], (selectErr, selectResults) => {
+                    if (selectErr) {
+                        console.error('Error while querying user information:', selectErr);
+                        return res.status(501).send('서버 에러');
+                    }
+                    // 변경된 사용자 정보 반환
+                    const updatedUserInfo = selectResults[0];
+                    res.status(200).json(updatedUserInfo);
                 res.status(200).send('이미지 삭제가 완료되었습니다.');
+                });
             });
         });
     });
