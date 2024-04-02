@@ -4,7 +4,15 @@ export class EventService {
 
     async getBigCategories() {
         // 임시 
-        const categories = await database.bigCategory.findMany({});
+        const categories = await database.bigCategory.findMany({
+            include: {
+                eventImage: {
+                    select: {
+                        filepath: true,
+                    }
+                }
+            }
+        });
 
         return categories;
     }
@@ -47,33 +55,59 @@ export class EventService {
 
     async createImage(payload) {
 
-        const isExist = await database.smallCategory.findUnique({
-            where: {
-                id: payload.categoryId
-            }
-        });
+        let isExist;
 
-        if (!isExist) throw { status: 404, msg: "not found : smallCategory ", categoryId: payload.categoryId };
+        if (payload.small) {
+            isExist = await database.smallCategory.findUnique({
+                where: {
+                    id: payload.small
+                }
+            });
 
-        await database.$transaction(async(db)=>{
-            payload.files.forEach(async (file) => {
-                const image = await db.eventImage.create({
-                    data: {
-                        filename: file.filename,
-                        filepath: file.path,
-                        mimetype: file.mimetype,
-                        size: file.size,
-                        smallCategoryId: payload.categoryId,
+            if (!isExist) throw { status: 404, msg: "not found : smallCategory ", categoryId: payload.small };
+        } else if (payload.big) {
+            isExist = await database.bigCategory.findUnique({
+                where: {
+                    name: payload.big,
+                }
+            });
+
+            if (!isExist) throw { status: 404, msg: "not found : bigCategory ", categoryId: payload.big };
+        }
+
+
+        console.log(payload.file.location, payload.file.key);
+
+        const image = await database.$transaction(async (db) => {
+            const image = await db.eventImage.create({
+                data: {
+                    filekey: payload.file.key,
+                    filepath: payload.file.location
+                }
+            });
+            if(payload.small){
+                const small = await db.smallCategory.update({
+                    where: {
+                        id: payload.small
+                    },
+                    data : {
+                        imageId : image.id, 
                     }
                 });
-            });
-        });
-        const images = await this.db.eventImage.findMany({
-            where: {
-                smallCategoryId: payload.categoryId,
+            }else if(payload.big){
+                const big = await db.bigCategory.update({
+                    where : {
+                        name : payload.big
+                    },
+                    data : {
+                        imageId : image.id,
+                    }
+                });
             }
+            return image;
         });
-        return images;
+
+        return image;
     }
 
     async getEvent(payload) {
@@ -83,9 +117,13 @@ export class EventService {
                 id: payload.id
             },
             include: {
-                smallCategory : {
-                    include : {
-                        eventImage : true,
+                smallCategory: {
+                    include: {
+                        eventImage: {
+                            select: {
+                                filepath: true,
+                            }
+                        }
                     }
                 },
                 // eventUser1 : {
@@ -143,45 +181,45 @@ export class EventService {
             data: {
                 name: payload.small,
                 bigName: payload.big,
-                selectOne : payload.selectOne,
-                selectTwo : payload.selectTwo,
+                selectOne: payload.selectOne,
+                selectTwo: payload.selectTwo,
             }
         });
 
     }
-    
-    async updateAnswer(payload){
+
+    async updateAnswer(payload) {
         const isExists = await database.event.findUnique({
-            where : {
-                id : payload.id,
+            where: {
+                id: payload.id,
             }
         });
 
-        if(!isExists) throw { status : 404, msg : "not found : event" };
+        if (!isExists) throw { status: 404, msg: "not found : event" };
 
-        const updatedEvent = await database.$transaction(async(db)=>{
+        const updatedEvent = await database.$transaction(async (db) => {
             let event;
 
-            if(isExists.user1 === payload.userEmail){
+            if (isExists.user1 === payload.userEmail) {
                 event = await db.event.update({
-                    where : {
-                        id : isExists.id,
+                    where: {
+                        id: isExists.id,
                     },
-                    data : {
-                        user1Choice : payload.content,
+                    data: {
+                        user1Choice: payload.content,
                     }
                 });
-            }else if(isExists.user2 === payload.userEmail){
+            } else if (isExists.user2 === payload.userEmail) {
                 event = await db.event.update({
-                    where : {
-                        id : isExists.id,
+                    where: {
+                        id: isExists.id,
                     },
-                    data : {
-                        user2Choice : payload.content,
+                    data: {
+                        user2Choice: payload.content,
                     }
                 });
-            }else{
-                throw { status : 400, msg : "bad request"};
+            } else {
+                throw { status: 400, msg: "bad request" };
             }
 
             event = await db.event.findUnique({
@@ -189,9 +227,13 @@ export class EventService {
                     id: isExists.id
                 },
                 include: {
-                    smallCategory : {
-                        include : {
-                            eventImage : true,
+                    smallCategory: {
+                        include: {
+                            eventImage: {
+                                select: {
+                                    filepath: true,
+                                }
+                            },
                         }
                     },
                     // eventUser1 : {
@@ -210,7 +252,7 @@ export class EventService {
                     // }
                 }
             });
-    
+
             return event;
         });
 

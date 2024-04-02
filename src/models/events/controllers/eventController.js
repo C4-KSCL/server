@@ -3,7 +3,7 @@ import { EventService } from "../services/eventService";
 import path from "path";
 import { param, body } from "express-validator";
 
-import { upload } from "../../../middlewares/multer";
+import { upload, imageDelete } from "../../../middlewares/multer";
 import { validatorErrorChecker } from "../../../middlewares/validator";
 
 import database from "../../../database";
@@ -31,10 +31,10 @@ class EventController {
         ]
             , this.getSmalls.bind(this));
 
-        this.router.post("/upload-image/:categoryId",
+        this.router.post("/upload-small-image/:categoryId",
             [param('categoryId'), body('image'), validatorErrorChecker],
             upload.single('image'),
-            this.postImages.bind(this));
+            this.postSmallImages.bind(this));
 
         this.router.get("/get-image/:filename", [
             param('filename'),
@@ -62,7 +62,21 @@ class EventController {
         this.router.patch("/update-event-answer/:id", [
             param("id"),
             body("content"),
+            validatorErrorChecker,
         ], this.patchEventAnswer.bind(this));
+
+        this.router.post("/upload-big-image/:name", [
+            param("name"),
+            body("image"),
+            validatorErrorChecker
+        ], upload.single('image'),
+            this.postBigImage.bind(this));
+
+        this.router.delete("/delete-image/:id", [
+            param("id"),
+            validatorErrorChecker
+        ], imageDelete,
+        )
     }
 
     // 이벤트 빅 카테고리 반환
@@ -88,22 +102,17 @@ class EventController {
         }
     }
 
-    async postImages(req, res, next) {
+    async postSmallImages(req, res, next) {
         const { categoryId } = req.params;
 
         try {
-            const image = await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
+            const image = await this.service.createImage({ file: req.file, small: Number(categoryId) });
 
-            if (!images) throw { status: 500, msg: "fail to upload image" };
+            if (!image) throw { status: 500, msg: "fail to upload image" };
 
-            res.status(201).json({ images: images });
+            res.status(201).json({ image: image });
 
         } catch (err) {
-            if (err.categoryId) {
-                deleteFiles({ files: req.files, categoryId: err.categoryId });
-            } else {
-                deleteFiles({ files: req.files });
-            }
             next(err);
         }
     }
@@ -155,7 +164,7 @@ class EventController {
         try {
             const { big, small, selectOne, selectTwo } = req.body;
 
-            await this.service.createSmall({ big: big, small: small, selectOne : selectOne, selectTwo : selectTwo });
+            await this.service.createSmall({ big: big, small: small, selectOne: selectOne, selectTwo: selectTwo });
 
             res.status(201).json({ msg: "true" });
         } catch (err) {
@@ -163,18 +172,34 @@ class EventController {
         }
     }
 
-    async patchEventAnswer(req,res,next){
-        try{
+    async patchEventAnswer(req, res, next) {
+        try {
             const { content } = req.body;
 
             const { id } = req.params;
 
             const user = req.user;
 
-            const event = await this.service.updateAnswer({content : content, id : Number(id), userEmail : user});
+            const event = await this.service.updateAnswer({ content: content, id: Number(id), userEmail: user });
 
-            res.status(200).json({event : event});
-        }catch(err){
+            res.status(200).json({ event: event });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async postBigImage(req, res, next) {
+        const { name } = req.params;
+
+        try {
+    
+            const image = await this.service.createImage({ file: req.file, big: name });
+
+            if (!image) throw { status: 500, msg: "fail to upload image" };
+
+            res.status(201).json({ image: image });
+
+        } catch (err) {
             next(err);
         }
     }

@@ -49,7 +49,7 @@ export class ChatService {
                             include : {
                                 eventImage : {
                                     select : {
-                                        filepath : true,
+                                        eventImage : true,
                                     }
                                 }
                             }
