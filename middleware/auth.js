@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
-const accessTokenExpiryTime = '30m'; // Access Token 유효기간
+const accessTokenExpiryTime = '1440m'; // Access Token 유효기간
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
 exports.verifyAccessToken = (req, res, next) => {
@@ -36,30 +36,30 @@ exports.verifyAccessToken = (req, res, next) => {
             catch (error){
                 if(req.headers.refreshtoken != undefined) { //우선 refresh 토큰을 보냈는지 확인
                     if(error.name === 'TokenExpiredError'){
-                        return res.status(402).json({
+                        return res.status(492).json({
                             //Access 토큰 만료, Refresh 토큰 만료
-                            code: 402,
+                            code: 492,
                             message: 'refresh 토큰이 만료되었습니다.'
                         });
                     }
                     if(error.name === 'JsonWebTokenError'){
-                        return res.status(402).json({
+                        return res.status(492).json({
                             //refresh 토큰 오류
-                            code: 402,
+                            code: 492,
                             message: '유효하지 않은 Refresh 토큰입니다.'
                         });
                     }
                 }
             }
-            return res.status(401).json({
+            return res.status(491).json({
                 //Access 토큰 만료, Refresh 토큰 헤더에 없음
-                code: 401,
+                code: 491,
                 message: 'access 토큰이 만료되었습니다.'
             });
         }
-        return res.status(401).json({
+        return res.status(491).json({
             //Access 토큰 오류
-            code: 411,
+            code: 491,
             message: '유효하지 않은 Access 토큰입니다.'
         });
     }
