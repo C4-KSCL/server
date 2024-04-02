@@ -83,7 +83,25 @@ export class EventService {
                 id: payload.id
             },
             include: {
-                imageInEvent: true,
+                smallCategory : {
+                    include : {
+                        eventImage : true,
+                    }
+                },
+                eventUser1 : {
+                    select : {
+                        nickname : true,
+                        email : true,
+                        userImage : true,
+                    }
+                },
+                eventUser2 : {
+                    select : {
+                        nickname : true,
+                        email : true,
+                        userImage : true,
+                    }
+                }
             }
         });
 
@@ -109,25 +127,6 @@ export class EventService {
         });
     }
 
-    // big, middle
-    async createMiddle(payload) {
-        const isExist = await database.middleCategory.findUnique({
-            where: {
-                name: payload.middle,
-                bigName: payload.big
-            }
-        });
-
-        if (isExist) throw { status: 400, msg: "already exists : middle" };
-
-        await database.middleCategory.create({
-            data: {
-                name: payload.middle,
-                bigName: payload.big
-            }
-        });
-    }
-
     // middle, small
     async createSmall(payload) {
 
@@ -149,6 +148,73 @@ export class EventService {
             }
         });
 
+    }
+    
+    async updateAnswer(payload){
+        const isExists = await database.event.findUnique({
+            where : {
+                id : payload.id,
+            }
+        });
+
+        if(!isExists) throw { status : 404, msg : "not found : event" };
+
+        const updatedEvent = await database.$transaction(async(db)=>{
+            let event;
+
+            if(isExists.user1 === payload.userEmail){
+                event = await db.event.update({
+                    where : {
+                        id : isExists.id,
+                    },
+                    data : {
+                        user1Choice : payload.content,
+                    }
+                });
+            }else if(isExists.user2 === payload.userEmail){
+                event = await db.event.update({
+                    where : {
+                        id : isExists.id,
+                    },
+                    data : {
+                        user2Choice : payload.content,
+                    }
+                });
+            }else{
+                throw { status : 400, msg : "bad request"};
+            }
+
+            event = await db.event.findUnique({
+                where: {
+                    id: isExists.id
+                },
+                include: {
+                    smallCategory : {
+                        include : {
+                            eventImage : true,
+                        }
+                    },
+                    eventUser1 : {
+                        select : {
+                            nickname : true,
+                            email : true,
+                            userImage : true,
+                        }
+                    },
+                    eventUser2 : {
+                        select : {
+                            nickname : true,
+                            email : true,
+                            userImage : true,
+                        }
+                    }
+                }
+            });
+    
+            return event;
+        });
+
+        return updatedEvent;
     }
 }
 

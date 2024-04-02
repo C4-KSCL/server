@@ -3,7 +3,7 @@ import { EventService } from "../services/eventService";
 import path from "path";
 import { param, body } from "express-validator";
 
-import { imageUpload } from "../../../middlewares/multer";
+import { upload } from "../../../middlewares/multer";
 import { validatorErrorChecker } from "../../../middlewares/validator";
 
 import database from "../../../database";
@@ -32,8 +32,8 @@ class EventController {
             , this.getSmalls.bind(this));
 
         this.router.post("/upload-image/:categoryId",
-            [param('categoryId'), body('images'), validatorErrorChecker],
-            imageUpload.array('images'),
+            [param('categoryId'), body('image'), validatorErrorChecker],
+            upload.single('image'),
             this.postImages.bind(this));
 
         this.router.get("/get-image/:filename", [
@@ -58,6 +58,11 @@ class EventController {
             body("selectTwo"),
             validatorErrorChecker,
         ], this.postSmallEvent.bind(this));
+
+        this.router.patch("/update-event-answer/:id", [
+            param("id"),
+            body("content"),
+        ], this.patchEventAnswer.bind(this));
     }
 
     // 이벤트 빅 카테고리 반환
@@ -87,7 +92,7 @@ class EventController {
         const { categoryId } = req.params;
 
         try {
-            const images = await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
+            const image = await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
 
             if (!images) throw { status: 500, msg: "fail to upload image" };
 
@@ -108,7 +113,6 @@ class EventController {
             const { filename } = req.params;
 
             const image = await this.service.getImageByFilename(filename);
-
 
             if (!image) throw { status: 404, msg: "not found" };
 
@@ -155,6 +159,22 @@ class EventController {
 
             res.status(201).json({ msg: "true" });
         } catch (err) {
+            next(err);
+        }
+    }
+
+    async patchEventAnswer(req,res,next){
+        try{
+            const { content } = req.body;
+
+            const { id } = req.params;
+
+            const user = req.user;
+
+            const event = await this.service.updateAnswer({content : content, id : Number(id), userEmail : user});
+
+            res.status(200).json({event : event});
+        }catch(err){
             next(err);
         }
     }
