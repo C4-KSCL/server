@@ -56,8 +56,8 @@ model Event {
 
   smallCategory SmallCategory  @relation(fields: [category], references: [id])
   chatting      Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
-  eventUser1    User?          @relation(name : "event-user-one",fields: [user1], references: [email], onDelete: SetNull, onUpdate: Cascade)
-  eventUser2    User?          @relation(name : "event-user-two", fields: [user2], references: [email], onDelete: SetNull, onUpdate: Cascade)
+  eventUser1    User?          @relation(name : "event-user-one",fields: [user1], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
+  eventUser2    User?          @relation(name : "event-user-two", fields: [user2], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([category], map: "Event_category_fkey")
 }
