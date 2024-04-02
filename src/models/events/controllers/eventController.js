@@ -3,7 +3,7 @@ import { EventService } from "../services/eventService";
 import path from "path";
 import { param, body } from "express-validator";
 
-import { imageUpload } from "../../../middlewares/multer";
+import { upload } from "../../../middlewares/multer";
 import { validatorErrorChecker } from "../../../middlewares/validator";
 
 import database from "../../../database";
@@ -32,8 +32,8 @@ class EventController {
             , this.getSmalls.bind(this));
 
         this.router.post("/upload-image/:categoryId",
-            [param('categoryId'), body('images'), validatorErrorChecker],
-            imageUpload.array('images'),
+            [param('categoryId'), body('image'), validatorErrorChecker],
+            upload.single('image'),
             this.postImages.bind(this));
 
         this.router.get("/get-image/:filename", [
@@ -92,7 +92,7 @@ class EventController {
         const { categoryId } = req.params;
 
         try {
-            const images = await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
+            const image = await this.service.createImage({ files: req.files, categoryId: Number(categoryId) });
 
             if (!images) throw { status: 500, msg: "fail to upload image" };
 
