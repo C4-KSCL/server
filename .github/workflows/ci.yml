@@ -14,17 +14,10 @@ jobs:    # 작업들을 정의
 
     steps:    # 작업의 단계들을 정의
 
-#      - name: Checkout repository    # 리포지토리 코드를 체크아웃
-#       uses: actions/checkout@v2
+      - name: Checkout repository    # 리포지토리 코드를 체크아웃
+        uses: actions/checkout@v2
               # .env 파일 생성
 
-      - name: excuting remote ssh commands
-        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
-        with:
-          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
-          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
-          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
-          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
 
       - name: Load env file
         run: |
@@ -58,7 +51,13 @@ jobs:    # 작업들을 정의
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       
-        
+      - name: excuting remote ssh commands
+        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
+        with:
+          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
+          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
+          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
+          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
         
       
 
