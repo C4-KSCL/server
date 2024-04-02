@@ -120,7 +120,7 @@
 > 1. 프로필 사진 삭제
 - URL : edit/deleteprofile (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - deletepath 
-- 반환 값 : -
+- 반환 값 : user, images
   - 200 : 삭제 성공
   - 500 : S3에서 이미지 삭제 실패
   - 501 : DB에서 이미지 삭제 실패  
@@ -129,14 +129,14 @@
 > 2. 프로필 사진 추가
 - URL : edit/addprofile (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - files ★Form-Data 형식★
-- 반환 값 : -
+- 반환 값 : user, images
   - 200 : 이미지 저장 성공
   - 500~503 : 이미지 저장 실패(서버 에러)
 
 > 3. 이미지 삭제
 - URL : edit/deleteimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - deletepath 
-- 반환 값 : -
+- 반환 값 : user, images
   - 200 : 삭제 성공
   - 500 : S3에서 이미지 삭제 실패
   - 501 : DB에서 이미지 삭제 실패  
@@ -145,7 +145,7 @@
 > 4. 이미지 추가
 - URL : edit/addimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - files ★Form-Data 형식★
-- 반환 값 : -
+- 반환 값 : user, images
   - 200 : 이미지 저장 성공
   - 500~503 : 이미지 저장 실패(서버 에러)
 
@@ -153,7 +153,7 @@
 > 1. 개인정보 수정 -> 닉네임 수정시 닉네임 확인하는 API 거쳐야함
 - URL : edit/info (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - password, nickname, phoneNumber, birthdate, gender, myMBTI, myKeyword, friendKeyword - 특정 값은 변경하지 않더라도 기존 값을 보내줘야함
-- 반환 값 : User 객체
+- 반환 값 : user, images
   - 200 : 업데이트 성공
   - 400 : 값을 보내지 않은 경우
   - 404 : 올바르지 않은 값을 보낸 경우
