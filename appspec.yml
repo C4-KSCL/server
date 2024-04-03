@@ -12,9 +12,3 @@ permissions:
       pattern: '**'
       owner: root
       group: root
-
-hooks:
-    AfterInstall:
-        - location: scripts/after-deploy.sh
-          timeout: 2000
-          runas: root
