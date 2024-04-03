@@ -74,14 +74,4 @@ jobs:    # 작업들을 정의
           docker compose up -d
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      
-      - name: excuting remote ssh commands
-        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
-        with:
-          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP a
-          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
-          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
-          port: 22 # 접속포트22
-        
-      
 
