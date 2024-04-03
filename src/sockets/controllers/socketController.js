@@ -43,6 +43,8 @@ export class SocketController {
 
             this.setRoomId();
 
+            console.log(payload.roomId);
+
             this.io.to(payload.roomId).emit("user join in room", { userEmail: this.socket.userEmail });
 
         } catch (err) {

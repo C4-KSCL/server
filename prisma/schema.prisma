@@ -35,13 +35,13 @@ model Chatting {
   id                            Int      @id @default(autoincrement())
   roomId                        String   @db.VarChar(100)
   nickName                      String?  @db.VarChar(50)
-  userEmail                     String   @db.VarChar(50)
+  userEmail                     String?   @db.VarChar(50)
   createdAt                     DateTime @default(now()) @db.DateTime(0)
   content                       String   @db.Text
   readCount                     Int
-  nick  User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname])
+  nick  User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
   room                          Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User     @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email])
+  user User?     @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email], onDelete: SetNull, onUpdate: Cascade)
   event                         Event?
 
   @@index([nickName], map: "Chatting_nickName_fkey")
