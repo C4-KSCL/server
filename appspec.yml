@@ -3,8 +3,6 @@ os: linux
 files:
     - source: /
       destination: /home/api/api_back
-    - source: /docker-compose.yml
-      destination: /home/api/api_back
     - source: /config/
       destination: /home/api/config
 file_exists_behavior: OVERWRITE
