@@ -74,13 +74,26 @@ export class SocketService {
     // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
     async createEvent(payload) {
 
+        const user = await database.user.findUnique({
+            where : {
+                email : payload.userEmail,
+            }
+        });
+
         const message = await database.$transaction(async (db) => {
             const oppUser = await db.joinRoom.findFirst({
+                include : {
+                    user :{
+                        select : {
+                            nickname : true,
+                        }
+                    }
+                },
                 where : {
                     roomId : payload.roomId,
                     NOT : {
                         userEmail : payload.userEmail,
-                    }
+                    },
                 },
             });
 
@@ -98,8 +111,8 @@ export class SocketService {
                 data: {
                     chattingId: msg.id,
                     category: payload.categoryId,
-                    user1 : payload.userEmail,
-                    user2 : oppUser.userEmail,
+                    user1 : user.nickname,
+                    user2 : oppUser.user.nickname,
                 }
             });
 

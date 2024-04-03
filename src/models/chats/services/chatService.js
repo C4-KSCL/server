@@ -170,7 +170,7 @@ export class ChatService {
                 chats.push(chat);
             }
 
-            chats.sort((chat)=>(chat.createdAt)).reverse();
+            chats.sort((chat)=>(chat.createdAt));
 
             return chats;
 
