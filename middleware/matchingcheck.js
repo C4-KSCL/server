@@ -12,6 +12,8 @@ exports.check = (req, res, next) => {
         if (isAllowed(results[0].requestTime) == true) {//10분이상 차이남
             return next();
         }
+        console.log(requestTime)
+        console.log(getCurrentDateTime())
         return res.status(400).json({
             requestTime: results[0].requestTime
         });
