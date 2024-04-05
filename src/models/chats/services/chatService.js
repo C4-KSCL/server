@@ -102,6 +102,7 @@ export class ChatService {
                     },
                     where: {
                         roomId: join.roomId,
+                        
                     },
                     include: {
                         room: {
