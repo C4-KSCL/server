@@ -1,4 +1,5 @@
 import database from "../../../database";
+import { getNowTime } from "../../../utils/getKSTTime";
 
 export class FriendService {
 
@@ -70,7 +71,8 @@ export class FriendService {
                     if(request){
                         const room = await db.room.findUnique({
                             where : {
-                                id : request.roomId
+                                id : request.roomId,
+                                publishing : "true",
                             },
                             select : {
                                 id : true
@@ -129,7 +131,6 @@ export class FriendService {
                 }
             });
 
-            // 내가 왜 여기서 복수형을 택했을까?
             const joinRoom = await database.joinRoom.findFirst({
                 where : {
                     userEmail : payload.userEmail,
@@ -151,14 +152,32 @@ export class FriendService {
                         }
                     });
                 }
-
                 await db.addRequest.delete({
                     where : {
                         id : request.id,
                     }
                 });
-            });
+                
+                const room = await db.room.findUnique({
+                    where : {
+                        id : request.roomId,
+                    }
+                });
 
+                if(room){
+                    await db.chatting.deleteMany({
+                        where : {
+                            roomId : room.id,
+                        }
+                    });
+                    // 친구 삭제될 때 방도 같이 삭제
+                    await db.room.delete({
+                        where : {
+                            id : request.roomId,
+                        }
+                    });
+                }
+            });
         }catch(err){
             throw err;
         }

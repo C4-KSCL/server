@@ -1,4 +1,5 @@
 import database from "../../../database";
+import { getNowTime } from "../../../utils/getKSTTime";
 
 export class RequestService {
     // roomId String @id @db.VarChar(100)
@@ -8,6 +9,7 @@ export class RequestService {
 
     //
     // 방만들기 -> 방 참가 -> 메시지입력 -> 요청 전송 # 트랜잭션
+    // 요청을 보낼 때 나 뿐만 아니라 상대도 JoinRoom테이블에 데이터를 생성해야한다. 나는 JoinRoom의 join : true, 상대는 join : false
     // payload : {room : room object, content : content, oppEmail : oppEmail, userEmail : userEmail}
     async createRequest(payload) {
         const user = await database.user.findUnique({
@@ -22,6 +24,7 @@ export class RequestService {
                 data: {
                     id: payload.room.id,
                     name: payload.room.id,
+                    createdAt : getNowTime(),
                 }
             });
 
@@ -29,6 +32,16 @@ export class RequestService {
                 data: {
                     roomId: room.id,
                     userEmail: payload.userEmail,
+                    createdAt : getNowTime(),
+                }
+            });
+
+            const oppJoin = await db.joinRoom.create({
+                data : {
+                    roomId : room.id,
+                    userEmail : payload.oppEmail,
+                    join : false,
+                    createdAt : getNowTime(),
                 }
             });
 
@@ -39,6 +52,7 @@ export class RequestService {
                     userEmail: user.email,
                     content: payload.content,
                     readCount: 1,
+                    createdAt : getNowTime(),
                 },
             });
 
@@ -47,6 +61,7 @@ export class RequestService {
                     roomId: room.id,
                     reqUser: user.email,
                     recUser: payload.oppEmail,
+                    createdAt : getNowTime(),
                 },
             });
 
@@ -56,15 +71,18 @@ export class RequestService {
         return madeRequest;
     }
 
-    //
     // payload : request object
     // 방 삭제 -> 요청 거절 업데이트 # 트랜잭션
     async deleteRoomAndRejectRequest(payload) {
 
         await database.$transaction(async (db) => {
-            await db.room.delete({
+            await db.room.update({
                 where: {
                     id: payload.roomId,
+                },
+                data : {
+                    publishing : "deleted",
+                    createdAt : getNowTime(),
                 }
             });
 
@@ -74,6 +92,7 @@ export class RequestService {
                 },
                 data: {
                     status: "rejected",
+                    createdAt : getNowTime(),
                 }
             });
         });
@@ -103,6 +122,14 @@ export class RequestService {
             where: {
                 id: payload.requestId,
                 reqUser: payload.userEmail,
+                OR : [
+                    {
+                        status : "ing",
+                    },
+                    {
+                        status : "rejected",
+                    }
+                ]
             }
         });
 
@@ -129,7 +156,14 @@ export class RequestService {
             requests = await database.addRequest.findMany({
                 where: {
                     reqUser: payload.userEmail,
-                    status: payload.status,
+                    OR : [
+                        {
+                            status : payload.status,
+                        },
+                        {
+                            status : "rejected",
+                        }
+                    ]
                 },
                 include: {
                     room: {
@@ -258,17 +292,27 @@ export class RequestService {
 
         const updatedRoom = await database.$transaction(async (db) => {
 
+            const join = await db.joinRoom.findFirst({
+                where : {
+                    userEmail : payload.userEmail,
+                    roomId : payload.request.roomId
+                }
+            });
+
             await db.friend.create({
                 data: {
                     user1: payload.request.reqUser,
                     user2: payload.request.recUser,
+                    createdAt : getNowTime(),
                 }
             });
 
-            await db.joinRoom.create({
-                data: {
-                    roomId: payload.request.roomId,
-                    userEmail: payload.userEmail
+            await db.joinRoom.update({
+                where: {
+                    id : join.id
+                },
+                data : {
+                    join : true,
                 }
             });
 
@@ -314,10 +358,26 @@ export class RequestService {
 
     }
 
-    //
+    // { request, id(request) }
     async deleteRoomAndRequest(payload) {
         let room;
-        
+
+        console.log(payload);
+
+        const myJoin = await database.joinRoom.findFirst({
+            where : {
+                roomId : payload.request.roomId,
+                userEmail : payload.request.reqUser,
+            }
+        });
+
+        const oppJoin = await database.joinRoom.findFirst({
+            where : {
+                roomId : payload.request.roomId,
+                userEmail : payload.request.recUser,
+            }
+        });
+
         if(!payload.request.roomId){
             room = null;
         }else{
@@ -329,6 +389,32 @@ export class RequestService {
         }
 
         await database.$transaction(async (db) => {
+            await db.addRequest.delete({
+                where : {
+                    id : payload.id
+                }
+            });
+
+            // my join
+            await db.joinRoom.delete({
+                where : {
+                    id : myJoin.id
+                }
+            });
+
+            // opp join
+            await db.joinRoom.delete({
+                where : {
+                    id : oppJoin.id
+                }
+            });
+
+            await db.chatting.deleteMany({
+                where : {
+                    roomId : payload.request.roomId,
+                }
+            });
+
             if(room){
                 await db.room.delete({
                     where: {
@@ -336,12 +422,6 @@ export class RequestService {
                     }
                 });
             }            
-
-            await db.addRequest.delete({
-                where: {
-                    id: payload.request.id
-                }
-            });
         });
     }
 }

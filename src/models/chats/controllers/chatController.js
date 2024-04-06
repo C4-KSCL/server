@@ -28,6 +28,8 @@ class ChatController {
 
         this.router.get("/get-last-chats/", [
         ], this.getLastChats.bind(this));
+
+        this.router.delete("/delete/:id",this.deleteChat.bind(this));
     }
 
 
@@ -63,6 +65,18 @@ class ChatController {
 
             res.status(200).json({ lastChats: lastChats });
         } catch (err) {
+            next(err);
+        }
+    }
+    
+    async deleteChat(req,res,next){
+        try{
+            const { id } = req.params;
+
+            await this.service.deleteChat({id : Number(id)});
+
+            res.status(203).json({});
+        }catch(err){
             next(err);
         }
     }

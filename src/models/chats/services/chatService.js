@@ -17,12 +17,11 @@ export class ChatService {
                 id: payload.roomId,
             }
         });
-
+        
         const join = await database.joinRoom.findFirst({
             where : {
                 roomId : isExist.id,
                 userEmail : payload.userEmail,
-                join : true,
             }
         });
 
@@ -102,7 +101,6 @@ export class ChatService {
                     },
                     where: {
                         roomId: join.roomId,
-                        
                     },
                     include: {
                         room: {
@@ -146,6 +144,8 @@ export class ChatService {
                         }
                     }
                 });
+
+                if(chat.room.publishing === "deleted") continue;
     
                 const count = await db.chatting.count({
                     where: {
@@ -159,7 +159,8 @@ export class ChatService {
 
                 const joinCount = await db.joinRoom.count({
                     where : {
-                        roomId : join.roomId
+                        roomId : join.roomId,
+                        join : true,
                     }
                 });
 
@@ -171,7 +172,14 @@ export class ChatService {
                 chats.push(chat);
             }
 
-            chats.sort((chat)=>(chat.createdAt));
+            chats.sort((a, b) => {
+                // 두 날짜를 Date 객체로 변환
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+              
+                // 내림차순 정렬을 위해 b와 a를 비교
+                return dateB - dateA;
+              });
 
             return chats;
 
@@ -179,5 +187,13 @@ export class ChatService {
 
         return lastChats;
 
+    }
+
+    async deleteChat(payload){
+        await database.chatting.delete({
+            where : {
+                id : payload.id,
+            }
+        });
     }
 }
