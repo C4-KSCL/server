@@ -61,7 +61,7 @@ jobs:    # 작업들을 정의
             --application-name MatchingCodeDeploy
             --deployment-config-name CodeDeployDefault.AllAtOnce
             --deployment-group-name ${{ secrets.DEPLOYMENT_GROUP_NAME }}
-            --s3-location bucket=${{ secrets.ACTION_S3_BUCKET_NAME }},bundleType=zip,key=""/$GITHUB_SHA.zip
+            --s3-location bucket=${{ secrets.ACTION_S3_BUCKET_NAME }},bundleType=zip,key=$GITHUB_SHA.zip
 
 
       - name: Replace IP Address in nginx.conf
