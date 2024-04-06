@@ -9,11 +9,11 @@ exports.check = (req, res, next) => {
         if (results.length === 0) {
             return res.status(500).send('해당 사용자는 없습니다.');
         }
+        console.log(results[0].requestTime)
+        console.log(getCurrentDateTime(new Date))
         if (isAllowed(results[0].requestTime) == true) {//10분이상 차이남
             return next();
         }
-        console.log(requestTime)
-        console.log(getCurrentDateTime())
         return res.status(400).json({
             requestTime: results[0].requestTime
         });
@@ -22,14 +22,13 @@ exports.check = (req, res, next) => {
 
 // 현재 시간과 최근 요청 시간 비교 함수
 function isAllowed(requestTime) {
-    const koreaNow = getCurrentDateTime();
+    const koreaNow = getCurrentDateTime(new Date);
     const differenceInMinutes = calculateTimeDifference(koreaNow, requestTime);
     return differenceInMinutes >= 1; //10분 차이로 설정
 }
 
 //시간 형식 설정 함수
-function getCurrentDateTime() {
-    const now = new Date();
+function getCurrentDateTime(now) {
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -44,8 +43,6 @@ function getCurrentDateTime() {
 function calculateTimeDifference(time1, time2) {
     const date1 = new Date(time1);
     const date2 = new Date(time2);
-    console.log("현재시간", date1)
-    console.log("최근요청시간", date2)
     const differenceInMilliseconds = Math.abs(date1 - date2);
     const differenceInMinutes = differenceInMilliseconds / (1000 * 60);
     return differenceInMinutes;
