@@ -54,7 +54,7 @@ jobs:    # 작업들을 정의
 
 
       - name: 🚛 Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.gibeom_S3_BUCKET_NAME }}/${{ env.gibeom_S3_BUCKET_NAME }}/$GITHUB_SHA.zip
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.ACTION_S3_BUCKET_NAME }}/${{ env.ACTION_S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
 
       - name: 🚀 Deploy to EC2 with CodeDeploy
         run: aws deploy create-deployment
