@@ -24,7 +24,7 @@ exports.check = (req, res, next) => {
 function isAllowed(requestTime) {
     const koreaNow = getCurrentDateTime();
     const differenceInMinutes = calculateTimeDifference(koreaNow, requestTime);
-    return differenceInMinutes >= 10; //10분 차이로 설정
+    return differenceInMinutes >= 1; //10분 차이로 설정
 }
 
 //시간 형식 설정 함수
@@ -44,6 +44,8 @@ function getCurrentDateTime() {
 function calculateTimeDifference(time1, time2) {
     const date1 = new Date(time1);
     const date2 = new Date(time2);
+    console.log("현재시간", date1)
+    console.log("최근요청시간", date2)
     const differenceInMilliseconds = Math.abs(date1 - date2);
     const differenceInMinutes = differenceInMilliseconds / (1000 * 60);
     return differenceInMinutes;
