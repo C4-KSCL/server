@@ -6,11 +6,13 @@ exports.check = (req, res, next) => {
     req.mysqlConnection.query(checkQuery, [userEmail], (err, results) => {
         if (err) {
             console.error('Error while updating:', err);
-            return res.status(500).send('서버 에러');``
+            return res.status(500).send('서버 에러');
         }
         if (results.length === 0) {
             return res.status(500).send('해당 사용자는 없습니다.');
         }
+        console.log(results[0].requestTime)
+        console.log(getCurrentDateTime(new Date))
         if (isAllowed(results[0].requestTime) == true) {//10분이상 차이남
             return next();
         }
@@ -29,13 +31,8 @@ function isAllowed(requestTime) {
 
 //시간 형식 설정 함수
 function getCurrentDateTime() {
-    const now = moment.tz(Date.now(), "Asia/Seoul").format();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const now = moment().tz("Asia/Seoul");
+    const formattedDateTime = now.format("YYYY-MM-DD HH:mm:ss");
     return formattedDateTime;
 }
 
