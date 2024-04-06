@@ -1,7 +1,5 @@
 const moment = require('moment-timezone');
 
-
-console.log(dateInKorea);  // 한국 시간대에 맞는 날짜와 시간을 출력
 exports.check = (req, res, next) => {
     const userEmail = req.headers['email'];
     const checkQuery = `SELECT * FROM User WHERE email = ?`;
