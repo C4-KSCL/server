@@ -38,7 +38,6 @@ exports.friendMatching = (req, res) => {
                     console.error('Error while querying:', err);
                     return res.status(500).send('서버 에러');
                 }
-                console.log(imageResults)
                 const now = getCurrentDateTime();
                 const updateQuery = `UPDATE User SET requestTime = ? WHERE email = ?`;
                 req.mysqlConnection.query(updateQuery, [now, userEmail], (err, results) => {

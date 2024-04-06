@@ -11,8 +11,6 @@ exports.check = (req, res, next) => {
         if (results.length === 0) {
             return res.status(500).send('해당 사용자는 없습니다.');
         }
-        console.log(results[0].requestTime)
-        console.log(getCurrentDateTime(new Date))
         if (isAllowed(results[0].requestTime) == true) {//10분이상 차이남
             return next();
         }
