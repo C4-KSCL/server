@@ -9,7 +9,6 @@ const nodemailer = require('nodemailer');
 // 로그인 처리 컨트롤러 함수
 exports.login = (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password);
     const findInfoQuery = `SELECT * FROM User WHERE email = ? AND password = ?`;
     req.mysqlConnection.query(findInfoQuery, [email, password], (err, userResults) => {
         if (err) {

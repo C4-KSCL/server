@@ -44,22 +44,24 @@ jobs:    # 작업들을 정의
           echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> .env
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env 
           echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+          echo "MY_IP=${{ secrets.MY_IP }}" >> .env
           echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}" >> .env
-      
+          echo "DEPLOYMENT_GROUP_NAME=${{ secrets.DEPLOYMENT_GROUP_NAME }}" >> .env
+
           # 파일 압축
       - name: 📦 Zip project files
         run: zip -r ./$GITHUB_SHA.zip .
 
 
       - name: 🚛 Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.gibeom_S3_BUCKET_NAME }}/${{ env.gibeom_S3_BUCKET_NAME }}/$GITHUB_SHA.zip
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.ACTION_S3_BUCKET_NAME }}/$GITHUB_SHA.zip
 
       - name: 🚀 Deploy to EC2 with CodeDeploy
         run: aws deploy create-deployment
-            --application-name codedeploy-app
+            --application-name MatchingCodeDeploy
             --deployment-config-name CodeDeployDefault.AllAtOnce
-            --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }}
-            --s3-location bucket=${{ secrets.gibeom_S3_BUCKET_NAME }},bundleType=zip,key=${{ env.gibeom_S3_BUCKET_NAME }}/$GITHUB_SHA.zip
+            --deployment-group-name ${{ secrets.DEPLOYMENT_GROUP_NAME }}
+            --s3-location bucket=${{ secrets.ACTION_S3_BUCKET_NAME }},bundleType=zip,key=$GITHUB_SHA.zip
 
 
       - name: Replace IP Address in nginx.conf
@@ -73,14 +75,4 @@ jobs:    # 작업들을 정의
           docker compose up -d
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      
-      - name: excuting remote ssh commands
-        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
-        with:
-          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP a
-          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
-          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
-          port: 22 # 접속포트22
-        
-      
 

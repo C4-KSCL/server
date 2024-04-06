@@ -1,3 +1,5 @@
+const moment = require('moment-timezone');
+
 exports.check = (req, res, next) => {
     const userEmail = req.headers['email'];
     const checkQuery = `SELECT * FROM User WHERE email = ?`;
@@ -22,19 +24,13 @@ exports.check = (req, res, next) => {
 function isAllowed(requestTime) {
     const koreaNow = getCurrentDateTime();
     const differenceInMinutes = calculateTimeDifference(koreaNow, requestTime);
-    return differenceInMinutes >= 10; //10분 차이로 설정
+    return differenceInMinutes >= 1; //10분 차이로 설정
 }
 
 //시간 형식 설정 함수
 function getCurrentDateTime() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const now = moment().tz("Asia/Seoul");
+    const formattedDateTime = now.format("YYYY-MM-DD HH:mm:ss");
     return formattedDateTime;
 }
 

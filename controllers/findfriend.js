@@ -1,3 +1,5 @@
+const moment = require('moment-timezone');
+
 exports.friendMatching = (req, res) => {
     const userEmail = req.headers['email'];
     let friendMBTI = "";
@@ -8,10 +10,15 @@ exports.friendMatching = (req, res) => {
             console.error('Error while querying:', err);
             return res.status(500).send('서버 에러');
         }
-        friendMBTI = results[0].friendMBTI;
+        const myfriendMBTI = results[0].friendMBTI;
+        const myfriendMinAge = results[0].friendMinAge;
+        const myfriendMaxAge = results[0].friendMaxAge;
+        const myfriendGender = results[0].friendGender;
+        
         //사용자가 설정한 친구MBTI 탐색 후 해당 MBTI를 가진 유저 조회
-        const friendfindQuery = `SELECT * FROM User WHERE myMBTI = ? AND email != ? ORDER BY RAND() LIMIT 5`;
-        req.mysqlConnection.query(friendfindQuery, [friendMBTI, userEmail], (err, userResults) => {
+        const friendfindQuery = `SELECT * FROM User WHERE myMBTI = ? AND CAST(age AS UNSIGNED) <= CAST(? AS UNSIGNED) AND CAST(age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
+        AND gender = ? AND email != ? ORDER BY RAND() LIMIT 5`;
+        req.mysqlConnection.query(friendfindQuery, [myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail], (err, userResults) => {
             if (err) {
                 console.error('Error while querying:', err);
                 return res.status(500).send('서버 에러');
@@ -25,7 +32,7 @@ exports.friendMatching = (req, res) => {
             // findImageQuery에 WHERE 조건에 userNumber IN (...)을 추가하여 필터링
             const findImageQuery = `SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated 
             FROM UserImage, User 
-            WHERE User.userNumber = UserImage.userNumber AND User.myMBTI = ? AND User.email != ? AND UserImage.userNumber IN (${userNumbers.join(',')});`;
+            WHERE User.userNumber = UserImage.userNumber AND UserImage.userNumber IN (${userNumbers.join(',')});`;
             req.mysqlConnection.query(findImageQuery, [friendMBTI, userEmail], (err, imageResults) => {
                 if (err) {
                     console.error('Error while querying:', err);
@@ -66,13 +73,7 @@ exports.setting = (req, res) => {
 
 //시간 형식 설정 함수
 function getCurrentDateTime() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const now = moment().tz("Asia/Seoul");
+    const formattedDateTime = now.format("YYYY-MM-DD HH:mm:ss");
     return formattedDateTime;
 }

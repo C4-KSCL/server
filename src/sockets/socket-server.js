@@ -9,7 +9,7 @@ import { SocketController } from "./controllers/socketController";
 import { verfiyForSocket } from "../middlewares/auth";
 
 export const SocketServer = async (httpServer) => {
-    
+    /*
     const io = new Server(httpServer);
     //
     // const pubClient = createClient({ legacyMode: false, host: 'localhost', port: 6379});
@@ -70,5 +70,5 @@ export const SocketServer = async (httpServer) => {
     } catch (error) {
         console.error(`Redis 연결 오류: ${error}`);
     }
-    
+    */
 }
