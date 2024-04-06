@@ -1,3 +1,7 @@
+const moment = require('moment-timezone');
+
+
+console.log(dateInKorea);  // 한국 시간대에 맞는 날짜와 시간을 출력
 exports.check = (req, res, next) => {
     const userEmail = req.headers['email'];
     const checkQuery = `SELECT * FROM User WHERE email = ?`;
@@ -9,8 +13,6 @@ exports.check = (req, res, next) => {
         if (results.length === 0) {
             return res.status(500).send('해당 사용자는 없습니다.');
         }
-        console.log(results[0].requestTime)
-        console.log(getCurrentDateTime(new Date))
         if (isAllowed(results[0].requestTime) == true) {//10분이상 차이남
             return next();
         }
@@ -22,14 +24,14 @@ exports.check = (req, res, next) => {
 
 // 현재 시간과 최근 요청 시간 비교 함수
 function isAllowed(requestTime) {
-    const koreaNow = getCurrentDateTime(new Date);
+    const koreaNow = getCurrentDateTime();
     const differenceInMinutes = calculateTimeDifference(koreaNow, requestTime);
     return differenceInMinutes >= 1; //10분 차이로 설정
 }
 
 //시간 형식 설정 함수
-function getCurrentDateTime(now) {
-    const year = now.getFullYear();
+function getCurrentDateTime() {
+    const now = moment.tz(Date.now(), "Asia/Seoul").format();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');

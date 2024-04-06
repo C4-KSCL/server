@@ -72,7 +72,7 @@ exports.setting = (req, res) => {
 
 //시간 형식 설정 함수
 function getCurrentDateTime() {
-    const now = new Date();
+    const now = moment.tz(Date.now(), "Asia/Seoul").format();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
