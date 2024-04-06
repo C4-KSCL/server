@@ -30,7 +30,7 @@ exports.friendMatching = (req, res) => {
             // findImageQuery에 WHERE 조건에 userNumber IN (...)을 추가하여 필터링
             const findImageQuery = `SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated 
             FROM UserImage, User 
-            WHERE User.userNumber = UserImage.userNumber AND User.myMBTI = ? AND User.email != ? AND UserImage.userNumber IN (${userNumbers.join(',')});`;
+            WHERE User.userNumber = UserImage.userNumber AND UserImage.userNumber IN (${userNumbers.join(',')});`;
             req.mysqlConnection.query(findImageQuery, [friendMBTI, userEmail], (err, imageResults) => {
                 if (err) {
                     console.error('Error while querying:', err);

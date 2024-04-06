@@ -16,4 +16,4 @@ RUN npx prisma generate
 #8001포트로
 EXPOSE 8000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run dev"]
+CMD ["sh", "-c", "set TZ=Asia/Seoul && npx prisma migrate deploy && npm run dev"]
