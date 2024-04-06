@@ -4,7 +4,7 @@ REPOSITORY=/home/api/
 cd $REPOSITORY/api_back
 
 echo "> 🔵 Stop & Remove docker services."
-docker compose down
+docker-compose down
 
 # Docker 데몬이 실행 중인지 확인
 docker info > /dev/null 2>&1
@@ -17,4 +17,4 @@ else
 fi
 
 echo "> 🟢 Run new docker services."
-docker compose up --build -d
+docker-compose up --build -d
