@@ -6,7 +6,7 @@ exports.check = (req, res, next) => {
     req.mysqlConnection.query(checkQuery, [userEmail], (err, results) => {
         if (err) {
             console.error('Error while updating:', err);
-            return res.status(500).send('서버 에러');
+            return res.status(500).send('서버 에러');``
         }
         if (results.length === 0) {
             return res.status(500).send('해당 사용자는 없습니다.');
