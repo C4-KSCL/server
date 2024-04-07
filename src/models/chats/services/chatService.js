@@ -95,6 +95,10 @@ export class ChatService {
 
         const lastChats = await database.$transaction(async(db)=>{
             for (const join of joins) {
+                if(join.reqUser){
+                    join.userEmail = userEmail;
+                }
+
                 const chat = await db.chatting.findFirst({
                     orderBy: {
                         createdAt: "desc",
@@ -138,7 +142,6 @@ export class ChatService {
                                     },
                                     where: {
                                         status: "ing",
-                                        reqUser: userEmail,
                                     }
                                 }
                             }

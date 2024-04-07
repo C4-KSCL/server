@@ -72,5 +72,4 @@ export const SocketServer = async (httpServer) => {
     } catch (error) {
         console.error(`Redis 연결 오류: ${error}`);
     }
-    
 }
