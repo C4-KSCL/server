@@ -62,7 +62,7 @@ import { verifyAccessToken } from "./middleware/auth";
 
   await database.$connect();
 
-  const io = SocketServer(httpServer);
+  SocketServer(httpServer);
 
   app.use((req, res, next) => {
     req.mysqlConnection = connection; 
