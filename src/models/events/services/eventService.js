@@ -1,4 +1,5 @@
 import database from "../../../database";
+import { getNowTime } from "../../../utils/getKSTTime";
 
 export class EventService {
 
@@ -82,7 +83,8 @@ export class EventService {
             const image = await db.eventImage.create({
                 data: {
                     filekey: payload.file.key,
-                    filepath: payload.file.location
+                    filepath: payload.file.location,
+                    createdAt : getNowTime(),
                 }
             });
             if(payload.small){

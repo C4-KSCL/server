@@ -20,20 +20,15 @@ class RequestController {
 
     init() {
         this.router.post("/send", [
-            // body('userEmail').isEmail(),
             body('oppEmail').isEmail(),
             body('content'),
             validatorErrorChecker
         ], this.sendRequest.bind(this));
 
         this.router.get("/get-received", [
-            // param('userEmail').isEmail(),
-            // validatorErrorChecker
         ], this.getReceviedRequests.bind(this));
 
         this.router.get("/get-sended", [
-            // param('userEmail'),
-            // validatorErrorChecker
         ], this.getSendRequests.bind(this));
 
         this.router.post("/accept", [
@@ -53,11 +48,11 @@ class RequestController {
     }
 
     // 이미 보낸 요청이 있는 지 확인한다 그 후, 방을 만든 뒤, 참가 후, 메시지를 입력 후, 요청을 보낸다.
+    // 요청을 보낼 때 나 뿐만 아니라 상대도 JoinRoom테이블에 데이터를 생성해야한다. 나는 JoinRoom의 join : true, 상대는 join : false
     //  - url : /requests/send
     // header에 accessToken
     //  - 요청 데이터 : opp_id, message
     //  - 반환 데이터 : msg : 성공시 true, 실패 시 false
-    // 구조 변경 완료
     async sendRequest(req, res, next) {
         try {
             const userEmail = req.user;
@@ -92,13 +87,11 @@ class RequestController {
     // 받은 요청들을 반환한다.
     // /requests/get-received
     // header에 accessToken
-    // 구조 변경 완료
     async getReceviedRequests(req, res, next) {
         try {
             const userEmail = req.user;
 
             const requests = await this.service.getRequests({ userEmail: userEmail, recUser: userEmail, status: "ing" });
-
 
             res.status(200).json({ requests: requests });
         } catch (err) {
@@ -108,7 +101,6 @@ class RequestController {
 
     // 보낸 요청들을 반환한다.
     // header에 accessToken
-    // 구조 변경 완료
     async getSendRequests(req, res, next) {
         try {
             const userEmail = req.user;
@@ -123,7 +115,7 @@ class RequestController {
 
     // 친구 요청을 받아들인다.
     // 요청 아이디로 방 아이디 획득, 친구 추가, 채팅 방에 입장, 채팅 방 publishing을 true로 변환,  요청 삭제
-    // 구조 변경 완료
+    // 채팅방 입장은 JoinRoom 테이블의 join : false를 true로 바꿔주면 된다.
     async acceptRequest(req, res, next) {
         try {
             const userEmail = req.user;
@@ -149,7 +141,6 @@ class RequestController {
 
     // 요청 거절
     // 방 삭제, 요청 삭제
-    // 구조 변경 완료
     async rejectRequest(req, res, next) {
         try {
             const userEmail = req.user;
@@ -172,7 +163,6 @@ class RequestController {
         }
     }
 
-    // 구조 변경 완료   
     async deleteRequest(req, res, next) {
         try {
             const userEmail = req.user;

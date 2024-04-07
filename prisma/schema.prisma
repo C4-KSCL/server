@@ -8,14 +8,15 @@ datasource db {
 }
 
 model AddRequest {
-  id                            Int     @id @default(autoincrement())
-  roomId                        String? @db.VarChar(100)
-  reqUser                       String  @db.VarChar(50)
-  recUser                       String  @db.VarChar(50)
-  status                        String  @default("ing") @db.VarChar(25)
-  request User    @relation("request", fields: [reqUser], references: [email], onDelete: Cascade)
-  receive User    @relation("receive", fields: [recUser], references: [email], onDelete: Cascade)
-  room                          Room?   @relation(fields: [roomId], references: [id])
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  reqUser   String   @db.VarChar(50)
+  recUser   String   @db.VarChar(50)
+  status    String   @default("ing") @db.VarChar(25)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  request   User     @relation("request", fields: [reqUser], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  receive   User     @relation("receive", fields: [recUser], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade)
 
   @@index([recUser], map: "AddRequest_recUser_fkey")
   @@index([reqUser], map: "AddRequest_reqUser_fkey")
@@ -23,26 +24,26 @@ model AddRequest {
 }
 
 model BigCategory {
-  name           String           @id @db.VarChar(50)
-  imageId        Int?              @unique
+  name    String @id @db.VarChar(50)
+  imageId Int?   @unique
 
-  smallCategory  SmallCategory[]
+  smallCategory SmallCategory[]
 
-  eventImage EventImage? @relation(name: "big-images", fields: [imageId],references: [id],onDelete: SetNull, onUpdate: Cascade)
+  eventImage EventImage? @relation(name: "big-images", fields: [imageId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model Chatting {
-  id                            Int      @id @default(autoincrement())
-  roomId                        String   @db.VarChar(100)
-  nickName                      String?  @db.VarChar(50)
-  userEmail                     String?   @db.VarChar(50)
-  createdAt                     DateTime @default(now()) @db.DateTime(0)
-  content                       String   @db.Text
-  readCount                     Int
-  nick  User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
-  room                          Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User?     @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email], onDelete: SetNull, onUpdate: Cascade)
-  event                         Event?
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  nickName  String?  @db.VarChar(50)
+  userEmail String?  @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  content   String   @db.Text
+  readCount Int
+  nick      User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade)
+  user      User?    @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email], onDelete: SetNull, onUpdate: Cascade)
+  event     Event?
 
   @@index([nickName], map: "Chatting_nickName_fkey")
   @@index([roomId], map: "Chatting_roomId_fkey")
@@ -50,63 +51,65 @@ model Chatting {
 }
 
 model Event {
-  id            Int            @id @default(autoincrement())
-  chattingId    Int            @unique
-  category      Int
-  user1 String? @db.VarChar(100)
-  user2 String? @db.VarChar(100)
-  user1Choice String? @db.VarChar(100) 
-  user2Choice String? @db.VarChar(100)
+  id          Int      @id @default(autoincrement())
+  chattingId  Int      @unique
+  category    Int
+  user1       String?  @db.VarChar(100)
+  user2       String?  @db.VarChar(100)
+  user1Choice String?  @db.VarChar(100)
+  user2Choice String?  @db.VarChar(100)
+  createdAt   DateTime @default(now()) @db.DateTime(0)
 
-  smallCategory SmallCategory  @relation(fields: [category], references: [id])
-  chatting      Chatting       @relation(fields: [chattingId], references: [id], onDelete: Cascade)
-  eventUser1    User?          @relation(name : "event-user-one",fields: [user1], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
-  eventUser2    User?          @relation(name : "event-user-two", fields: [user2], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
+  smallCategory SmallCategory @relation(fields: [category], references: [id])
+  chatting      Chatting      @relation(fields: [chattingId], references: [id])
+  eventUser1    User?         @relation(name: "event-user-one", fields: [user1], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
+  eventUser2    User?         @relation(name: "event-user-two", fields: [user2], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([category], map: "Event_category_fkey")
 }
 
 model EventImage {
-  id              Int         @id @default(autoincrement())
-  filekey         String      @db.VarChar(255)
-  filepath        String      @db.VarChar(255)
-  createdAt       DateTime    @default(now()) @db.DateTime(0)
+  id        Int      @id @default(autoincrement())
+  filekey   String   @db.VarChar(255)
+  filepath  String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.DateTime(0)
 
-  smallCategory   SmallCategory? @relation(name: "small-images")
-  bigCategory     BigCategory? @relation(name: "big-images")
+  smallCategory SmallCategory? @relation(name: "small-images")
+  bigCategory   BigCategory?   @relation(name: "big-images")
 }
 
 model Friend {
-  id                      Int      @id @default(autoincrement())
-  user1                   String   @db.VarChar(50)
-  user2                   String   @db.VarChar(50)
-  createdAt               DateTime @default(now()) @db.DateTime(0)
-  userOne User     @relation("userOne", fields: [user1], references: [email], onDelete: Cascade)
-  userTwo User     @relation("userTwo", fields: [user2], references: [email], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  user1     String   @db.VarChar(50)
+  user2     String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  userOne   User     @relation("userOne", fields: [user1], references: [email], onUpdate: Cascade)
+  userTwo   User     @relation("userTwo", fields: [user2], references: [email], onUpdate: Cascade)
 
   @@index([user1], map: "Friend_user1_fkey")
   @@index([user2], map: "Friend_user2_fkey")
 }
 
 model JoinRoom {
-  id        Int    @id @default(autoincrement())
-  roomId    String @db.VarChar(100)
-  userEmail String @db.VarChar(50)
-  join Boolean @default(true)
-  
-  room      Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user      User   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  userEmail String   @db.VarChar(50)
+  join      Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+
+  room Room @relation(fields: [roomId], references: [id], onUpdate: Cascade)
+  user User @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([roomId], map: "JoinRoom_roomId_fkey")
   @@index([userEmail], map: "JoinRoom_userEmail_fkey")
 }
 
 model Room {
-  id              String            @id @db.VarChar(100)
-  name            String            @db.VarChar(100)
-  createdAt       DateTime          @default(now()) @db.DateTime(0)
-  publishing      String            @default("ing") @db.VarChar(10)
-  
+  id         String   @id @db.VarChar(100)
+  name       String   @db.VarChar(100)
+  createdAt  DateTime @default(now()) @db.DateTime(0)
+  publishing String   @default("ing") @db.VarChar(10)
+
   addRequest      AddRequest[]
   chatting        Chatting[]
   joinRoom        JoinRoom[]
@@ -114,53 +117,54 @@ model Room {
 }
 
 model SmallCategory {
-  id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar(50) @unique
-  bigName        String         @db.VarChar(50)
-  selectOne      String         @db.VarChar(100)
-  selectTwo      String         @db.VarChar(100)
-  imageId        Int?           @unique
+  id        Int    @id @default(autoincrement())
+  name      String @unique @db.VarChar(50)
+  bigName   String @db.VarChar(50)
+  selectOne String @db.VarChar(100)
+  selectTwo String @db.VarChar(100)
+  imageId   Int?   @unique
 
-  event          Event[]
-  eventImage     EventImage?     @relation(name: "small-images",fields: [imageId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  event       Event[]
+  eventImage  EventImage? @relation(name: "small-images", fields: [imageId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   bigCategory BigCategory @relation(fields: [bigName], references: [name], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([bigName], map: "BigCategory_bigName_fkey")
 }
 
 model User {
-  userNumber                          Int              @id @default(autoincrement())
-  email                               String?          @unique(map: "email") @db.VarChar(100)
-  password                            String?          @db.VarChar(100)
-  nickname                            String?          @unique @db.VarChar(100)
-  phoneNumber                         String?          @db.VarChar(100)
-  age                                 String?          @db.VarChar(100)
-  gender                              String?          @db.VarChar(100)
-  myMBTI                              String?          @db.VarChar(100)
-  myKeyword                           String?          @db.VarChar(100)
-  friendMBTI                          String?          @db.VarChar(100)
-  friendKeyword                       String?          @db.VarChar(100)
-  friendMaxAge                        String?
-  friendMinAge                        String?
-  friendGender                        String?          @db.VarChar(100)
-  userCreated                         DateTime?        @default(now()) @db.DateTime(0)
-  userImage                           String?          @default("https://matchingimage.s3.ap-northeast-2.amazonaws.com/defalut_user.png") @db.VarChar(1000)
-  userImageKey                        String?          @db.VarChar(1000)
-  requestTime                         DateTime?        @default(dbgenerated("'2000-01-01 00:00:00'")) @db.DateTime(0)
-  manager                             Boolean?         @default(false)
-  suspend                             Boolean?         @default(false)
-  
-  request AddRequest[]     @relation("request")
-  receive AddRequest[]     @relation("receive")
+  userNumber    Int       @id @default(autoincrement())
+  email         String?   @unique(map: "email") @db.VarChar(100)
+  password      String?   @db.VarChar(100)
+  nickname      String?   @unique @db.VarChar(100)
+  phoneNumber   String?   @db.VarChar(100)
+  age           String?   @db.VarChar(100)
+  gender        String?   @db.VarChar(100)
+  myMBTI        String?   @db.VarChar(100)
+  myKeyword     String?   @db.VarChar(100)
+  friendMBTI    String?   @db.VarChar(100)
+  friendKeyword String?   @db.VarChar(100)
+  friendMaxAge  String?
+  friendMinAge  String?
+  friendGender  String?   @db.VarChar(100)
+  userCreated   DateTime? @default(now()) @db.DateTime(0)
+  userImage     String?   @default("https://matchingimage.s3.ap-northeast-2.amazonaws.com/defalut_user.png") @db.VarChar(1000)
+  userImageKey  String?   @db.VarChar(1000)
+  requestTime   DateTime? @default(dbgenerated("'2000-01-01 00:00:00'")) @db.DateTime(0)
+  manager       Boolean?  @default(false)
+  suspend       Boolean?  @default(false)
+  deleteTime    DateTime? @db.DateTime(0)
+
+  request          AddRequest[]     @relation("request")
+  receive          AddRequest[]     @relation("receive")
   chattingEmail    Chatting[]       @relation("Chatting_nickNameToUser")
-  chattingNickName   Chatting[]       @relation("Chatting_userEmailToUser")
-  userOne           Friend[]         @relation("userOne")
-  userTwo           Friend[]         @relation("userTwo")
-  joinRoom                            JoinRoom[]
-  UserImage                           UserImage[]
-  userSocketToken                     UserSocketToken?
-  eventUser1       Event[]  @relation("event-user-one")
-  eventUser2       Event[]  @relation("event-user-two")
+  chattingNickName Chatting[]       @relation("Chatting_userEmailToUser")
+  userOne          Friend[]         @relation("userOne")
+  userTwo          Friend[]         @relation("userTwo")
+  joinRoom         JoinRoom[]
+  UserImage        UserImage[]
+  userSocketToken  UserSocketToken?
+  eventUser1       Event[]          @relation("event-user-one")
+  eventUser2       Event[]          @relation("event-user-two")
 }
 
 model UserImage {
@@ -180,7 +184,59 @@ model UserSocketToken {
   token         String? @db.VarChar(255)
   connectRoomId String? @db.VarChar(255)
   room          Room?   @relation(fields: [connectRoomId], references: [id])
-  user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([connectRoomId], map: "UserSocketToken_connectRoomId_fkey")
+}
+
+model RoomBackup {
+  id         String   @id @db.VarChar(100)
+  name       String   @db.VarChar(100)
+  createdAt  DateTime @db.DateTime(0)
+  publishing String   @db.VarChar(10)
+}
+
+model RequestBackup {
+  id        Int      @id @default(autoincrement())
+  roomId    String?  @db.VarChar(100)
+  reqUser   String   @db.VarChar(50)
+  recUser   String   @db.VarChar(50)
+  status    String   @db.VarChar(25)
+  createdAt DateTime @db.DateTime(0)
+}
+
+model ChattingBackup {
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  nickName  String?  @db.VarChar(50)
+  userEmail String?  @db.VarChar(50)
+  createdAt DateTime @db.DateTime(0)
+  content   String   @db.Text
+  readCount Int
+}
+
+model EventBackup {
+  id          Int      @id @default(autoincrement())
+  chattingId  Int      @unique
+  category    Int
+  user1       String?  @db.VarChar(100)
+  user2       String?  @db.VarChar(100)
+  user1Choice String?  @db.VarChar(100)
+  user2Choice String?  @db.VarChar(100)
+  createdAt   DateTime @db.DateTime(0)
+}
+
+model JoinRoomBackup {
+  id        Int      @id @default(autoincrement())
+  roomId    String   @db.VarChar(100)
+  userEmail String   @db.VarChar(50)
+  join      Boolean  @default(true)
+  createdAt DateTime @db.DateTime(0)
+}
+
+model FriendBackup {
+  id        Int      @id @default(autoincrement())
+  user1     String   @db.VarChar(50)
+  user2     String   @db.VarChar(50)
+  createdAt DateTime @db.DateTime(0)
 }
