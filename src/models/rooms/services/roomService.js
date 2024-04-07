@@ -106,6 +106,7 @@ export class RoomService {
                             select: {
                                 id: true,
                                 roomId: true,
+                                join : true,
                                 user: {
                                     select: {
                                         email: true,

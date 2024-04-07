@@ -107,6 +107,7 @@ export class ChatService {
                             include: {
                                 joinRoom: {
                                     select: {
+                                        join : true,
                                         user: {
                                             select: {
                                                 email: true,
