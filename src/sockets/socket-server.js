@@ -12,8 +12,8 @@ export const SocketServer = async (httpServer) => {
     
     const io = new Server(httpServer);
     //
-    const pubClient = createClient({ legacyMode: false, host: 'localhost', port: 6379});
-    // const pubClient = createClient({ legacyMode: false, url: 'redis://redis:6379' });
+    // const pubClient = createClient({ legacyMode: false, host: 'localhost', port: 6379});
+    const pubClient = createClient({ legacyMode: false, url: 'redis://redis:6379' });
     const subClient = pubClient.duplicate();
 
     // Redis 클라이언트에 대한 오류 이벤트 핸들러 추가
@@ -36,8 +36,8 @@ export const SocketServer = async (httpServer) => {
 
         io.use(async (socket, next) => {
             try {
-                // const token = socket.handshake.auth.token;
-                const token = socket.handshake.query.token;
+                const token = socket.handshake.auth.token;
+                // const token = socket.handshake.query.token;
 
                 socket.userEmail = await verfiyForSocket(token);
 
