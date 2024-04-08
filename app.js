@@ -21,6 +21,9 @@ import Controllers from "./src/controllers.friends-chats";
 import { SocketServer } from "./src/sockets/socket-server";
 import { verifyAccessToken } from "./middleware/auth";
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기준으로 경로 지정
+
 (async () => {
 
   const app = express();
@@ -76,6 +79,7 @@ import { verifyAccessToken } from "./middleware/auth";
     console.log(`Hello World! 현재 포트 : ${clientPort}`);
     res.send(`Hello World! 현재 포트 : ${clientPort}`);
   }); //동작 확인용
+  app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); //swagger
   app.use('/auth', authRouter); //로그인
   app.use('/signup', signupRouter); //회원가입
   app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)
