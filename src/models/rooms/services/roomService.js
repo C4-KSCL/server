@@ -45,6 +45,7 @@ export class RoomService {
                     userEmail: payload.oppEmail,
                     roomId: room.id,
                     createdAt : getNowTime(),
+                    status : payload.blocking,
                 }
             });
 
@@ -168,6 +169,7 @@ export class RoomService {
                     content: `${payload.userEmail}님이 방을 떠났습니다.`,
                     createdAt : getNowTime(),
                     readCount : payload.joinCount - 1,
+                    type : "out",
                 }
             });
 
@@ -275,10 +277,11 @@ export class RoomService {
 
         return undefined;
     }
-    //id(joinRoom), roomId, userEmail, oppEmail, oppJoinId
+    //id(joinRoom), roomId, userEmail, oppEmail, oppJoinId, blocking
     async changeToTrueJoin(payload) {
 
         const join = await database.$transaction(async (db) => {
+            // 자신의 조인을 true로 바꿈.
             await db.joinRoom.update({
                 where: {
                     id: payload.id,
@@ -286,16 +289,6 @@ export class RoomService {
                 },
                 data: {
                     join: true
-                }
-            });
-
-            await db.joinRoom.update({
-                where : {
-                    id : payload.oppJoinId,
-                    roomId : payload.roomId
-                },
-                data : {
-                    join : true,
                 }
             });
 
@@ -333,6 +326,19 @@ export class RoomService {
         if (!join) throw { status: 404, msg: "not found : join in checkJoin" };
 
         return join;
+    }
+
+    async findBlocking(payload){
+
+        // 상대의 기준으로 내가 차단이 됐는지 찾아내는 것임.
+        const blocking = await database.friend.findFirst({
+            where : {
+                userEmail : payload.oppEmail,
+                oppEmail : payload.userEmail,
+            }
+        });
+
+        return blocking.status;
     }
 
 }

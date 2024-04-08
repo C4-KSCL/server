@@ -15,7 +15,7 @@ export class SocketController {
     constructor(io, socket) {
         this.io = io;
         this.socket = socket;
-        this.roomService = new RoomService();
+        // this.roomService = new RoomService();
         this.service = new SocketService();
     }
 
@@ -59,16 +59,24 @@ export class SocketController {
     // 메시지를 받으면 메시지 생성 후, 메시지를 사용자에게 보낸다.
     // 현재 접속해 있는 유저의 수에 채팅방안에 있는 유저의 수를 뺀다.
     // payload : content
+    // 상대가 방에 조인이 안 돼있으면 차단 여부를 확인 후 조인을 시킨 후에 채팅을 보낸다.
     async newMessage(payload) {
         try {
             payload.userEmail = this.socket.userEmail;
             payload.roomId = this.socket.roomId;
 
-            let joinCount = await this.service.getJoinCount({ roomId: payload.roomId });
+            let joinCount = 2;
+
+            // 차단 여부를 확인함
+            const friend = await this.service.getFriend(payload);
+
+            // 차단이 아닐 시에 상대의 조인이 false이면 true로 바꿈.
+            // 상대를 다시 초대하는 로직
 
             const oppSocket = await this.service.getOppSocket(payload);
 
-            if (oppSocket) joinCount--;
+            if (oppSocket.connectRoomId === payload.roomId) joinCount--;
+
 
             // roomId, userEmail, content
             const msg = await this.service.createChat(new CreateChatDTO({
@@ -76,6 +84,7 @@ export class SocketController {
                 userEmail: payload.userEmail,
                 content: payload.content,
                 readCount: joinCount - 1,
+                friend : friend,
             }));
 
 
@@ -127,17 +136,20 @@ export class SocketController {
             // oppSocket 확인
             // 메시지 생성
 
-            let joinCount = await this.service.getJoinCount({ roomId: payload.roomId });
+            const friend = await this.service.getFriend(payload);
+
+            let joinCount = 2;
 
             const oppSocket = await this.service.getOppSocket(payload);
 
-            if (oppSocket) joinCount--;
+            if (oppSocket.connectRoomId === payload.roomId) joinCount--;
 
             const msg = await this.service.createEvent({
                 roomId: payload.roomId,
                 userEmail: payload.userEmail,
                 categoryId: smallCategory.id,
                 readCount: --joinCount,
+                friend : friend
             });
 
 
@@ -156,37 +168,37 @@ export class SocketController {
         }
     }
 
-    // roomId
-    // 접속이 돼 있는 방인지 검사 후 탈퇴
-    async leaveRoom(payload){
-        try {
-            const userEmail = this.socket.userEmail;
+    // // roomId
+    // // 접속이 돼 있는 방인지 검사 후 탈퇴
+    // async leaveRoom(payload){
+    //     try {
+    //         const userEmail = this.socket.userEmail;
 
-            const roomId = payload.roomId;
+    //         const roomId = payload.roomId;
 
-            // 방에 입장해 있는 지 확인
-            const isJoin = await this.roomService.checkJoin({ roomId, userEmail });
+    //         // 방에 입장해 있는 지 확인
+    //         const isJoin = await this.roomService.checkJoin({ roomId, userEmail });
 
-            // 방에 입장해 있는 유저의 수 확인
-            const joinCount = await this.roomService.getJoinCount({ roomId });
+    //         // 방에 입장해 있는 유저의 수 확인
+    //         const joinCount = await this.roomService.getJoinCount({ roomId });
 
-            const msg = await this.roomService.leaveRoom({ userEmail, roomId, joinCount, joinId : isJoin.id });
+    //         const msg = await this.roomService.leaveRoom({ userEmail, roomId, joinCount, joinId : isJoin.id });
 
-            if(msg){
-                this.socket.leave(payload.roomId);
+    //         if(msg){
+    //             this.socket.leave(payload.roomId);
 
-                this.io.to(payload.roomId).emit("leave room", msg);
+    //             this.io.to(payload.roomId).emit("leave room", msg);
                 
-                this.socket.emit("ack", {msg : "complete leave room"});
+    //             this.socket.emit("ack", {msg : "complete leave room"});
 
-            }else{
-                this.socket.emit("error", {error : "error in leaveRoom"});
-            }
+    //         }else{
+    //             this.socket.emit("error", {error : "error in leaveRoom"});
+    //         }
 
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // }
 
     // 소켓 연결이 끊기면 UserSocketToken 테이블에 데이터 삭제
     async disconnecting() {

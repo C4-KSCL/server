@@ -116,6 +116,7 @@ class RequestController {
     // 친구 요청을 받아들인다.
     // 요청 아이디로 방 아이디 획득, 친구 추가, 채팅 방에 입장, 채팅 방 publishing을 true로 변환,  요청 삭제
     // 채팅방 입장은 JoinRoom 테이블의 join : false를 true로 바꿔주면 된다.
+    // fcm이 필요함.
     async acceptRequest(req, res, next) {
         try {
             const userEmail = req.user;

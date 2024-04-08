@@ -17,23 +17,54 @@ export class ChatService {
                 id: payload.roomId,
             }
         });
-        
+
         const join = await database.joinRoom.findFirst({
-            where : {
-                roomId : isExist.id,
-                userEmail : payload.userEmail,
+            where: {
+                roomId: isExist.id,
+                userEmail: payload.userEmail,
             }
         });
 
-        if(!join) throw { status : 404, msg : "not found : join in get-chats" };
+        if (!isExist || !join) throw { status: 404, msg: "not found : join in get-chats" };
+
+        const out = await database.chatting.findFirst({
+            orderBy : {
+                createdAt : "desc"
+            },
+            where: {
+                roomId: payload.roomId,
+                type: "out",
+                userEmail : payload.userEmail,
+            }
+        });
+        let where;
+
+        if (out) {
+            where = {
+                roomId: isExist.id,
+                
+                NOT: {
+                    type: "out",
+                },
+                id: {
+                    gt: out.id,
+                }
+            }
+        } else {
+            where = {
+                roomId: isExist.id,
+                
+                NOT: {
+                    type: "out",
+                }
+            }
+        }
 
         const chats = await database.chatting.findMany({
             orderBy: {
                 createdAt: "desc",
             },
-            where: {
-                roomId: isExist.id,
-            },
+            where: where,
             select: {
                 id: true,
                 roomId: true,
@@ -42,13 +73,14 @@ export class ChatService {
                 createdAt: true,
                 content: true,
                 readCount: true,
+                type : true,
                 event: {
                     include: {
                         smallCategory: {
-                            include : {
-                                eventImage : {
-                                    select : {
-                                        filepath : true,
+                            include: {
+                                eventImage: {
+                                    select: {
+                                        filepath: true,
                                     }
                                 }
                             }
@@ -56,7 +88,7 @@ export class ChatService {
                     }
                 },
                 user: {
-                    select: { 
+                    select: {
                         userImage: true,
                     }
                 }
@@ -75,7 +107,7 @@ export class ChatService {
         const joins = await database.joinRoom.findMany({
             where: {
                 userEmail: userEmail,
-                join : true,
+                join: true,
             }
         });
 
@@ -93,31 +125,57 @@ export class ChatService {
 
         // if (joins.length === 0) throw { status: 404, msg: "not found : join" };
 
-        const lastChats = await database.$transaction(async(db)=>{
+        const lastChats = await database.$transaction(async (db) => {
             for (const join of joins) {
-                if(join.reqUser){
+                if (join.reqUser) {
                     join.userEmail = userEmail;
                 }
 
-                const chat = await db.chatting.findFirst({
+                const out = await db.chatting.findFirst({
                     orderBy: {
                         createdAt: "desc",
                     },
                     where: {
                         roomId: join.roomId,
+                        type: "out"
+                    }
+                });
+                let where;
+                if (out) {
+                    where = {
+                        roomId: join.roomId,
+                        id: {
+                            gt: out.id,
+                        },
+                        NOT: {
+                            type: "out"
+                        }
+                    }
+                } else {
+                    where = {
+                        roomId: join.roomId,
+                        NOT: {
+                            type: "out"
+                        }
+                    }
+                }
+                const chat = await db.chatting.findFirst({
+                    orderBy: {
+                        createdAt: "desc",
                     },
+                    where: where,
                     include: {
                         room: {
                             include: {
                                 joinRoom: {
                                     select: {
-                                        join : true,
+                                        join: true,
                                         user: {
                                             select: {
                                                 email: true,
                                                 nickname: true,
                                                 userImage: true,
-                                                gender : true,
+                                                gender: true,
                                             }
                                         }
                                     },
@@ -129,14 +187,14 @@ export class ChatService {
                                 },
                                 addRequest: {
                                     select: {
-                                        id : true,
-                                        reqUser : true,
+                                        id: true,
+                                        reqUser: true,
                                         receive: {
                                             select: {
                                                 email: true,
                                                 nickname: true,
                                                 userImage: true,
-                                                gender : true,
+                                                gender: true,
                                             }
                                         }
                                     },
@@ -149,28 +207,49 @@ export class ChatService {
                     }
                 });
 
-                if(chat.room.publishing === "deleted") continue;
-    
-                const count = await db.chatting.count({
-                    where: {
+                if(!chat) continue;
+
+                if (chat.room.publishing === "deleted") continue;
+                if(out){
+                    where = {
                         roomId: join.roomId,
                         readCount: 1,
                         NOT: {
                             userEmail: userEmail,
+                            type : "out"
+                        },
+                        id : {
+                            gt: out.id,
                         }
                     }
+                }else{
+                    where = {
+                        roomId: join.roomId,
+                        readCount: 1,
+                        NOT: {
+                            userEmail: userEmail,
+                            type : "out"
+                        }
+                    }
+                }
+                
+                const count = await db.chatting.count({
+                    orderBy : {
+                        createdAt : "desc"
+                    },
+                    where: where
                 });
 
                 const joinCount = await db.joinRoom.count({
-                    where : {
-                        roomId : join.roomId,
-                        join : true,
+                    where: {
+                        roomId: join.roomId,
+                        join: true,
                     }
                 });
 
-                
+
                 chat.notReadCounts = count;
-    
+
                 chat.room.joinCount = joinCount;
 
                 chats.push(chat);
@@ -180,10 +259,10 @@ export class ChatService {
                 // 두 날짜를 Date 객체로 변환
                 const dateA = new Date(a.createdAt);
                 const dateB = new Date(b.createdAt);
-              
+
                 // 내림차순 정렬을 위해 b와 a를 비교
                 return dateB - dateA;
-              });
+            });
 
             return chats;
 
@@ -193,10 +272,10 @@ export class ChatService {
 
     }
 
-    async deleteChat(payload){
+    async deleteChat(payload) {
         await database.chatting.delete({
-            where : {
-                id : payload.id,
+            where: {
+                id: payload.id,
             }
         });
     }

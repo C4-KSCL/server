@@ -4,7 +4,7 @@ import database from "../../../database";
 
 import { validatorErrorChecker } from "../../../middlewares/validator";
 
-import { param, query } from "express-validator";
+import { param, query, body } from "express-validator";
 
 class FriendController {
     path = "/friends";
@@ -24,6 +24,10 @@ class FriendController {
             param('oppEmail').isEmail(),
             validatorErrorChecker,
         ], this.deleteFriend.bind(this));
+        this.router.patch("/blocking", [
+            body("oppEmail").isEmail(),
+            validatorErrorChecker
+        ],this.blockingFriend.bind(this));
     }
 
     async getList(req, res, next) {
@@ -37,6 +41,24 @@ class FriendController {
         } catch (err) {
             next(err);
         }
+    }
+
+    // 친구 차단.
+    // 차단하면 friend, joinRoom ... 등의 데이터들의 상태를 false로 바꿔줘야함.
+    async blockingFriend(req,res,next){
+        try{
+            const userEmail = req.user;
+
+            const {oppEmail} = req.body;
+
+
+        }catch(err){
+            next(err);
+        }
+    }
+
+    async unBlockingFriend(req,res,next){
+
     }
 
     async deleteFriend(req, res, next) {
