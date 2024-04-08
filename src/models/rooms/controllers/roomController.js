@@ -25,7 +25,7 @@ class RoomController {
     }
 
     init() {
-        this.router.post("/create", [
+        this.router.patch("/create", [
             body('oppEmail').isEmail(),
             validatorErrorChecker
         ], this.createRoom.bind(this));
@@ -54,6 +54,7 @@ class RoomController {
     // create-room을 하는 시점은 채팅방에서 혼자 나갔다거나, 둘다 나갔다는 뜻이다.
     // 혼자 나갔을 때는 나간 채팅방의 joinRoom을 찾아서 join 컬럼을 true로 만들어 줘야한다.
     // 둘 다 나갔을 때는 addRequest의 roomId를 바꿔줘야한다.
+    // 방의 최종 삭제 시점은 친구 삭제 시에 이루어 짐.
     async createRoom(req, res, next) {
         try {
             const userEmail = req.user;
@@ -64,18 +65,20 @@ class RoomController {
 
             // 친구와의 채팅방이 있는지 확인함.
             // joinRoom object를 반환
-            const isExistRoom = await this.service.findRoom({userEmail : userEmail, oppEmail : oppEmail});
+            const isExistRoom = await this.service.findJoinRoom({userEmail : userEmail, oppEmail : oppEmail});
+
+            const oppJoinRoom = await this.service.findJoinRoom({userEmail : oppEmail, oppEmail : userEmail});
 
             if(isExistRoom){
-
-                const joinCount = await this.service.getJoinCount({ roomId : isExistRoom.roomId });
 
                 const join = await this.service.changeToTrueJoin({
                     id : isExistRoom.id,
                     roomId : isExistRoom.roomId, 
                     userEmail : userEmail,
-                    joinCount : joinCount,
+                    oppJoinId : oppJoinRoom.id,
+                    oppEmail : oppEmail,
                 });
+
                 res.status(200).json({room : join});
                 
             }else{

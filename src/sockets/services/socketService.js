@@ -1,4 +1,5 @@
 import database from "../../database";
+import { getNowTime } from "../../utils/getKSTTime";
 
 export class SocketService {
     // payload : roomId, userEmail, limit
@@ -21,18 +22,31 @@ export class SocketService {
         const isExist = await database.chatting.findUnique({
             where: {
                 id: payload.chatId,
+            },
+            include : {
+                event: true,
             }
         });
 
         if (!isExist) return undefined;
 
-        const msg = await database.chatting.update({
-            where: {
-                id: isExist.id,
-            },
-            data: {
-                content: "더 이상 읽을 수 없는 메시지입니다.",
-            },
+        const msg = await database.$transaction(async(db)=>{
+            if(isExist.content === "content-is-random-event"){
+                const event = await db.event.delete({
+                    where : {
+                        id : isExist.event.id
+                    }
+                });
+            }
+            const msg = await db.chatting.update({
+                where: {
+                    id: isExist.id,
+                },
+                data: {
+                    content: "더 이상 읽을 수 없는 메시지입니다.",
+                },
+            });
+            return msg;
         });
 
         return msg;
@@ -46,6 +60,7 @@ export class SocketService {
                 content: payload.content,
                 userEmail: payload.userEmail,
                 readCount: payload.readCount,
+                createdAt : getNowTime(),
             }
         });
 
@@ -104,6 +119,7 @@ export class SocketService {
                     roomId: payload.roomId,
                     readCount: payload.readCount,
                     userName: payload.userName,
+                    createdAt : getNowTime(),
                 }
             });
 
@@ -113,6 +129,7 @@ export class SocketService {
                     category: payload.categoryId,
                     user1 : user.nickname,
                     user2 : oppUser.user.nickname,
+                    createdAt : getNowTime(),
                 }
             });
 

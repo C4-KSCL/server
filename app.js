@@ -29,7 +29,6 @@ const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기�
   const app = express();
 
   const httpServer = http.createServer(app);
-  const httpServer2 = http.createServer(app);
 
   if (process.env.NODE_ENV === 'production') {
     app.use(morgan('combined')); //로깅하는 것을 배포모드
@@ -69,7 +68,7 @@ const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기�
   SocketServer(httpServer);
 
   app.use((req, res, next) => {
-    req.mysqlConnection = connection;
+    req.mysqlConnection = connection; 
     next();
   });
 

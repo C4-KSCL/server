@@ -45,6 +45,7 @@ class FriendController {
 
             const { oppEmail } = req.params;
 
+            // 친구가 삭제될 때는 friend, request,room,chatting이 동시에 삭제 됨. => deleted 테이블에 삽입해야 함.
             await this.service.deleteFriend({ userEmail, oppEmail });
 
             res.status(204).json({});

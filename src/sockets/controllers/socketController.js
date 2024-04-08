@@ -1,5 +1,6 @@
 import { SocketService } from "../services/socketService";
 import { CreateChatDTO } from "../../models/chats/dto/create-chat.dto";
+import { RoomService } from "../../models/rooms/services";
 import { RandomChoice } from "../../utils/choiceSmall";
 import { pushAlam } from "../../utils/pushAlam";
 
@@ -9,10 +10,12 @@ export class SocketController {
     io;
     socket;
     service;
+    roomService;
 
     constructor(io, socket) {
         this.io = io;
         this.socket = socket;
+        this.roomService = new RoomService();
         this.service = new SocketService();
     }
 
@@ -147,6 +150,38 @@ export class SocketController {
             // }
 
             this.io.to(payload.roomId).emit("new event", msg);
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    // roomId
+    // 접속이 돼 있는 방인지 검사 후 탈퇴
+    async leaveRoom(payload){
+        try {
+            const userEmail = this.socket.userEmail;
+
+            const roomId = payload.roomId;
+
+            // 방에 입장해 있는 지 확인
+            const isJoin = await this.roomService.checkJoin({ roomId, userEmail });
+
+            // 방에 입장해 있는 유저의 수 확인
+            const joinCount = await this.roomService.getJoinCount({ roomId });
+
+            const msg = await this.roomService.leaveRoom({ userEmail, roomId, joinCount, joinId : isJoin.id });
+
+            if(msg){
+                this.socket.leave(payload.roomId);
+
+                this.io.to(payload.roomId).emit("leave room", msg);
+                
+                this.socket.emit("ack", {msg : "complete leave room"});
+
+            }else{
+                this.socket.emit("error", {error : "error in leaveRoom"});
+            }
 
         } catch (err) {
             console.log(err);

@@ -1,56 +1,59 @@
 import database from "../../../database";
+import { getNowTime } from "../../../utils/getKSTTime";
 
 export class RoomService {
-    
+
     // 방 만듬 -> 유저 조인 -> 상대 조인 # 트랜잭션
     // { room: new CreateRoomDTO(), userEmail: userEmail, oppEmail : oppEmail }
-    async createRoom(payload){
+    async createRoom(payload) {
         const request = await database.addRequest.findFirst({
-            where : {
-                OR : [
+            where: {
+                OR: [
                     {
-                        reqUser : payload.userEmail,
-                        recUser : payload.oppEmail,
+                        reqUser: payload.userEmail,
+                        recUser: payload.oppEmail,
                     },
                     {
-                        recUser : payload.userEmail,
-                        reqUser : payload.oppEmail,
+                        recUser: payload.userEmail,
+                        reqUser: payload.oppEmail,
                     }
                 ],
-                status : "accepted",
+                status: "accepted",
             }
         });
 
-        const createdRoom = await database.$transaction(async(db)=>{
+        const createdRoom = await database.$transaction(async (db) => {
             const room = await db.room.create({
-                data : {
-                    id : payload.room.id,
-                    name : payload.room.id,
-                    publishing : "true",
-                    joinCount : 2
+                data: {
+                    id: payload.room.id,
+                    name: payload.room.id,
+                    publishing: "true",
+                    createdAt : getNowTime(),
                 }
             });
 
             const userJoin = await db.joinRoom.create({
-                data : {
-                    userEmail : payload.userEmail,
-                    roomId : room.id,
+                data: {
+                    userEmail: payload.userEmail,
+                    roomId: room.id,
+                    createdAt : getNowTime(),
                 }
             });
 
             const oppJoin = await db.joinRoom.create({
-                data : {
-                    userEmail : payload.oppEmail,
-                    roomId : room.id,
+                data: {
+                    userEmail: payload.oppEmail,
+                    roomId: room.id,
+                    createdAt : getNowTime(),
                 }
             });
 
             await db.addRequest.update({
-                where : {
-                    id : request.id,
+                where: {
+                    id: request.id,
                 },
-                data : {
-                    roomId : room.id,
+                data: {
+                    roomId: room.id,
                 }
             });
 
@@ -60,14 +63,14 @@ export class RoomService {
         return createdRoom;
     }
 
-    async checkUser(payload){
+    async checkUser(payload) {
         const isExistOppUser = await database.user.findUnique({
-            where : {
-                email : payload.oppEmail
+            where: {
+                email: payload.oppEmail
             },
         });
 
-        if(!isExistOppUser) throw { status : 404, msg : "not found : oppEmail in create-room"};
+        if (!isExistOppUser) throw { status: 404, msg: "not found : oppEmail in create-room" };
     }
 
     async getRooms(payload) {
@@ -77,18 +80,18 @@ export class RoomService {
         const joinRooms = await database.joinRoom.findMany({
             where: {
                 userEmail: payload.userEmail,
-                join : true,
+                join: true,
             }
         });
 
         for (let join of joinRooms) {
             const room = await database.room.findUnique({
-                where : {
-                    id : join.roomId
+                where: {
+                    id: join.roomId
                 }
             });
 
-            if(room.publishing === "true"){
+            if (room.publishing === "true") {
                 const room = await database.room.findFirst({
                     where: {
                         id: join.roomId
@@ -103,32 +106,33 @@ export class RoomService {
                             select: {
                                 id: true,
                                 roomId: true,
+                                join : true,
                                 user: {
                                     select: {
                                         email: true,
                                         nickname: true,
-                                        userImage : true,
+                                        userImage: true,
                                     }
                                 },
                             }
                         },
-                        
+
                     }
                 });
                 rooms.push(room);
-            }else if(room.publishing === "ing"){
+            } else if (room.publishing === "ing") {
                 const room = await database.room.findFirst({
                     where: {
                         id: join.roomId
                     },
                     include: {
-                        addRequest : {
-                            select : {
-                                receive : {
-                                    select : {
-                                        email : true,
-                                        nickname : true,
-                                        userImage : true,
+                        addRequest: {
+                            select: {
+                                receive: {
+                                    select: {
+                                        email: true,
+                                        nickname: true,
+                                        userImage: true,
                                     }
                                 }
                             }
@@ -144,57 +148,57 @@ export class RoomService {
     }
 
     // // 방 퇴장 -> 요청이 있으면 삭제 # 트랜잭션
-    // {userEmail, roomId, joinCount, joinId}
-    async leaveRoom(payload){
+    // {userEmail, roomId, joinCount,joinId}
+    async leaveRoom(payload) {
 
-        await database.$transaction(async(db)=>{
+        const message = await database.$transaction(async (db) => {
             await db.joinRoom.update({
-                where : {
-                    id : payload.joinId
+                where: {
+                    id: payload.joinId
                 },
-                data : {
-                    join : false
+                data: {
+                    join: false
                 }
             });
 
-            await db.room.update({
-                where : {
-                    id : payload.roomId
-                },
-                data : {
-                    joinCount : payload.joinCount-1,
+            const msg = await db.chatting.create({
+                data: {
+                    roomId: payload.roomId,
+                    userEmail: payload.userEmail,
+                    content: `${payload.userEmail}님이 방을 떠났습니다.`,
+                    createdAt : getNowTime(),
+                    readCount : payload.joinCount - 1,
                 }
             });
 
-            await db.addRequest.deleteMany({
-                where : {
-                    reqUser : payload.userEmail,
-                    roomId : payload.roomId,
-                    status : "ing",
-                }
-            });
-
-            if(payload.joinCount === 1){
-                await db.room.delete({
-                    where : {
-                        id : payload.roomId
+            if (payload.joinCount === 1) {
+                await db.room.update({
+                    where: {
+                        id: payload.roomId
+                    },
+                    data: {
+                        publishing: "deleted",
                     }
                 });
             }
+
+            return msg;
         });
-    } 
+        return message;
+    }
 
     async getJoinCount(payload) {
 
-        const isExist = await database.room.findUnique({
+        const isExist = await database.joinRoom.count({
             where: {
-                id: payload.roomId,
+                roomId: payload.roomId,
+                join : true,
             }
         });
 
         if (!isExist) throw { status: 404, msg: "not found : room" };
 
-        return isExist.joinCount;
+        return isExist;
 
     }
 
@@ -229,92 +233,104 @@ export class RoomService {
     }
 
     // payload : userEmail, oppEmail
-    async findRoom(payload){
+    async findJoinRoom(payload) {
 
         const request = await database.addRequest.findFirst({
-            where : {
-                OR : [
+            where: {
+                OR: [
                     {
-                        reqUser : payload.userEmail,
-                        recUser : payload.oppEmail,
+                        reqUser: payload.userEmail,
+                        recUser: payload.oppEmail,
                     },
                     {
-                        recUser : payload.userEmail,
-                        reqUser : payload.oppEmail,
+                        recUser: payload.userEmail,
+                        reqUser: payload.oppEmail,
                     }
                 ],
-                status : "accepted",
             }
         });
 
-        if(!request) throw { status : 404, msg : "not found : request in find-room" };
+        if (!request) throw { status: 404, msg: "not found : request in find-room" };
 
-        if(request.roomId===null) return undefined;
+        if (request.roomId === null) return undefined;
 
         const joinRoom = await database.joinRoom.findFirst({
-            where : {
-                roomId : request.roomId
+            where: {
+                roomId: request.roomId,
+                userEmail : payload.userEmail
             }
         });
 
-        if(!joinRoom) throw { status : 404, msg : "not found : joinRoom in find-room" };
+        if (!joinRoom) throw { status: 404, msg: "not found : joinRoom in find-room" };
 
         const room = await database.room.findUnique({
-            where : {
-                id : request.roomId,
+            where: {
+                id: request.roomId,
             }
         });
 
-        if(!room) throw { status : 404, msg : "not found : room in findRoom" };
+        if (!room) throw { status: 404, msg: "not found : room in findRoom" };
 
-        if(joinRoom) return joinRoom;
+        if (joinRoom) return joinRoom;
 
         return undefined;
     }
-    //id(joinRoom), roomId, userEmail
-    async changeToTrueJoin(payload){
+    //id(joinRoom), roomId, userEmail, oppEmail, oppJoinId
+    async changeToTrueJoin(payload) {
 
-        await database.$transaction(async(db)=>{
+        const join = await database.$transaction(async (db) => {
+            await db.joinRoom.update({
+                where: {
+                    id: payload.id,
+                    roomId: payload.roomId
+                },
+                data: {
+                    join: true
+                }
+            });
+
             await db.joinRoom.update({
                 where : {
-                    id : payload.id,
+                    id : payload.oppJoinId,
                     roomId : payload.roomId
                 },
                 data : {
-                    join : true
+                    join : true,
                 }
             });
 
             await db.room.update({
-                where : {
-                    id : payload.roomId
+                where: {
+                    id: payload.roomId
                 },
-                data : {
-                    joinCount : payload.joinCount + 1,
+                data: {
+                    publishing : "true"
                 }
             });
+
+            const join = await database.joinRoom.findUnique({
+                where: {
+                    id: payload.id
+                }
+            });
+
+            return join;
         });
 
-        const join = await database.joinRoom.findUnique({
-            where : {
-                id : payload.id
-            }
-        });
-        
         return join;
-    }   
+    }
 
     // roomId, userEmail
-    async checkJoin(payload){
+    async checkJoin(payload) {
         const join = await database.joinRoom.findFirst({
-            where : {
-                roomId : payload.roomId,
-                userEmail : payload.userEmail,
-                join : true
+            where: {
+                roomId: payload.roomId,
+                userEmail: payload.userEmail,
+                join: true
             }
         });
 
-        if(!join) throw { status : 404, msg : "not found : join in checkJoin" };
+        if (!join) throw { status: 404, msg: "not found : join in checkJoin" };
 
         return join;
     }
