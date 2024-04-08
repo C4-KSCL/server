@@ -1,7 +1,7 @@
 exports.deleteuser = (req, res) => {
     const email = req.headers.email;
-    const deleteQuery = `DELETE FROM User WHERE email = ?`;
-    req.mysqlConnection.query(deleteQuery, [email], (err, results) => {
+    const deleteUpdateQuery = `UPDATE User SET  deleteTime = Now() WHERE email = ?`;
+    req.mysqlConnection.query(deleteUpdateQuery, [email], (err, results) => {
         if (err) {
             console.error('Error while querying:', err);
             return res.status(500).send('서버 에러');
