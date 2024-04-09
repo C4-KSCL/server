@@ -56,6 +56,7 @@ class EventController {
             body("big"),
             body("selectOne"),
             body("selectTwo"),
+            body("content"),
             validatorErrorChecker,
         ], this.postSmallEvent.bind(this));
 
@@ -76,7 +77,7 @@ class EventController {
             param("id"),
             validatorErrorChecker
         ], imageDelete,
-        )
+        );
     }
 
     // 이벤트 빅 카테고리 반환
@@ -162,9 +163,9 @@ class EventController {
 
     async postSmallEvent(req, res, next) {
         try {
-            const { big, small, selectOne, selectTwo } = req.body;
+            const { big, small, selectOne, selectTwo, content } = req.body;
 
-            await this.service.createSmall({ big: big, small: small, selectOne: selectOne, selectTwo: selectTwo });
+            await this.service.createSmall({ big: big, small: small, selectOne: selectOne, selectTwo: selectTwo, content : content });
 
             res.status(201).json({ msg: "true" });
         } catch (err) {

@@ -22,6 +22,6 @@ const options = {
 };
 
 const outputFile = './swagger-output.json'; // 현재 폴더 내에 파일 생성
-const endpointsFiles = ['../app.js']; // 상위 폴더의 app.js 파일
+const endpointsFiles = ['../app.js',"../src/controllers.friends-chats/index.js"]; // 상위 폴더의 app.js 파일
 
 swaggerAutogen(outputFile, endpointsFiles, options);
