@@ -9,6 +9,17 @@ exports.verifyAccessToken = (req, res, next) => {
         req.access_decoded = jwt.verify(req.headers.accesstoken, process.env.ACCESS_TOKEN_SECRET)
         req.headers.email = req.access_decoded.email; //헤더에 유저의 이메일 정보를 추가
         req.user = req.access_decoded.email;
+        const email = req.access_decoded.email;
+        const findInfoQuery = `SELECT * FROM User WHERE email = ?`;
+        req.mysqlConnection.query(findInfoQuery, [email], (err, userResults) => {
+            if (err) {
+                console.error('Error while querying:', err);
+                return res.status(500).send('서버 에러');
+            }
+            if (userResults.length === 0) {
+                return res.status(404).send('해당 회원은 존재하지 않습니다.');
+            }
+        });
         return next();
     }
     catch (error) { 
@@ -57,7 +68,7 @@ exports.verifyAccessToken = (req, res, next) => {
                 message: 'access 토큰이 만료되었습니다.'
             });
         }
-        return res.status(401).json({
+        return res.status(411).json({
             //Access 토큰 오류
             code: 411,
             message: '유효하지 않은 Access 토큰입니다.'
