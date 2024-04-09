@@ -1,6 +1,6 @@
 exports.deleteuser = (req, res) => {
     const email = req.headers.email;
-    const deleteUpdateQuery = `UPDATE User SET  deleteTime = Now() WHERE email = ?`;
+    const deleteUpdateQuery = `UPDATE User SET deleteTime = DATE_ADD(NOW(), INTERVAL 1 DAY) WHERE email = ?;`;
     req.mysqlConnection.query(deleteUpdateQuery, [email], (err, results) => {
         if (err) {
             console.error('Error while querying:', err);
