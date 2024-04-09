@@ -7,81 +7,67 @@ import { body, query, param } from "express-validator";
 
 import database from "../../../database";
 
-class ChatController {
-    path = "/chats";
-    router;
-    service;
+const service = new ChatService();
+const router = Router();
 
-    constructor() {
-        this.router = Router();
-        this.service = new ChatService();
-        this.init();
+router.get("/get-chats/:roomId", [
+    param('roomId'),
+    query('page'),
+    query('limit'),
+    validatorErrorChecker,
+], getChats);
+
+router.get("/get-last-chats/", [
+], getLastChats);
+
+router.delete("/delete/:id", deleteChat);
+
+async function getChats(req, res, next) {
+    try {
+        const userEmail = req.user;
+
+        const { roomId } = req.params;
+
+        const { page, limit } = req.query;
+
+        const { skip, take } = pagination(page, limit);
+
+        // room 존재 확인
+        // room join 확인하기
+        // 채팅 받아오기
+        const chats = await service.getChats({ userEmail, roomId, skip, take });
+
+        res.status(200).json({ chats: chats });
+
+    } catch (err) {
+        next(err);
     }
-
-    init() {
-        this.router.get("/get-chats/:roomId", [
-            param('roomId'),
-            query('page'),
-            query('limit'),
-            validatorErrorChecker,
-        ], this.getChats.bind(this));
-
-        this.router.get("/get-last-chats/", [
-        ], this.getLastChats.bind(this));
-
-        this.router.delete("/delete/:id",this.deleteChat.bind(this));
-    }
-
-
-    async getChats(req, res, next) {
-        try {
-            const userEmail = req.user;
-
-            const { roomId } = req.params;
-
-            const { page, limit } = req.query;
-
-            const { skip, take } = pagination(page, limit);
-
-            // room 존재 확인
-            // room join 확인하기
-            // 채팅 받아오기
-            const chats = await this.service.getChats({ userEmail, roomId, skip, take });
-
-            res.status(200).json({ chats: chats });
-
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    
-    async getLastChats(req, res, next) {
-        try {
-            const userEmail = req.user;
-
-            // 마지막 채팅들 받아오기
-            const lastChats = await this.service.getLastChats(userEmail);
-
-            res.status(200).json({ lastChats: lastChats });
-        } catch (err) {
-            next(err);
-        }
-    }
-    
-    async deleteChat(req,res,next){
-        try{
-            const { id } = req.params;
-
-            await this.service.deleteChat({id : Number(id)});
-
-            res.status(203).json({});
-        }catch(err){
-            next(err);
-        }
-    }
-
 }
 
-const chatController = new ChatController();
-export default chatController;
+
+async function getLastChats(req, res, next) {
+    try {
+        const userEmail = req.user;
+
+        // 마지막 채팅들 받아오기
+        const lastChats = await service.getLastChats(userEmail);
+
+        res.status(200).json({ lastChats: lastChats });
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function deleteChat(req,res,next){
+    try{
+        const { id } = req.params;
+
+        await service.deleteChat({id : Number(id)});
+
+        res.status(203).json({});
+    }catch(err){
+        next(err);
+    }
+}
+
+export default router;

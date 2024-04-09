@@ -5,6 +5,16 @@ import chatController from "../models/chats/controllers/chatController";
 import eventController from "../models/events/controllers/eventController";
 import friendController from "../models/friends/controllers/friendController";
 
-const Controllers = [chatController, roomController, userController, requestController, eventController, friendController];
+import { Router } from "express";
+import { verifyAccessToken } from "../../middleware/auth";
 
-export default Controllers;
+const router = Router();
+
+router.use("/users", userController);
+router.use("/requests", verifyAccessToken, requestController);
+router.use("/rooms", verifyAccessToken, roomController);
+router.use("/chats", verifyAccessToken, chatController);
+router.use("/events", verifyAccessToken, eventController);
+router.use("/friends", verifyAccessToken, friendController);
+
+export default router;
