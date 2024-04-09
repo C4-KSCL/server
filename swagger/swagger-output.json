@@ -51,8 +51,8 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized"
+          "301": {
+            "description": "Moved Permanently"
           },
           "500": {
             "description": "Internal Server Error"
@@ -81,8 +81,8 @@
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
+          "304": {
+            "description": "Not Modified"
           },
           "500": {
             "description": "Internal Server Error"
@@ -114,8 +114,8 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized"
+          "301": {
+            "description": "Moved Permanently"
           },
           "500": {
             "description": "Internal Server Error"
@@ -303,8 +303,8 @@
           "200": {
             "description": "OK"
           },
-          "401": {
-            "description": "Unauthorized"
+          "301": {
+            "description": "Moved Permanently"
           },
           "500": {
             "description": "Internal Server Error"
@@ -339,7 +339,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -368,8 +368,17 @@
           "402": {
             "description": "Payment Required"
           },
+          "404": {
+            "description": "Not Found"
+          },
+          "411": {
+            "description": "Length Required"
+          },
           "500": {
             "description": "Internal Server Error"
+          },
+          "501": {
+            "description": "Not Implemented"
           }
         }
       }
@@ -387,7 +396,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -416,8 +425,14 @@
           "404": {
             "description": "Not Found"
           },
+          "411": {
+            "description": "Length Required"
+          },
           "500": {
             "description": "Internal Server Error"
+          },
+          "504": {
+            "description": "Gateway Timeout"
           }
         },
         "requestBody": {
@@ -458,7 +473,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -483,6 +498,12 @@
           },
           "402": {
             "description": "Payment Required"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "411": {
+            "description": "Length Required"
           },
           "500": {
             "description": "Internal Server Error"
@@ -526,7 +547,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -551,6 +572,12 @@
           },
           "402": {
             "description": "Payment Required"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "411": {
+            "description": "Length Required"
           },
           "500": {
             "description": "Internal Server Error"
@@ -594,7 +621,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -614,8 +641,8 @@
           "300": {
             "description": "Multiple Choices"
           },
-          "400": {
-            "description": "Bad Request"
+          "304": {
+            "description": "Not Modified"
           },
           "401": {
             "description": "Unauthorized"
@@ -626,8 +653,14 @@
           "404": {
             "description": "Not Found"
           },
+          "411": {
+            "description": "Length Required"
+          },
           "500": {
             "description": "Internal Server Error"
+          },
+          "502": {
+            "description": "Bad Gateway"
           }
         },
         "requestBody": {
@@ -683,7 +716,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -708,6 +741,12 @@
           },
           "402": {
             "description": "Payment Required"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "411": {
+            "description": "Length Required"
           },
           "500": {
             "description": "Internal Server Error"
@@ -751,7 +790,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -776,6 +815,12 @@
           },
           "402": {
             "description": "Payment Required"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "411": {
+            "description": "Length Required"
           },
           "500": {
             "description": "Internal Server Error"
@@ -819,7 +864,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -839,6 +884,9 @@
           "300": {
             "description": "Multiple Choices"
           },
+          "304": {
+            "description": "Not Modified"
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -847,6 +895,9 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "411": {
+            "description": "Length Required"
           },
           "500": {
             "description": "Internal Server Error"
