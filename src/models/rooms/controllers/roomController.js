@@ -33,7 +33,7 @@ class RoomController {
         this.router.get("/get-list/", [
         ], this.getRooms.bind(this));
 
-        this.router.delete("/leave/:roomId", [
+        this.router.patch("/leave/:roomId", [
             param('roomId'),
             validatorErrorChecker
         ], this.leaveRoom.bind(this));
@@ -55,6 +55,7 @@ class RoomController {
     // 혼자 나갔을 때는 나간 채팅방의 joinRoom을 찾아서 join 컬럼을 true로 만들어 줘야한다.
     // 둘 다 나갔을 때는 addRequest의 roomId를 바꿔줘야한다.
     // 방의 최종 삭제 시점은 친구 삭제 시에 이루어 짐.
+    // 차단이 되어있지 않은 친구만 초대가능 => 차단이 됐으면 joinRoom의 join을 계속 false로 놔둬야함.
     async createRoom(req, res, next) {
         try {
             const userEmail = req.user;
@@ -69,6 +70,8 @@ class RoomController {
 
             const oppJoinRoom = await this.service.findJoinRoom({userEmail : oppEmail, oppEmail : userEmail});
 
+            const blocking = await this.service.findBlocking({userEmail : userEmail, oppEmail : oppEmail});
+
             if(isExistRoom){
 
                 const join = await this.service.changeToTrueJoin({
@@ -77,6 +80,7 @@ class RoomController {
                     userEmail : userEmail,
                     oppJoinId : oppJoinRoom.id,
                     oppEmail : oppEmail,
+                    blocking : blocking,
                 });
 
                 res.status(200).json({room : join});
@@ -85,7 +89,8 @@ class RoomController {
                 const room = await this.service.createRoom({ 
                     room: new CreateRoomDTO(),
                     userEmail: userEmail,
-                    oppEmail: oppEmail 
+                    oppEmail: oppEmail,
+                    blocking : blocking, 
                 });
     
                 res.status(201).json({ room : room });

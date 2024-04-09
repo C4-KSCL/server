@@ -82,7 +82,6 @@ export class RequestService {
                 },
                 data : {
                     publishing : "deleted",
-                    createdAt : getNowTime(),
                 }
             });
 
@@ -92,7 +91,7 @@ export class RequestService {
                 },
                 data: {
                     status: "rejected",
-                    createdAt : getNowTime(),
+                    updatedAt : getNowTime(),
                 }
             });
         });
@@ -273,22 +272,24 @@ export class RequestService {
     // 친구 생성 -> 조인 생성 -> room update -> 요청 업데이트 -> socket 테이블 업데이트 # 트랜잭션
     // {userEmail : userEmail, request : request}
     async acceptRequest(payload) {
-        const isExistFriend = await database.friend.findFirst({
+
+        // 나의 시점에서 상대와 친구
+        const isExistMy = await database.friend.findFirst({
             where: {
-                OR: [
-                    {
-                        user1: payload.request.reqUser,
-                        user2: payload.request.recUser
-                    },
-                    {
-                        user2: payload.request.reqUser,
-                        user1: payload.request.recUser
-                    }
-                ]
+                userEmail : payload.userEmail,
+                oppEmail : payload.request.reqUser,
             }
         });
 
-        if (isExistFriend) throw { status: 400, msg: "already exists : friend" };
+        // 상대 시점에서 나와의 친구
+        const isExistOthers = await database.friend.findFirst({
+            where : {
+                userEmail : payload.request.reqUser,
+                oppEmail : payload.userEmail,
+            }
+        });
+
+        if (isExistMy && isExistOthers) throw { status: 400, msg: "already exists : friend" };
 
         const updatedRoom = await database.$transaction(async (db) => {
 
@@ -298,14 +299,25 @@ export class RequestService {
                     roomId : payload.request.roomId
                 }
             });
+            if(!isExistMy){
+                await db.friend.create({
+                    data: {
+                        userEmail : payload.userEmail,
+                        oppEmail : payload.request.reqUser,
+                        createdAt : getNowTime(),
+                    }
+                });
+            }
 
-            await db.friend.create({
-                data: {
-                    user1: payload.request.reqUser,
-                    user2: payload.request.recUser,
-                    createdAt : getNowTime(),
-                }
-            });
+            if(!isExistOthers){
+                await db.friend.create({
+                    data : {
+                        userEmail : payload.request.reqUser,
+                        oppEmail : payload.userEmail,
+                        createdAt : getNowTime(),
+                    }
+                });
+            }
 
             await db.joinRoom.update({
                 where: {

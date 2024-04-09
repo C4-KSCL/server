@@ -8,15 +8,16 @@ datasource db {
 }
 
 model AddRequest {
-  id        Int      @id @default(autoincrement())
-  roomId    String   @db.VarChar(100)
-  reqUser   String   @db.VarChar(50)
-  recUser   String   @db.VarChar(50)
-  status    String   @default("ing") @db.VarChar(25)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  request   User     @relation("request", fields: [reqUser], references: [email], onDelete: Cascade, onUpdate: Cascade)
-  receive   User     @relation("receive", fields: [recUser], references: [email], onDelete: Cascade, onUpdate: Cascade)
-  room      Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade)
+  id        Int       @id @default(autoincrement())
+  roomId    String    @db.VarChar(100)
+  reqUser   String    @db.VarChar(50)
+  recUser   String    @db.VarChar(50)
+  status    String    @default("ing") @db.VarChar(25)
+  createdAt DateTime  @default(now()) @db.DateTime(0)
+  updatedAt DateTime? @db.DateTime(0)
+  request   User      @relation("request", fields: [reqUser], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  receive   User      @relation("receive", fields: [recUser], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  room      Room      @relation(fields: [roomId], references: [id], onUpdate: Cascade)
 
   @@index([recUser], map: "AddRequest_recUser_fkey")
   @@index([reqUser], map: "AddRequest_reqUser_fkey")
@@ -40,10 +41,12 @@ model Chatting {
   createdAt DateTime @default(now()) @db.DateTime(0)
   content   String   @db.Text
   readCount Int
-  nick      User?    @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
-  room      Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade)
-  user      User?    @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email], onDelete: SetNull, onUpdate: Cascade)
-  event     Event?
+  type      String   @default("text") @db.VarChar(10)
+
+  nick  User?  @relation("Chatting_nickNameToUser", fields: [nickName], references: [nickname], onDelete: SetNull, onUpdate: Cascade)
+  room  Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade)
+  user  User?  @relation("Chatting_userEmailToUser", fields: [userEmail], references: [email], onDelete: SetNull, onUpdate: Cascade)
+  event Event?
 
   @@index([nickName], map: "Chatting_nickName_fkey")
   @@index([roomId], map: "Chatting_roomId_fkey")
@@ -79,15 +82,17 @@ model EventImage {
 }
 
 model Friend {
-  id        Int      @id @default(autoincrement())
-  user1     String   @db.VarChar(50)
-  user2     String   @db.VarChar(50)
+  id        Int     @id @default(autoincrement())
+  userEmail String  @db.VarChar(50)
+  oppEmail  String  @db.VarChar(50)
+  status    Boolean @default(true)
   createdAt DateTime @default(now()) @db.DateTime(0)
-  userOne   User     @relation("userOne", fields: [user1], references: [email], onUpdate: Cascade)
-  userTwo   User     @relation("userTwo", fields: [user2], references: [email], onUpdate: Cascade)
 
-  @@index([user1], map: "Friend_user1_fkey")
-  @@index([user2], map: "Friend_user2_fkey")
+  me        User     @relation("userOne", fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  friend    User     @relation("userTwo", fields: [oppEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userEmail], map: "Friend_user1_fkey")
+  @@index([oppEmail], map: "Friend_user2_fkey")
 }
 
 model JoinRoom {
@@ -210,9 +215,10 @@ model ChattingBackup {
   roomId    String   @db.VarChar(100)
   nickName  String?  @db.VarChar(50)
   userEmail String?  @db.VarChar(50)
-  createdAt DateTime @db.DateTime(0)
+  createdAt DateTime @default(now()) @db.DateTime(0)
   content   String   @db.Text
   readCount Int
+  type      String   @default("text") @db.VarChar(10)
 }
 
 model EventBackup {
@@ -235,8 +241,9 @@ model JoinRoomBackup {
 }
 
 model FriendBackup {
-  id        Int      @id @default(autoincrement())
-  user1     String   @db.VarChar(50)
-  user2     String   @db.VarChar(50)
-  createdAt DateTime @db.DateTime(0)
+  id        Int     @id @default(autoincrement())
+  userEmail String  @db.VarChar(50)
+  oppEmail  String  @db.VarChar(50)
+  status    Boolean @default(true)
+  createdAt DateTime @default(now()) @db.DateTime(0)
 }

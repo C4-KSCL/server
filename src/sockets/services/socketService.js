@@ -23,18 +23,18 @@ export class SocketService {
             where: {
                 id: payload.chatId,
             },
-            include : {
+            include: {
                 event: true,
             }
         });
 
         if (!isExist) return undefined;
 
-        const msg = await database.$transaction(async(db)=>{
-            if(isExist.content === "content-is-random-event"){
+        const msg = await database.$transaction(async (db) => {
+            if (isExist.content === "content-is-random-event") {
                 const event = await db.event.delete({
-                    where : {
-                        id : isExist.event.id
+                    where: {
+                        id: isExist.event.id
                     }
                 });
             }
@@ -52,16 +52,50 @@ export class SocketService {
         return msg;
     }
 
+    // friend
     async createChat(payload) {
+        let joinOpp;
 
-        const chat = await database.chatting.create({
-            data: {
-                roomId: payload.roomId,
-                content: payload.content,
-                userEmail: payload.userEmail,
-                readCount: payload.readCount,
-                createdAt : getNowTime(),
+        const user = await database.user.findUnique({
+            where : {
+                email : payload.email,
             }
+        });
+
+        if (payload.friend) {
+            joinOpp = await database.joinRoom.findFirst({
+                where: {
+                    roomId: payload.roomId,
+                    userEmail: payload.friend.userEmail,
+                }
+            });
+
+        }
+        const chat = await database.$transaction(async (db) => {
+            // 만약 차단이 안 되어있고, join이 faluse시에 다시 참여시킴.
+            if (payload.friend.status === true) {
+                await db.joinRoom.update({
+                    where: {
+                        id: joinOpp.id,
+                    },
+                    data: {
+                        join: true,
+                    }
+                });
+            }
+            const chat = await db.chatting.create({
+                data: {
+                    roomId: payload.roomId,
+                    content: payload.content,
+                    userEmail: payload.userEmail,
+                    readCount: payload.readCount,
+                    nickName : user.nickname,
+                    createdAt: getNowTime(),
+                }
+            });
+
+            return chat;
+
         });
 
         return chat;
@@ -70,8 +104,8 @@ export class SocketService {
     async getJoinCount(payload) {
         const isExist = await database.joinRoom.count({
             where: {
-                roomId : payload.roomId,
-                join : true,
+                roomId: payload.roomId,
+                join: true,
             }
         });
 
@@ -87,27 +121,51 @@ export class SocketService {
     // oppContent String @db.Text
 
     // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
+    // friend
     async createEvent(payload) {
 
         const user = await database.user.findUnique({
-            where : {
-                email : payload.userEmail,
+            where: {
+                email: payload.userEmail,
             }
         });
+        
+        let joinOpp;
+
+        if (payload.friend) {
+            joinOpp = await database.joinRoom.findFirst({
+                where: {
+                    roomId: payload.roomId,
+                    userEmail: payload.friend.userEmail,
+                }
+            });
+
+        }
 
         const message = await database.$transaction(async (db) => {
+            if (payload.friend.status === true) {
+                await db.joinRoom.update({
+                    where: {
+                        id: joinOpp.id,
+                    },
+                    data: {
+                        join: true,
+                    }
+                });
+            }
+
             const oppUser = await db.joinRoom.findFirst({
-                include : {
-                    user :{
-                        select : {
-                            nickname : true,
+                include: {
+                    user: {
+                        select: {
+                            nickname: true,
                         }
                     }
                 },
-                where : {
-                    roomId : payload.roomId,
-                    NOT : {
-                        userEmail : payload.userEmail,
+                where: {
+                    roomId: payload.roomId,
+                    NOT: {
+                        userEmail: payload.userEmail,
                     },
                 },
             });
@@ -119,7 +177,9 @@ export class SocketService {
                     roomId: payload.roomId,
                     readCount: payload.readCount,
                     userName: payload.userName,
-                    createdAt : getNowTime(),
+                    nickName : user.nickname,
+                    type: "event",
+                    createdAt: getNowTime(),
                 }
             });
 
@@ -127,14 +187,14 @@ export class SocketService {
                 data: {
                     chattingId: msg.id,
                     category: payload.categoryId,
-                    user1 : user.nickname,
-                    user2 : oppUser.user.nickname,
-                    createdAt : getNowTime(),
+                    user1: user.nickname,
+                    user2: oppUser.user.nickname,
+                    createdAt: getNowTime(),
                 }
             });
 
             if (!msg) throw { status: 500, msg: "not created : msg" };
-            if (!event) throw { status : 500, msg : "not created : event" };
+            if (!event) throw { status: 500, msg: "not created : event" };
 
             const msgWithEvent = await db.chatting.findUnique({
                 where: {
@@ -144,26 +204,26 @@ export class SocketService {
                     event: {
                         include: {
                             smallCategory: {
-                                include : {
-                                    eventImage : {
-                                        select : {
-                                            filepath : true,
+                                include: {
+                                    eventImage: {
+                                        select: {
+                                            filepath: true,
                                         }
                                     }
                                 }
                             },
-                            eventUser1 : {
-                                select : {
-                                    email : true,
-                                    nickname : true,
-                                    userImage : true,
+                            eventUser1: {
+                                select: {
+                                    email: true,
+                                    nickname: true,
+                                    userImage: true,
                                 }
                             },
-                            eventUser2 : {
-                                select : {
-                                    email : true,
-                                    nickname : true,
-                                    userImage : true,
+                            eventUser2: {
+                                select: {
+                                    email: true,
+                                    nickname: true,
+                                    userImage: true,
                                 }
                             },
                         },
@@ -243,28 +303,68 @@ export class SocketService {
             }
         });
 
-        if (!opp) return undefined;
+        if(!opp) return { connectRoomId : null };
 
-        const socketToken = await database.userSocketToken.findUnique({
+        // 지금 채팅방에 접속해있지 않은 상대 유저의 토큰
+        const socket = await database.userSocketToken.findFirst({
             where: {
                 userEmail: opp.userEmail,
-                connectRoomId: payload.roomId
             }
         });
 
-        return socketToken;
-
+        return socket;
     }
 
-    async checkSmall(payload){
+    async checkSmall(payload) {
         const small = await database.smallCategory.findUnique({
-            where : {
-                name : payload.small
+            where: {
+                name: payload.small
             }
         });
 
-        if(!small) throw { status : 404, msg: "not found : smallCategory" };
+        if (!small) throw { status: 404, msg: "not found : smallCategory" };
 
         return small;
+    }
+
+    // userEmail, roomId
+    // 상대가 나를 차단했는 지 확인하는 절차
+    async getFriend(payload) {
+        // 일단 친구를 찾아야 함.
+        const joinOthers = await database.joinRoom.findFirst({
+            where: {
+                roomId: payload.roomId,
+                NOT: {
+                    userEmail: payload.userEmail,
+                }
+            }
+        });
+
+        if (!joinOthers) return undefined;
+
+        const friend = await database.friend.findFirst({
+            where: {
+                userEmail: joinOthers.userEmail,
+                oppEmail: payload.userEmail,
+            }
+        });
+
+        if (!friend) return undefined;
+
+        return friend;
+    }
+
+    // { oppEmail, roomId }
+    async changeJoinToTrueOpp(payload) {
+        // joinRoom의 join을 true로 바꿔서 방에 다시 참여시킴
+        await database.joinRoom.update({
+            where: {
+                userEmail: payload.oppEmail,
+                roomId: payload.roomId,
+            },
+            data: {
+                join: true,
+            }
+        });
     }
 }
