@@ -57,8 +57,8 @@ export class SocketService {
         let joinOpp;
 
         const user = await database.user.findUnique({
-            where : {
-                email : payload.email,
+            where: {
+                email: payload.userEmail,
             }
         });
 
@@ -74,14 +74,27 @@ export class SocketService {
         const chat = await database.$transaction(async (db) => {
             // 만약 차단이 안 되어있고, join이 faluse시에 다시 참여시킴.
             if (payload.friend.status === true) {
-                await db.joinRoom.update({
-                    where: {
-                        id: joinOpp.id,
-                    },
-                    data: {
-                        join: true,
-                    }
-                });
+                if (joinOpp.join === false) {
+                    await db.joinRoom.update({
+                        where: {
+                            id: joinOpp.id,
+                        },
+                        data: {
+                            join: true,
+                        }
+                    });
+
+                    await db.chatting.create({
+                        data: {
+                            roomId: payload.roomId,
+                            userEmail: joinOpp.userEmail,
+                            content: `${joinOpp.userEmail}님이 방을 떠났습니다.`,
+                            createdAt: getNowTime(),
+                            readCount: 0,
+                            type: "out",
+                        }
+                    });
+                }
             }
             const chat = await db.chatting.create({
                 data: {
@@ -89,15 +102,12 @@ export class SocketService {
                     content: payload.content,
                     userEmail: payload.userEmail,
                     readCount: payload.readCount,
-                    nickName : user.nickname,
+                    nickName: user.nickname,
                     createdAt: getNowTime(),
                 }
             });
-
             return chat;
-
         });
-
         return chat;
     }
 
@@ -129,7 +139,7 @@ export class SocketService {
                 email: payload.userEmail,
             }
         });
-        
+
         let joinOpp;
 
         if (payload.friend) {
@@ -177,7 +187,7 @@ export class SocketService {
                     roomId: payload.roomId,
                     readCount: payload.readCount,
                     userName: payload.userName,
-                    nickName : user.nickname,
+                    nickName: user.nickname,
                     type: "event",
                     createdAt: getNowTime(),
                 }
@@ -210,20 +220,6 @@ export class SocketService {
                                             filepath: true,
                                         }
                                     }
-                                }
-                            },
-                            eventUser1: {
-                                select: {
-                                    email: true,
-                                    nickname: true,
-                                    userImage: true,
-                                }
-                            },
-                            eventUser2: {
-                                select: {
-                                    email: true,
-                                    nickname: true,
-                                    userImage: true,
                                 }
                             },
                         },
@@ -303,7 +299,7 @@ export class SocketService {
             }
         });
 
-        if(!opp) return { connectRoomId : null };
+        if (!opp) return { connectRoomId: null };
 
         // 지금 채팅방에 접속해있지 않은 상대 유저의 토큰
         const socket = await database.userSocketToken.findFirst({
