@@ -158,9 +158,6 @@ export class RequestService {
                     OR : [
                         {
                             status : payload.status,
-                        },
-                        {
-                            status : "rejected",
                         }
                     ]
                 },

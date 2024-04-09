@@ -87,11 +87,6 @@ export class ChatService {
                         }
                     }
                 },
-                user: {
-                    select: {
-                        userImage: true,
-                    }
-                }
             },
             skip: payload.skip,
             take: payload.take,

@@ -185,8 +185,8 @@ export class RoomService {
 
                 await db.chatting.deleteMany({
                     where: {
-                        id: payload.roomId,
-                    }
+                        roomId : payload.roomId,
+                    },
                 });
             }
 

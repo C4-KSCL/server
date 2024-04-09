@@ -251,6 +251,16 @@ export class FriendService {
                         join : false,
                     }
                 });
+                await db.chatting.create({
+                    data: {
+                        roomId: join.roomId,
+                        userEmail: payload.userEmail,
+                        content: `${payload.userEmail}님이 방을 떠났습니다.`,
+                        createdAt: getNowTime(),
+                        readCount: 0,
+                        type: "out",
+                    }
+                }); 
             }
         });
     }
