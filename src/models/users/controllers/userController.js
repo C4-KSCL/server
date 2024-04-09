@@ -16,12 +16,12 @@ class UserController {
     }
 
     init(){
-        this.router.post("/create",[
-            body('email').isEmail(),
-            body('nickname'),
-            validatorErrorChecker
-        ], this.createUser.bind(this));
-        this.router.get("/",this.getUsers.bind(this));
+        // this.router.post("/create",[
+        //     body('email').isEmail(),
+        //     body('nickname'),
+        //     validatorErrorChecker
+        // ], this.createUser.bind(this));
+        // this.router.get("/",this.getUsers.bind(this));
     }
 
     async createUser(req,res,next){
