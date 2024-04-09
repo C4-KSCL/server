@@ -185,6 +185,7 @@ export class EventService {
                 bigName: payload.big,
                 selectOne: payload.selectOne,
                 selectTwo: payload.selectTwo,
+                content : payload.content,
             }
         });
 

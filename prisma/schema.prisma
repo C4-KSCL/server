@@ -82,14 +82,14 @@ model EventImage {
 }
 
 model Friend {
-  id        Int     @id @default(autoincrement())
-  userEmail String  @db.VarChar(50)
-  oppEmail  String  @db.VarChar(50)
-  status    Boolean @default(true)
+  id        Int      @id @default(autoincrement())
+  userEmail String   @db.VarChar(50)
+  oppEmail  String   @db.VarChar(50)
+  status    Boolean  @default(true)
   createdAt DateTime @default(now()) @db.DateTime(0)
 
-  me        User     @relation("userOne", fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
-  friend    User     @relation("userTwo", fields: [oppEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  me     User @relation("userOne", fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  friend User @relation("userTwo", fields: [oppEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([userEmail], map: "Friend_user1_fkey")
   @@index([oppEmail], map: "Friend_user2_fkey")
@@ -125,6 +125,7 @@ model SmallCategory {
   id        Int    @id @default(autoincrement())
   name      String @unique @db.VarChar(50)
   bigName   String @db.VarChar(50)
+  content   String @db.Text
   selectOne String @db.VarChar(100)
   selectTwo String @db.VarChar(100)
   imageId   Int?   @unique
@@ -241,9 +242,9 @@ model JoinRoomBackup {
 }
 
 model FriendBackup {
-  id        Int     @id @default(autoincrement())
-  userEmail String  @db.VarChar(50)
-  oppEmail  String  @db.VarChar(50)
-  status    Boolean @default(true)
+  id        Int      @id @default(autoincrement())
+  userEmail String   @db.VarChar(50)
+  oppEmail  String   @db.VarChar(50)
+  status    Boolean  @default(true)
   createdAt DateTime @default(now()) @db.DateTime(0)
 }
