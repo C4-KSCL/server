@@ -106,6 +106,9 @@ export class SocketService {
                     createdAt: getNowTime(),
                 }
             });
+
+            chat.event = null;
+            
             return chat;
         });
         return chat;
