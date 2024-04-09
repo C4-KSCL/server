@@ -194,4 +194,97 @@ export class FriendService {
         }
 
     }
+
+    // userEmail, oppEmail
+    // 차단, 만약 참가한 room이 있다면 join을 false, 
+    async blockFriend(payload){
+
+        // joinRoom을 찾음
+        const friend = await database.friend.findFirst({
+            where : {
+                userEmail : payload.userEmail,
+                oppEmail : payload.oppEmail,
+            }
+        });
+
+        if(!friend) throw { status : 404, msg : "not found friend : block friend" };
+
+        const request = await database.addRequest.findFirst({
+            where : {
+                OR : [
+                    {
+                        reqUser : payload.userEmail,
+                        recUser : payload.oppEmail,
+                    },{
+                        reqUser : payload.oppEmail,
+                        recUser : payload.userEmail,
+                    }
+                ]
+            }
+        });
+
+        if(!request) throw { status : 404, msg :  "not found request : block friend"};
+
+        const join = await database.joinRoom.findFirst({
+            where : {
+                roomId : request.roomId,
+                userEmail : payload.userEmail,
+                join : true,
+            }
+        });
+
+        await database.$transaction(async(db)=>{
+            await db.friend.update({
+                where : {
+                    id : friend.id,
+                },
+                data : {
+                    status : false,
+                }
+            });
+            if(join){
+                await db.joinRoom.update({
+                    where : {
+                        id : join.id
+                    },
+                    data : {
+                        join : false,
+                    }
+                });
+            }
+        });
+    }
+
+    // userEmail, oppEmail
+    async unblockFriend(payload){
+        const friend = await database.friend.findFirst({
+            where : {
+                userEmail : payload.userEmail,
+                oppEmail : payload.oppEmail,
+                status : false,
+            }
+        }); 
+
+        if(!friend) throw { status : 404, msg : "not found blocking friend : unblockFriend" };
+
+        await database.friend.update({
+            where : {
+                id : friend.id,
+            },
+            data : {
+                status : true,
+            }
+        });
+    }
+
+    async getblockingFriendsByEmail(userEmail){
+        const blockingFriends = await database.friend.findMany({
+            where: {
+                userEmail : userEmail,
+                status : false,
+            }
+        });
+
+        return blockingFriends;
+    }
 }

@@ -27,7 +27,13 @@ class FriendController {
         this.router.patch("/blocking", [
             body("oppEmail").isEmail(),
             validatorErrorChecker
-        ],this.blockingFriend.bind(this));
+        ], this.blockingFriend.bind(this));
+        this.router.patch("/unblocking", [
+            body("oppEmail").isEmail(),
+            validatorErrorChecker
+        ], this.unBlockingFriend.bind(this));
+
+        this.router.get("/get-blocking-friend", this.getBlockingFriends.bind(this));
     }
 
     async getList(req, res, next) {
@@ -45,20 +51,44 @@ class FriendController {
 
     // 친구 차단.
     // 차단하면 friend, joinRoom ... 등의 데이터들의 상태를 false로 바꿔줘야함.
-    async blockingFriend(req,res,next){
+    async blockingFriend(req, res, next) {
+        try {
+            const userEmail = req.user;
+
+            const { oppEmail } = req.body;
+
+            await this.service.blockFriend({userEmail, oppEmail});
+
+            res.status(200).json({msg : "success"});
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async unBlockingFriend(req, res, next) {
         try{
             const userEmail = req.user;
 
-            const {oppEmail} = req.body;
+            const { oppEmail } = req.body;
 
+            await this.service.unblockFriend({userEmail, oppEmail});
 
+            res.status(200).json({msg : "success"});
         }catch(err){
             next(err);
         }
     }
 
-    async unBlockingFriend(req,res,next){
+    async getBlockingFriends(req,res,next){
+        try{
+            const userEmail = req.user;
 
+            const blockingFriends = await this.service.getblockingFriendsByEmail(userEmail);
+
+            res.status(200).json(blockingFriends);
+        }catch(err){
+            next(err);
+        }
     }
 
     async deleteFriend(req, res, next) {
