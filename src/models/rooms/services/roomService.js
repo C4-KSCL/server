@@ -28,7 +28,7 @@ export class RoomService {
                     id: payload.room.id,
                     name: payload.room.id,
                     publishing: "true",
-                    createdAt : getNowTime(),
+                    createdAt: getNowTime(),
                 }
             });
 
@@ -36,7 +36,7 @@ export class RoomService {
                 data: {
                     userEmail: payload.userEmail,
                     roomId: room.id,
-                    createdAt : getNowTime(),
+                    createdAt: getNowTime(),
                 }
             });
 
@@ -44,8 +44,8 @@ export class RoomService {
                 data: {
                     userEmail: payload.oppEmail,
                     roomId: room.id,
-                    createdAt : getNowTime(),
-                    status : payload.blocking,
+                    createdAt: getNowTime(),
+                    status: payload.blocking,
                 }
             });
 
@@ -107,7 +107,7 @@ export class RoomService {
                             select: {
                                 id: true,
                                 roomId: true,
-                                join : true,
+                                join: true,
                                 user: {
                                     select: {
                                         email: true,
@@ -167,9 +167,9 @@ export class RoomService {
                     roomId: payload.roomId,
                     userEmail: payload.userEmail,
                     content: `${payload.userEmail}님이 방을 떠났습니다.`,
-                    createdAt : getNowTime(),
-                    readCount : payload.joinCount - 1,
-                    type : "out",
+                    createdAt: getNowTime(),
+                    readCount: payload.joinCount - 1,
+                    type: "out",
                 }
             });
 
@@ -180,6 +180,12 @@ export class RoomService {
                     },
                     data: {
                         publishing: "deleted",
+                    }
+                });
+
+                await db.chatting.deleteMany({
+                    where: {
+                        id: payload.roomId,
                     }
                 });
             }
@@ -194,7 +200,7 @@ export class RoomService {
         const isExist = await database.joinRoom.count({
             where: {
                 roomId: payload.roomId,
-                join : true,
+                join: true,
             }
         });
 
@@ -259,7 +265,7 @@ export class RoomService {
         const joinRoom = await database.joinRoom.findFirst({
             where: {
                 roomId: request.roomId,
-                userEmail : payload.userEmail
+                userEmail: payload.userEmail
             }
         });
 
@@ -297,7 +303,7 @@ export class RoomService {
                     id: payload.roomId
                 },
                 data: {
-                    publishing : "true"
+                    publishing: "true"
                 }
             });
 
@@ -328,13 +334,13 @@ export class RoomService {
         return join;
     }
 
-    async findBlocking(payload){
+    async findBlocking(payload) {
 
         // 상대의 기준으로 내가 차단이 됐는지 찾아내는 것임.
         const blocking = await database.friend.findFirst({
-            where : {
-                userEmail : payload.oppEmail,
-                oppEmail : payload.userEmail,
+            where: {
+                userEmail: payload.oppEmail,
+                oppEmail: payload.userEmail,
             }
         });
 

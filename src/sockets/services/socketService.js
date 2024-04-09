@@ -56,6 +56,12 @@ export class SocketService {
     async createChat(payload) {
         let joinOpp;
 
+        const user = await database.user.findUnique({
+            where : {
+                email : payload.email,
+            }
+        });
+
         if (payload.friend) {
             joinOpp = await database.joinRoom.findFirst({
                 where: {
@@ -83,6 +89,7 @@ export class SocketService {
                     content: payload.content,
                     userEmail: payload.userEmail,
                     readCount: payload.readCount,
+                    nickName : user.nickname,
                     createdAt: getNowTime(),
                 }
             });
@@ -170,6 +177,7 @@ export class SocketService {
                     roomId: payload.roomId,
                     readCount: payload.readCount,
                     userName: payload.userName,
+                    nickName : user.nickname,
                     type: "event",
                     createdAt: getNowTime(),
                 }
