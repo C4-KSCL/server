@@ -339,7 +339,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -387,7 +387,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -458,7 +458,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -526,7 +526,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -594,7 +594,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -683,7 +683,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -751,7 +751,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -819,7 +819,7 @@
           },
           {
             "name": "email",
-            "in": "header - created by backend",
+            "in": "header",
             "schema": {
               "type": "string"
             }

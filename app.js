@@ -83,7 +83,7 @@ const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기�
   app.use('/signup', signupRouter); //회원가입
   app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)
   app.use('/edit', editRouter); //정보 수정
-  app.use('/delete', deleteRouter); //정보 수정
+  app.use('/delete', deleteRouter); //정보 수정x
   
 
   Controllers.forEach((controller) => {
