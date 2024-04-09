@@ -24,7 +24,7 @@ exports.friendMatching = (req, res) => {
                 return res.status(500).send('서버 에러');
             }
             if (userResults.length === 0) {
-                return res.status(401).send('해당하는 사용자가 없습니다.');
+                return res.status(501).send('해당하는 사용자가 없습니다.');
             }
             // userResults에서 userNumber만 추출하여 배열로 만듦
             const userNumbers = userResults.map(user => user.userNumber);
@@ -65,7 +65,7 @@ exports.setting = (req, res) => {
             return res.status(500).send('서버 에러');
         }
         if (results.affectedRows === 0) {
-            return res.status(404).send('사용자를 찾을 수 없습니다.');
+            return res.status(504).send('사용자를 찾을 수 없습니다.');
         }
         return res.status(200).send('설정 완료');
     });

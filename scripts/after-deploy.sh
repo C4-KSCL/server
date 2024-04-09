@@ -16,8 +16,5 @@ else
     echo "> Docker is not running. Skipping image removal."
 fi
 
-echo "> 🔵 Replace MY_IP in nginx.conf with the value from GitHub Secrets."
-sed -i 's/MY_IP/${{ secrets.MY_IP }}/g' nginx.conf
-
 echo "> 🟢 Run new docker services."
 docker-compose up --build -d
