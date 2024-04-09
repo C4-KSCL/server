@@ -1,7 +1,7 @@
 exports.editInfo = (req, res) => {
     const email = req.headers.email;
     if (!email) {
-        return res.status(400).send('이메일 헤더가 제공되지 않았습니다.');
+        return res.status(300).send('이메일 헤더가 제공되지 않았습니다.');
     }
     const { password, nickname, phoneNumber, age, gender, myMBTI, myKeyword, friendKeyword } = req.body;
     // 유저 정보 업데이트문을 수행하는 쿼리문
@@ -12,7 +12,7 @@ exports.editInfo = (req, res) => {
             return res.status(500).send('서버 에러');
         }
         if (results.affectedRows === 0) {
-            return res.status(404).send('해당 이메일의 사용자가 존재하지 않거나 변경된 내용이 없습니다.');
+            return res.status(304).send('해당 이메일의 사용자가 존재하지 않거나 변경된 내용이 없습니다.');
         }
         const email = req.body.email || req.headers.email;
         const findInfoQuery = `SELECT * FROM User WHERE email = ?`;
@@ -22,7 +22,7 @@ exports.editInfo = (req, res) => {
                 return res.status(500).send('서버 에러');
             }
             if (userResults.length === 0) {
-                return res.status(401).send('아이디 또는 비밀번호가 올바르지 않습니다.');
+                return res.status(502).send('아이디 또는 비밀번호가 올바르지 않습니다.');
             }
             const userNumber = userResults[0].userNumber; // 첫 번째 결과값을 사용자 정보로 설정
             const findImageQuery = `SELECT * FROM UserImage WHERE userNumber = ?`;

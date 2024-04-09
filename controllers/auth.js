@@ -61,7 +61,7 @@ exports.findpw = (req, res) => {
             return res.status(500).send('서버 에러');
         }
         if (results.length === 0) {
-            return res.status(401).send('존재하지 않는 이메일입니다.');
+            return res.status(301).send('존재하지 않는 이메일입니다.');
         }
         const user = results[0]; // 첫 번째 결과값을 사용자 정보로 설정
     });
@@ -108,7 +108,7 @@ exports.setpw = (req, res) => {
         }
         if (results.affectedRows === 0) {
             // 쿼리가 실행되었지만 영향을 받은 행이 없는 경우
-            return res.status(404).send('해당 이메일을 가진 사용자를 찾을 수 없습니다.');
+            return res.status(304).send('해당 이메일을 가진 사용자를 찾을 수 없습니다.');
         }
         res.status(200).send('비밀번호 변경이 완료되었습니다.');
     });

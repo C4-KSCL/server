@@ -45,7 +45,7 @@ exports.checknickname = (req, res) => {
             return res.status(500).send('서버 에러');
         }
         if (results.length !== 0) {
-            return res.status(401).send('존재하는 닉네임입니다.');
+            return res.status(301).send('존재하는 닉네임입니다.');
         }
         return res.status(200).send('사용가능한 닉네임 입니다.');
     });
@@ -62,7 +62,7 @@ exports.register = (req, res) => {
             return res.status(500).send('서버 에러');
         }
         if (results.length !== 0) {
-            return res.status(401).send('존재하는 이메일입니다.');
+            return res.status(301).send('존재하는 이메일입니다.');
         }
         else {
             const userData = {
