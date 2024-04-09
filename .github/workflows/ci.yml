@@ -62,12 +62,7 @@ jobs:    # 작업들을 정의
             --deployment-config-name CodeDeployDefault.AllAtOnce
             --deployment-group-name ${{ secrets.DEPLOYMENT_GROUP_NAME }}
             --s3-location bucket=${{ secrets.ACTION_S3_BUCKET_NAME }},bundleType=zip,key=$GITHUB_SHA.zip
-
-
-      - name: Replace IP Address in nginx.conf
-        run: |
-          sed -i 's/MY_IP/${{ secrets.MY_IP }}/g' nginx.conf
-
+            
       - name: Install Docker Compose    # Docker Compose를 설치
         run: | # |의 의미는 여러 줄을 수행가능
           sudo apt-get update

@@ -14,6 +14,7 @@ const signupRouter = require('./routes/signup');
 const findfriendRouter = require('./routes/findfriend');
 const editRouter = require('./routes/edit');
 const deleteRouter = require('./routes/delete');
+const cors = require('cors');
 
 import http from "http";
 import database from "./src/database";
@@ -78,6 +79,7 @@ const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기�
     console.log(`Hello World! 현재 포트 : ${clientPort}`);
     res.send(`Hello World! 현재 포트 : ${clientPort}`);
   }); //동작 확인용
+  app.use(cors());
   app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); //swagger
   app.use('/auth', authRouter); //로그인
   app.use('/signup', signupRouter); //회원가입
