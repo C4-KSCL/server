@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "This is my API Document",
-    "description": "이렇게 스웨거 자동생성이 됩니다.",
+    "description": "SoluMBTI 매칭",
     "version": "1.0.0"
   },
   "servers": [
@@ -336,13 +336,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -387,13 +380,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -470,13 +456,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -544,13 +523,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -612,13 +584,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -713,13 +678,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -781,13 +739,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -861,13 +812,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -909,13 +853,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -986,13 +923,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1037,13 +967,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1082,13 +1005,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1150,13 +1066,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1232,13 +1141,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1300,13 +1202,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1377,13 +1272,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1430,13 +1318,6 @@
           },
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1492,13 +1373,6 @@
           },
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1574,13 +1448,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1642,13 +1509,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1701,13 +1561,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1746,13 +1599,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1805,13 +1651,6 @@
           },
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1873,13 +1712,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1929,13 +1761,6 @@
           },
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1994,13 +1819,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2042,13 +1860,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2110,13 +1921,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2204,13 +2008,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2280,13 +2077,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2342,13 +2132,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2390,13 +2173,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2455,13 +2231,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2506,13 +2275,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2580,13 +2342,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2642,13 +2397,6 @@
         "parameters": [
           {
             "name": "accesstoken",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"

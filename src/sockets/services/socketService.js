@@ -6,9 +6,20 @@ export class SocketService {
     async updateChatReadCount(payload) {
         const updatedChats = await database.chatting.updateMany({
             where: {
-                roomId: payload.roomId,
-                userEmail: { not: payload.userEmail },
-                readCount: 1
+                OR : [
+                    {
+                        roomId: payload.roomId,
+                        NOT : {
+                            userEmail : payload.userEmail,
+                        },
+                        readCount: 1
+                    },
+                    {
+                        roomId : payload.roomId,
+                        userEmail : null,
+                        readCount : 1
+                    }
+                ],        
             },
             data: {
                 readCount: 0
