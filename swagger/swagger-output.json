@@ -338,13 +338,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header - created by back-end",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -390,13 +383,6 @@
           {
             "name": "accesstoken",
             "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
-            "in": "header - created by back-end",
             "schema": {
               "type": "string"
             }
@@ -472,13 +458,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header - created by back-end",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -546,13 +525,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header - created by back-end",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -615,13 +587,6 @@
           {
             "name": "accesstoken",
             "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
-            "in": "header - created by back-end",
             "schema": {
               "type": "string"
             }
@@ -715,13 +680,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header - created by back-end",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -789,13 +747,6 @@
             }
           },
           {
-            "name": "email",
-            "in": "header - created by back-end",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -858,13 +809,6 @@
           {
             "name": "accesstoken",
             "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "email",
-            "in": "header - created by back-end",
             "schema": {
               "type": "string"
             }
