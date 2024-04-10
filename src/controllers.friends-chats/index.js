@@ -10,7 +10,7 @@ import { verifyAccessToken } from "../../middleware/auth";
 
 const router = Router();
 
-router.use("/users", userController);
+// router.use("/users", userController);
 router.use("/requests", verifyAccessToken, requestController);
 router.use("/rooms", verifyAccessToken, roomController);
 router.use("/chats", verifyAccessToken, chatController);

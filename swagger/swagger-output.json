@@ -6,9 +6,6 @@
     "version": "1.0.0"
   },
   "servers": [
-    {
-      "url": "http://localhost:8000"
-    },
     {}
   ],
   "paths": {
@@ -902,46 +899,6 @@
           },
           "500": {
             "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/users/create": {
-      "post": {
-        "description": "",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "example": "any"
-                  },
-                  "nickname": {
-                    "example": "any"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/users/": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }
