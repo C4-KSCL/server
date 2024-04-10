@@ -1,5 +1,5 @@
 const swaggerAutogen = require('swagger-autogen')({ openapi: '3.0.0' });
-
+require('dotenv').config(); // dotenv를 통해 환경 변수 로드
 const options = {
     info: {
         title: 'SOULMBTI API Document',
@@ -7,7 +7,7 @@ const options = {
     },
     servers: [
         {
-            url: 'http://localhost:8000',
+            url: `http://${process.env.MY_IP}:8000`,
         }
     ],
     schemes: ['http'],
