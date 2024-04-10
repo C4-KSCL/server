@@ -4,52 +4,43 @@ import { UserService } from "../services/userService";
 import { validatorErrorChecker } from "../../../middlewares/validator";
 import { body } from "express-validator";
 
-class UserController {
-    path = "/users";
-    router;
-    service;
+const service = new UserService();
 
-    constructor(){
-        this.router = Router();
-        this.service = new UserService();
-        this.init();
-    }
+const router = Router();
 
-    init(){
-        // this.router.post("/create",[
-        //     body('email').isEmail(),
-        //     body('nickname'),
-        //     validatorErrorChecker
-        // ], this.createUser.bind(this));
-        // this.router.get("/",this.getUsers.bind(this));
-    }
+router.post("/create", [
+    body('email').isEmail(),
+    body('nickname'),
+    validatorErrorChecker
+], createUser);
 
-    async createUser(req,res,next){
-        try{
-            const { email, nickname } = req.body;
+router.get("/", getUsers);
 
-            const user = await this.service.createUser({email : email, nickname : nickname});
+export default router;
 
-            if(!user) throw { status : 400, msg : "fail to create user" };
+async function createUser(req, res, next) {
+    try {
+        const { email, nickname } = req.body;
 
-            res.status(201).json(user);
-        }catch(err){
-            next(err);
-        }
-    }
+        const user = await service.createUser({ email: email, nickname: nickname });
 
-    async getUsers(req,res,next){
-        try{
-            const users = await this.service.getUsers();
+        if (!user) throw { status: 400, msg: "fail to create user" };
 
-            if(users.length === 0) throw { status : 404, msg : "not found : user"};
-
-            res.status(200).json(users);
-        }catch(err){
-            next(err);
-        }
+        res.status(201).json(user);
+    } catch (err) {
+        next(err);
     }
 }
 
-const userController = new UserController();
-export default userController;
+async function getUsers(req, res, next) {
+    try {
+        const users = await service.getUsers();
+
+        if (users.length === 0) throw { status: 404, msg: "not found : user" };
+
+        res.status(200).json(users);
+    } catch (err) {
+        next(err);
+    }
+}
+

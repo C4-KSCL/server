@@ -113,7 +113,7 @@ export class SocketController {
 
             if (!msg) this.socket.emit("failed", { msg: "failed to requests" });
 
-            this.io.to(payload.roomId).emit("delete message", msg);
+            this.io.to(payload.roomId).emit("delete message", {msg: msg});
 
         } catch (err) {
             console.log(err);
@@ -161,44 +161,12 @@ export class SocketController {
             //     pushAlam({tokens : oppTokens, ...message});
             // }
 
-            this.io.to(payload.roomId).emit("new event", msg);
+            this.io.to(payload.roomId).emit("new event", {msg : msg});
 
         } catch (err) {
             console.log(err);
         }
     }
-
-    // // roomId
-    // // 접속이 돼 있는 방인지 검사 후 탈퇴
-    // async leaveRoom(payload){
-    //     try {
-    //         const userEmail = this.socket.userEmail;
-
-    //         const roomId = payload.roomId;
-
-    //         // 방에 입장해 있는 지 확인
-    //         const isJoin = await this.roomService.checkJoin({ roomId, userEmail });
-
-    //         // 방에 입장해 있는 유저의 수 확인
-    //         const joinCount = await this.roomService.getJoinCount({ roomId });
-
-    //         const msg = await this.roomService.leaveRoom({ userEmail, roomId, joinCount, joinId : isJoin.id });
-
-    //         if(msg){
-    //             this.socket.leave(payload.roomId);
-
-    //             this.io.to(payload.roomId).emit("leave room", msg);
-                
-    //             this.socket.emit("ack", {msg : "complete leave room"});
-
-    //         }else{
-    //             this.socket.emit("error", {error : "error in leaveRoom"});
-    //         }
-
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // }
 
     // 소켓 연결이 끊기면 UserSocketToken 테이블에 데이터 삭제
     async disconnecting() {
