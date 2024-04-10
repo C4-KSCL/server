@@ -23,7 +23,14 @@ import { SocketServer } from "./src/sockets/socket-server";
 import { verifyAccessToken } from "./middleware/auth";
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기준으로 경로 지정
+const fs = require('fs');
+// Swagger 설정
+const swaggerDocument = JSON.parse(fs.readFileSync('./swagger/swagger-output.json', 'utf8'));
+
+// '.env' 파일에서 가져온 IP 주소를 Swagger 문서에 반영합니다.
+swaggerDocument.servers = [{
+    url: `http://${process.env.MY_IP}:8000`
+}];
 
 (async () => {
 
@@ -80,7 +87,7 @@ const swaggerDocument = require('./swagger/swagger-output.json'); // app.js 기�
     res.send(`Hello World! 현재 포트 : ${clientPort}`);
   }); //동작 확인용
   app.use(cors());
-  app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); //swagger
+  app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   app.use('/auth', authRouter); //로그인
   app.use('/signup', signupRouter); //회원가입
   app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)

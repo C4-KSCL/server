@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8000"
+      "url": "http://MY_IP:8000"
     }
   ],
   "paths": {
@@ -338,6 +338,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -382,6 +389,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -458,6 +472,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -525,6 +546,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -586,6 +614,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -680,6 +715,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -747,6 +789,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -808,6 +857,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -901,6 +957,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -965,6 +1028,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1009,6 +1079,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1047,6 +1124,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1108,6 +1192,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1183,6 +1274,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1244,6 +1342,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1314,6 +1419,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1360,6 +1472,13 @@
           },
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1415,6 +1534,13 @@
           },
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1490,6 +1616,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1551,6 +1684,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1603,6 +1743,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1641,6 +1788,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1693,6 +1847,13 @@
           },
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1754,6 +1915,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1803,6 +1971,13 @@
           },
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1861,6 +2036,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -1902,6 +2084,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -1963,6 +2152,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2050,6 +2246,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2119,6 +2322,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2174,6 +2384,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2215,6 +2432,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2273,6 +2497,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2317,6 +2548,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
@@ -2384,6 +2622,13 @@
             }
           },
           {
+            "name": "email",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "refreshtoken",
             "in": "header",
             "schema": {
@@ -2439,6 +2684,13 @@
         "parameters": [
           {
             "name": "accesstoken",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
             "in": "header",
             "schema": {
               "type": "string"
