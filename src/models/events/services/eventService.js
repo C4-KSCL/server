@@ -198,12 +198,19 @@ export class EventService {
             }
         });
 
+        const user = await database.user.findUnique({
+            where : {
+                email : payload.userEmail,
+            }
+        });
+
         if (!isExists) throw { status: 404, msg: "not found : event" };
+
 
         const updatedEvent = await database.$transaction(async (db) => {
             let event;
 
-            if (isExists.user1 === payload.userEmail) {
+            if (isExists.user1 === user.nickname) {
                 event = await db.event.update({
                     where: {
                         id: isExists.id,
@@ -212,7 +219,7 @@ export class EventService {
                         user1Choice: payload.content,
                     }
                 });
-            } else if (isExists.user2 === payload.userEmail) {
+            } else if (isExists.user2 === user.nickname) {
                 event = await db.event.update({
                     where: {
                         id: isExists.id,
