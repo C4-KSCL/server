@@ -115,8 +115,9 @@ swaggerDocument.servers = [{
   });
 })();
 
-function formatDate() { // 현재 시간을 구하는 함수
-  const d = new Date();
+function formatDate() { //현재 시간을 구함
+  const now = new Date();
+  now.setHours(now.getHours() + 9); // UTC+9
   const pad = (s) => (s < 10 ? '0' + s : s);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 }
