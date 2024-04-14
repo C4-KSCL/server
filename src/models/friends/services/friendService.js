@@ -31,24 +31,24 @@ export class FriendService {
             const userFriends = await database.$transaction(async (db) => {
                 for (const friend of friends) {
                     const request = await db.addRequest.findFirst({
-                        where : {
-                            status : "accepted",
-                            OR : [
+                        where: {
+                            status: "accepted",
+                            OR: [
                                 {
-                                    reqUser : friend.userEmail,
-                                    recUser : friend.oppEmail
+                                    reqUser: friend.userEmail,
+                                    recUser: friend.oppEmail
                                 },
                                 {
-                                    reqUser : friend.oppEmail,
-                                    recUser : friend.userEmail
+                                    reqUser: friend.oppEmail,
+                                    recUser: friend.userEmail
                                 }
                             ]
                         }
                     });
 
-                    if(!request){
+                    if (!request) {
                         friend.room = null;
-                    }else{
+                    } else {
                         friend.room = await db.joinRoom.findFirst({
                             select: {
                                 roomId: true,
@@ -197,58 +197,58 @@ export class FriendService {
 
     // userEmail, oppEmail
     // 차단, 만약 참가한 room이 있다면 join을 false, 
-    async blockFriend(payload){
+    async blockFriend(payload) {
 
         // joinRoom을 찾음
         const friend = await database.friend.findFirst({
-            where : {
-                userEmail : payload.userEmail,
-                oppEmail : payload.oppEmail,
+            where: {
+                userEmail: payload.userEmail,
+                oppEmail: payload.oppEmail,
             }
         });
 
-        if(!friend) throw { status : 404, msg : "not found friend : block friend" };
+        if (!friend) throw { status: 404, msg: "not found friend : block friend" };
 
         const request = await database.addRequest.findFirst({
-            where : {
-                OR : [
+            where: {
+                OR: [
                     {
-                        reqUser : payload.userEmail,
-                        recUser : payload.oppEmail,
-                    },{
-                        reqUser : payload.oppEmail,
-                        recUser : payload.userEmail,
+                        reqUser: payload.userEmail,
+                        recUser: payload.oppEmail,
+                    }, {
+                        reqUser: payload.oppEmail,
+                        recUser: payload.userEmail,
                     }
                 ]
             }
         });
 
-        if(!request) throw { status : 404, msg :  "not found request : block friend"};
+        if (!request) throw { status: 404, msg: "not found request : block friend" };
 
         const join = await database.joinRoom.findFirst({
-            where : {
-                roomId : request.roomId,
-                userEmail : payload.userEmail,
-                join : true,
+            where: {
+                roomId: request.roomId,
+                userEmail: payload.userEmail,
+                join: true,
             }
         });
 
-        await database.$transaction(async(db)=>{
+        await database.$transaction(async (db) => {
             await db.friend.update({
-                where : {
-                    id : friend.id,
+                where: {
+                    id: friend.id,
                 },
-                data : {
-                    status : false,
+                data: {
+                    status: false,
                 }
             });
-            if(join){
+            if (join) {
                 await db.joinRoom.update({
-                    where : {
-                        id : join.id
+                    where: {
+                        id: join.id
                     },
-                    data : {
-                        join : false,
+                    data: {
+                        join: false,
                     }
                 });
                 await db.chatting.create({
@@ -260,38 +260,50 @@ export class FriendService {
                         readCount: 0,
                         type: "out",
                     }
-                }); 
+                });
             }
         });
     }
 
     // userEmail, oppEmail
-    async unblockFriend(payload){
+    async unblockFriend(payload) {
         const friend = await database.friend.findFirst({
-            where : {
-                userEmail : payload.userEmail,
-                oppEmail : payload.oppEmail,
-                status : false,
+            where: {
+                userEmail: payload.userEmail,
+                oppEmail: payload.oppEmail,
+                status: false,
             }
-        }); 
+        });
 
-        if(!friend) throw { status : 404, msg : "not found blocking friend : unblockFriend" };
+        if (!friend) throw { status: 404, msg: "not found blocking friend : unblockFriend" };
 
         await database.friend.update({
-            where : {
-                id : friend.id,
+            where: {
+                id: friend.id,
             },
-            data : {
-                status : true,
+            data: {
+                status: true,
             }
         });
     }
 
-    async getblockingFriendsByEmail(userEmail){
+    async getblockingFriendsByEmail(userEmail) {
         const blockingFriends = await database.friend.findMany({
             where: {
-                userEmail : userEmail,
-                status : false,
+                userEmail: userEmail,
+                status: false,
+            },
+            include: {
+                friend: {
+                    select: {
+                        myMBTI: true,
+                        myKeyword: true,
+                        nickname: true,
+                        userImage: true,
+                        age: true,
+                        gender: true,
+                    }
+                },
             }
         });
 
