@@ -43,9 +43,9 @@ swaggerDocument.servers = [{
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
     app.use(hpp()); //보안 취약점 보호
   } else {
-    app.use(morgan('dev')); //로깅하는 것을 개발모드
+    morgan.token('formattedDate', formatDate); // 현재 시간이 나타나도록 추가
+    app.use(morgan(':formattedDate :method :url :status :response-time ms - :res[content-length]'));
   }
-
 
   app.use(express.static(path.join(__dirname, 'public'))); // public 폴더를 static으로
   app.use(express.json());
@@ -114,3 +114,10 @@ swaggerDocument.servers = [{
     console.log('hi start server 8000!!!!!!');
   });
 })();
+
+function formatDate() { //현재 시간을 구함
+  const now = new Date();
+  now.setHours(now.getHours() + 9); // UTC+9
+  const pad = (s) => (s < 10 ? '0' + s : s);
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
