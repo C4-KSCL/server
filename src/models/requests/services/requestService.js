@@ -243,9 +243,16 @@ export class RequestService {
 
         if (isExist) {
             if (isExist.status === "rejected" || isExist.status === "deleted") { return; }
-            else if (isExist.status === "accepted") { throw { status: 404, msg: "already friend : reqeust" }; }
+            else if (isExist.status === "accepted") { throw { status: 400, msg: "already friend : request" }; }
+            
+            const msg = {
+                error_msg : "already exist : request",
+                requestId : isExist.id,
+                reqUser : isExist.reqUser,
+                recUser : isExist.recUser
+            };
 
-            throw { status: 400, msg: "already exist : request" };
+            throw { status: 400, msg: msg };
         }
     }
 
