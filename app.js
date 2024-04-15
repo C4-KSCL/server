@@ -81,10 +81,7 @@ swaggerDocument.servers = [{
   });
 
   app.get("/", (req, res) => {
-    const hostHeader = req.headers.host;
-    const clientPort = hostHeader ? hostHeader.split(':')[1] : null; // 호스트 헤더가 있는 경우에만 분할
-    console.log(`Hello World! 현재 포트 : ${clientPort}`);
-    res.send(`Hello World! 현재 포트 : ${clientPort}`);
+    res.send(`Hello World! 현재 포트`);
   }); //동작 확인용
   app.use(cors());
   app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
