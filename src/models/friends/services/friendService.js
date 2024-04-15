@@ -56,23 +56,9 @@ export class FriendService {
                             where: {
                                 roomId: request.roomId,
                                 userEmail: userEmail,
-                                join: true,
                             }
                         });
                     }
-                    // if(request){
-                    //     const room = await db.room.findUnique({
-                    //         where : {
-                    //             id : request.roomId,
-                    //             publishing : "true",
-                    //         },
-                    //         select : {
-                    //             id : true
-                    //         }
-                    //     }); 
-                    //     friend.room = room;
-                    // }
-
                 }
 
                 return friends;
