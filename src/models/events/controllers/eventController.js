@@ -49,11 +49,11 @@ router.post("/create-small-event", [
     validatorErrorChecker,
 ], postSmallEvent);
 
-router.patch("/update-event-answer/:id", [
-    param("id"),
-    body("content"),
-    validatorErrorChecker,
-], patchEventAnswer);
+// router.patch("/update-event-answer/:id", [
+//     param("id"),
+//     body("content"),
+//     validatorErrorChecker,
+// ], patchEventAnswer);
 
 router.post("/upload-big-image/:name", [
     param("name"),

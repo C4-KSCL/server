@@ -217,7 +217,7 @@ model ChattingBackup {
   nickName  String?  @db.VarChar(50)
   userEmail String?  @db.VarChar(50)
   createdAt DateTime @default(now()) @db.DateTime(0)
-  content   String   @db.Text
+  content   String?   @db.Text
   readCount Int
   type      String   @default("text") @db.VarChar(10)
 }
