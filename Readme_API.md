@@ -117,7 +117,7 @@
   - 500 : 매칭 실패(서버 에러)   
 
 > 3. 친구 이미지 찾기
-- URL : findfriend/setting (POST)
+- URL : findfriend/getimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - friendEmail
 - 반환 값 : user 객체, images 객체
   - 200 : 매칭 성공 
