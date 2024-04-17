@@ -84,6 +84,33 @@ exports.setting = (req, res) => {
     });
 }
 
+exports.getimage = (req, res) => {
+    const { friendEmail } = req.body;
+    const finduserquery = `SELECT * FROM User WHERE email = ?`;
+    req.mysqlConnection.query(finduserquery, [friendEmail], (err, userResults) => {
+        if (err) {
+            console.error('Error while querying:', err);
+            return res.status(500).send('서버 에러');
+        }
+        if (userResults.length === 0) {
+            return res.status(301).send('존재하지 않는 이메일입니다.');
+        }
+        const userNumber = userResults[0].userNumber; 
+        const findImageQuery = `SELECT * FROM UserImage WHERE userNumber = ?`;
+        req.mysqlConnection.query(findImageQuery, [userNumber], (err, imageResults) => {
+            if (err) {
+                console.error('Error while querying:', err);
+                return res.status(500).send('서버 에러');
+            }
+            return res.status(200).json({
+                user : userResults[0],
+                images : imageResults,
+                // 필요한 사용자 정보를 추가로 반환할 수 있음
+            });
+        });
+    });
+}
+
 //시간 형식 설정 함수
 function getCurrentDateTime() {
     const now = moment().tz("Asia/Seoul");

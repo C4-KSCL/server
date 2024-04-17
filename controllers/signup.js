@@ -11,7 +11,6 @@ exports.emailauth = (req, res) => {
         if (results.length !== 0) {
             return res.status(301).send('존재하는 이메일입니다.');
         }
-
         // 랜덤한 인증번호 생성 (예: 6자리 숫자)
         const verificationCode = Math.floor(100000 + Math.random() * 900000);
         console.log("A")
@@ -23,7 +22,6 @@ exports.emailauth = (req, res) => {
                 pass: process.env.SEND_MAIL_PW, // 네이버 비밀번호
             },
         });
-
         // 이메일 전송 옵션
         const mailOptions = {
             from: process.env.SEND_MAIL_ID, // 발신자 이메일 주소

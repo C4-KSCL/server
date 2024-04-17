@@ -5,7 +5,7 @@
 > 1. 로그인
 - URL : auth/login (POST)
 - 요청 값 : email, password
-- 반환 값 : user 객체, images 객체, accessToken, refreshToekn
+- 반환 값 : user 객체, images 객체, accessToken, refreshToken
 - 응답상태 코드  
   - 200 - 로그인 성공   
   - 401 - 로그인 실패(잘못된 아이디 혹은 비밀번호)
@@ -116,6 +116,13 @@
   - 200 : 매칭 성공 
   - 500 : 매칭 실패(서버 에러)   
 
+> 3. 친구 이미지 찾기
+- URL : findfriend/setting (POST)
+- 요청 값 : 헤더 - accesstoken, 바디 - friendEmail
+- 반환 값 : user 객체, images 객체
+  - 200 : 매칭 성공 
+  - 301 : 이메일 오류
+  - 500 : 매칭 실패(서버 에러)  
 -----
 ### 회원정보(프로필 사진) 수정
 > 1. 프로필 사진 삭제
