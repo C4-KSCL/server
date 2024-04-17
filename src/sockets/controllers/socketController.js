@@ -52,6 +52,7 @@ export class SocketController {
 
         } catch (err) {
             console.log(err);
+            this.socket.emit("error", {msg: err.msg});
         }
 
     }
@@ -98,6 +99,7 @@ export class SocketController {
 
         } catch (err) {
             console.log(err);
+            this.socket.emit("error", {msg: err.msg});
         }
     }
 
@@ -153,7 +155,7 @@ export class SocketController {
             });
 
 
-            if (!msg) this.socket.emit("failed", { msg: "failed to requests" });
+            if (!msg) this.socket.emit("error", { msg: "failed to requests" });
 
             // if(oppSocket){
             //     const oppTokens = getTokens({roomId, userEmail});
@@ -165,7 +167,25 @@ export class SocketController {
 
         } catch (err) {
             console.log(err);
+            this.socket.emit("error", {msg: err.msg});
         }
+    }
+
+    // payload : { eventId, content }
+    async updateEventAnswer(payload){
+        try{
+            const { eventId, content } = payload;
+            const user = this.socket.userEmail;
+
+            const event = await this.service.updateAnswer({id : Number(eventId), userEmail : user, content : content});
+
+            this.io.to(this.socket.roomId).emit("answer to event", {event : event});
+
+        }catch(err){
+            console.log(err);
+            this.socket.emit("error", {msg: err.msg});
+        }
+
     }
 
     // 소켓 연결이 끊기면 UserSocketToken 테이블에 데이터 삭제

@@ -377,4 +377,84 @@ export class SocketService {
             }
         });
     }
+
+    async updateAnswer(payload) {
+        const isExists = await database.event.findUnique({
+            where: {
+                id: payload.id,
+            }
+        });
+
+        const user = await database.user.findUnique({
+            where : {
+                email : payload.userEmail,
+            }
+        });
+
+        if (!isExists) throw { status: 404, msg: "not found : event" };
+
+
+        const updatedEvent = await database.$transaction(async (db) => {
+            let event;
+
+            if (isExists.user1 === user.nickname) {
+                event = await db.event.update({
+                    where: {
+                        id: isExists.id,
+                    },
+                    data: {
+                        user1Choice: payload.content,
+                    }
+                });
+            } else if (isExists.user2 === user.nickname) {
+                event = await db.event.update({
+                    where: {
+                        id: isExists.id,
+                    },
+                    data: {
+                        user2Choice: payload.content,
+                    }
+                });
+            } else {
+                throw { status: 400, msg: "bad request" };
+            }
+
+            event = await db.event.findUnique({
+                where: {
+                    id: isExists.id
+                },
+                include: {
+                    smallCategory: {
+                        include: {
+                            eventImage: {
+                                select: {
+                                    filepath: true,
+                                }
+                            },
+                        }
+                    },
+                    // eventUser1 : {
+                    //     select : {
+                    //         nickname : true,
+                    //         email : true,
+                    //         userImage : true,
+                    //     }
+                    // },
+                    // eventUser2 : {
+                    //     select : {
+                    //         nickname : true,
+                    //         email : true,
+                    //         userImage : true,
+                    //     }
+                    // }
+                }
+            });
+
+            return event;
+        });
+
+        console.log(updatedEvent);
+
+        return updatedEvent;
+    }
 }
