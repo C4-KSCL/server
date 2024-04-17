@@ -16,9 +16,22 @@ exports.friendMatching = (req, res) => {
         const myfriendGender = results[0].friendGender;
         
         //사용자가 설정한 친구MBTI 탐색 후 해당 MBTI를 가진 유저 조회
-        const friendfindQuery = `SELECT * FROM User WHERE myMBTI = ? AND CAST(age AS UNSIGNED) <= CAST(? AS UNSIGNED) AND CAST(age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
-        AND gender = ? AND email != ? AND deleteTime is NULL ORDER BY RAND() LIMIT 5`;
-        req.mysqlConnection.query(friendfindQuery, [myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail], (err, userResults) => {
+        const friendfindQuery = `SELECT * FROM User 
+        WHERE myMBTI = ? 
+        AND CAST(age AS UNSIGNED) <= CAST(? AS UNSIGNED) 
+        AND CAST(age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
+        AND gender = ? 
+        AND email != ? 
+        AND deleteTime IS NULL 
+        AND email NOT IN (
+            SELECT oppEmail FROM Friend WHERE userEmail = ?
+        )
+        AND email NOT IN (
+            SELECT recUser FROM AddRequest WHERE reqUser = ? AND status = 'ing'
+        )
+        ORDER BY RAND() 
+        LIMIT 5;`;
+        req.mysqlConnection.query(friendfindQuery, [myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail], (err, userResults) => {
             if (err) {
                 console.error('Error while querying:', err);
                 return res.status(500).send('서버 에러');
