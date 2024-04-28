@@ -106,7 +106,35 @@ exports.friendMatching = (req, res) => {
         });
     });
 };
+exports.getfriendinfo = (req, res) => {
+    let userNumbers = req.query.userNumbers;
+    if (typeof userNumbers === 'string') {
+        userNumbers = userNumbers.split(',').map(Number);
+    }
 
+    // 해당 번호에 해당하는 친구들의 정보를 반환하는 쿼리문
+    const infoQuery = 'SELECT * FROM User WHERE userNumber IN (?)';
+    req.mysqlConnection.query(infoQuery, [userNumbers], (error, userResults) => {
+        if (error) {
+            console.error('Error while querying:', error);
+            return res.status(500).send('서버 에러');
+        }
+        // 해당 번호에 해당하는 친구들의 이미지를 반환하는 쿼리문
+        const findImageQuery = `SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated 
+            FROM UserImage
+            WHERE UserImage.userNumber IN (?)`;
+            req.mysqlConnection.query(findImageQuery, [userNumbers], (err, imageResults) => {  // 여기서 database 사용해야 합니다.
+            if (err) {
+                console.error('Error while querying:', err);
+                return res.status(500).send('서버 에러');
+            }
+            return res.status(200).json({
+                users: userResults,
+                images: imageResults
+            });
+        });
+    });
+};
 exports.setting = (req, res) => {
     const userEmail = req.headers['email'];
     const { friendMBTI, friendMaxAge, friendMinAge, friendGender } = req.body;
@@ -156,3 +184,4 @@ function getCurrentDateTime() {
     const formattedDateTime = now.format("YYYY-MM-DD HH:mm:ss");
     return formattedDateTime;
 }
+
