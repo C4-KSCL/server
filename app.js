@@ -81,7 +81,7 @@ swaggerDocument.servers = [{
   });
 
   app.get("/", (req, res) => {
-    res.send(`Hello World! 현재 포트`);
+    res.send(`Hello World!! 현재 포트`);
   }); //동작 확인용
   app.use(cors());
   app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
