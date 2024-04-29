@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { FriendService } from "../services/friendService";
-import database from "../../../database";
 
 import { validatorErrorChecker } from "../../../middlewares/validator";
 

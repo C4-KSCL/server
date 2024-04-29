@@ -78,6 +78,7 @@ export class SocketController {
 
             if (oppSocket.connectRoomId === payload.roomId) joinCount--;
 
+            oppSocket.token = "";
 
             // roomId, userEmail, content
             const msg = await this.service.createChat(new CreateChatDTO({
@@ -89,11 +90,11 @@ export class SocketController {
             }));
 
 
-            // if(oppSocket){
-            //     const oppTokens = getTokens({roomId, userEmail});
+            if(oppSocket){
+                const oppTokens = getTokens({roomId, userEmail});
 
-            //     pushAlam({tokens : oppTokens, ...message});
-            // }
+                pushAlam({tokens : oppTokens, ...message});
+            }
 
             this.io.to(payload.roomId).emit("new message", { msg: msg });
 

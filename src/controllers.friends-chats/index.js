@@ -4,6 +4,7 @@ import userController from "../models/users/controllers/userController";
 import chatController from "../models/chats/controllers/chatController";
 import eventController from "../models/events/controllers/eventController";
 import friendController from "../models/friends/controllers/friendController";
+import tokenController from "../models/fcm-tokens/controllers/tokenContoller";
 
 import { Router } from "express";
 import { verifyAccessToken } from "../../middleware/auth";
@@ -16,5 +17,6 @@ router.use("/rooms", verifyAccessToken, roomController);
 router.use("/chats", verifyAccessToken, chatController);
 router.use("/events", verifyAccessToken, eventController);
 router.use("/friends", verifyAccessToken, friendController);
+router.use("/tokens", verifyAccessToken, tokenController);
 
 export default router;

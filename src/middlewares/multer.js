@@ -49,8 +49,8 @@ export const imageDelete = async (req, res, next) => {
             return res.status(500).send('이미지 삭제에 실패했습니다.');
         }
         await database.eventImage.delete({
-            where : {
-                id : image.id,
+            where: {
+                id: image.id,
             }
         });
     });

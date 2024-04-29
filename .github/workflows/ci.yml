@@ -48,6 +48,21 @@ jobs:    # 작업들을 정의
           echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}" >> .env
           echo "DEPLOYMENT_GROUP_NAME=${{ secrets.DEPLOYMENT_GROUP_NAME }}" >> .env
 
+          touch fcm_config.json
+          echo "{
+            "type": "",
+            "project_id": "",
+            "private_key_id": "",
+            "private_key": "",
+            "client_email": "",
+            "client_id": "",
+            "auth_uri": "",
+            "token_uri": "",
+            "auth_provider_x509_cert_url": "",
+            "client_x509_cert_url": "",
+            "universe_domain": ""
+          }" >> fcm_config.json
+
           # 파일 압축
       - name: 📦 Zip project files
         run: zip -r ./$GITHUB_SHA.zip .

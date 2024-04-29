@@ -1,5 +1,5 @@
 import admin from "firebase-admin";
-// import serAccount from'../서버 키 이름.json';
+import serAccount from'../../fcm_config.json';
 
 
 // payload : tokens, sendUserName, content
