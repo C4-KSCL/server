@@ -59,6 +59,9 @@ exports.friendMatching = (req, res) => {
         LIMIT 3;
         `;  
         req.mysqlConnection.query(friendfindQuery, [userEmail, myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail, userEmail], (err, userResults) => {
+            console.log("Executing query:", friendfindQuery);
+            console.log("With parameters:", [userEmail, myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail, userEmail]);
+            
             if (err) {
                 console.error('Error while querying:', err);
                 return res.status(500).send('서버 에러');
@@ -82,7 +85,7 @@ exports.friendMatching = (req, res) => {
                 });
             });
             // findImageQuery에 WHERE 조건에 userNumber IN (...)을 추가하여 필터링
-            const findImageQuery = `SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated 
+            const findImageQuery = `SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated, UserImage.imageKey
             FROM UserImage, User 
             WHERE User.userNumber = UserImage.userNumber AND UserImage.userNumber IN (${userNumbers.join(',')});`;
             req.mysqlConnection.query(findImageQuery, [friendMBTI, userEmail], (err, imageResults) => {
