@@ -72,11 +72,7 @@ exports.friendMatching = (req, res) => {
         ORDER BY totalScore DESC
         limit 3;        
         `;  
-req.mysqlConnection.query(friendfindQuery, [myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail, userEmail,userEmail], (err, userResults) => {
-
-        console.log("Executing query:", friendfindQuery);
-            console.log("With parameters:", [myfriendMBTI,myfriendMBTI,myfriendMBTI,myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail, userEmail]);
-            
+        req.mysqlConnection.query(friendfindQuery, [myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail, userEmail,userEmail], (err, userResults) => {    
             if (err) {
                 console.error('Error while querying:', err);
                 return res.status(500).send('서버 에러');
