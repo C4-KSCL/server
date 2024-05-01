@@ -23,6 +23,8 @@ exports.verifyAccessToken = (req, res, next) => {
         return next();
     }
     catch (error) { 
+        
+        console.log(req.headers.accesstoken)
         //Access 토큰 문제 발생
         if (error.name === 'TokenExpiredError') { //Access 토큰 기간 만료
             try { 
