@@ -68,9 +68,9 @@ exports.verifyAccessToken = (req, res, next) => {
                 message: 'access 토큰이 만료되었습니다.'
             });
         }
-        return res.status(411).json({
+        return res.status(417).json({
             //Access 토큰 오류
-            code: 411,
+            code: 417,
             message: '유효하지 않은 Access 토큰입니다.'
         });
     }
