@@ -23,8 +23,6 @@ exports.verifyAccessToken = (req, res, next) => {
         return next();
     }
     catch (error) { 
-        
-        console.log(req.headers.accesstoken)
         //Access 토큰 문제 발생
         if (error.name === 'TokenExpiredError') { //Access 토큰 기간 만료
             try { 
@@ -70,9 +68,9 @@ exports.verifyAccessToken = (req, res, next) => {
                 message: 'access 토큰이 만료되었습니다.'
             });
         }
-        return res.status(417).json({
+        return res.status(411).json({
             //Access 토큰 오류
-            code: 417,
+            code: 411,
             message: '유효하지 않은 Access 토큰입니다.'
         });
     }
