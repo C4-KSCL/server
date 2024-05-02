@@ -48,6 +48,7 @@ swaggerDocument.servers = [{
     app.use(morgan('combined')); //로깅하는 것을 배포모드
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
     app.use(hpp()); //보안 취약점 보호
+    console.log("hello https");
         // HTTP 요청을 HTTPS로 리디렉션
     app.use((req, res, next) => {
       if (!req.secure) {
