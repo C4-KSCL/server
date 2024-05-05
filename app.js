@@ -46,7 +46,7 @@ swaggerDocument.servers = [{
       cert: fs.readFileSync(path.join('/etc/key/cert.pem')),
     }
     HTTPS.createServer(option, app).listen(port, () => {
-      console.log('HTTPS 서버가 실행되었습니다. 포트 :: ' + port);
+      console.log('HTTPS 서버가 실행되었습니다.. 포트 :: ' + port);
     });
     app.use(morgan('combined')); //로깅하는 것을 배포모드
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
