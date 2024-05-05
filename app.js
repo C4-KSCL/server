@@ -39,12 +39,12 @@ const port = process.env.PORT || 8000;
 
   let httpServer;
 
-  if (process.env.NODE_ENV === 'production1') {
+  if (process.env.NODE_ENV === 'production') {
     
     const option = {
-      ca: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')), 'utf8'),
-      key: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem')), 'utf8'),
-      cert: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'cert.pem')), 'utf8'),
+      ca: fs.readFileSync('./key/fullchain.pem'),
+      key: fs.readFileSync('./privkey.pem'),
+      cert: fs.readFileSync('./cert.pem')
     }
     https.createServer(option, app).listen(port, () => {
       console.log('HTTPS 서버가 실행되었습니다... 포트 :: ' + port);
