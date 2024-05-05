@@ -39,10 +39,10 @@ const port = process.env.PORT || 8000;
 
   let httpServer;
 
-  if (process.env.NODE_ENV === 'production1') {
+  if (process.env.NODE_ENV === 'production') {
     const privateKeyPath = '/etc/letsencrypt/live/soulmbti.shop/privkey.pem';
     const certificatePath = '/etc/letsencrypt/live/soulmbti.shop/cert.pem';
-    const caBundlePath = '/etc/letsencrypt/live/soulmbti.shop/fullchain.pem';
+    const caBundlePath = '/etc/letsencrypt/live/soulmbti.shop/chain.pem';
 
     // 파일을 동기적으로 읽어오기
     const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
