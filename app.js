@@ -40,12 +40,22 @@ const port = process.env.PORT || 8000;
   let httpServer;
 
   if (process.env.NODE_ENV === 'production1') {
-    const option = {
-      ca: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')), 'utf8'),
-      key: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem')), 'utf8'),
-      cert: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'cert.pem')), 'utf8'),
-    }
-    https.createServer(option, app).listen(port, () => {
+    const privateKeyPath = '/etc/letsencrypt/live/soulmbti.shop/privkey.pem';
+    const certificatePath = '/etc/letsencrypt/live/soulmbti.shop/cert.pem';
+    const caBundlePath = '/etc/letsencrypt/live/soulmbti.shop/fullchain.pem';
+
+    // 파일을 동기적으로 읽어오기
+    const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+    const certificate = fs.readFileSync(certificatePath, 'utf8');
+    const caBundle = fs.readFileSync(caBundlePath, 'utf8');
+
+    // 옵션 객체에 인증서 정보 설정
+    const credentials = {
+        key: privateKey,
+        cert: certificate,
+        ca: caBundle
+    };
+    https.createServer(credentials, app).listen(port, () => {
       console.log('HTTPS 서버가 실행되었습니다... 포트 :: ' + port);
     });
     app.use(morgan('combined')); //로깅하는 것을 배포모드
