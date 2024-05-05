@@ -40,6 +40,9 @@ swaggerDocument.servers = [{
   let httpServer;
 
   if (process.env.NODE_ENV === 'production') {
+    console.log('Running as user ID:', process.getuid());
+    console.log('Running as user Name:', require('os').userInfo().username);
+
     const option = {
       ca: fs.readFileSync(path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')),
       key: fs.readFileSync(path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem')),
