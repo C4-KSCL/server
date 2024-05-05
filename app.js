@@ -39,7 +39,7 @@ swaggerDocument.servers = [{
 
   let httpServer;
 
-  if (process.env.NODE_ENV === 'production1') {
+  if (process.env.NODE_ENV === 'production') {
     const options = {
       key: fs.readFileSync(path.resolve(process.cwd(),'/etc/letsencrypt/live/soulmbti.shop/privkey.pem'), 'utf8').toString(),
       cert: fs.readFileSync(path.resolve(process.cwd(),'/etc/letsencrypt/live/soulmbti.shop/fullchain.pem'), 'utf8').toString()
