@@ -42,7 +42,7 @@ swaggerDocument.servers = [{
   if (process.env.NODE_ENV === 'production') {
     console.log('Running as user ID:', process.getuid());
     console.log('Running as user Name:', require('os').userInfo().username);
-    path2 = path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'fullchain2.pem');
+    const path2 = path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'fullchain2.pem');
     fs.access(path2, fs.constants.F_OK, (err) => {
       console.log(`${path2} ${err ? 'does not exist' : 'exists'}`);
     });
