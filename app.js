@@ -32,7 +32,7 @@ const swaggerDocument = JSON.parse(fs.readFileSync('./swagger/swagger-output.jso
 swaggerDocument.servers = [{
     url: `http://${process.env.MY_IP}:8000`
 }];
-
+const port = process.env.PORT || 8000;
 (async () => {
 
   const app = express();
@@ -41,12 +41,11 @@ swaggerDocument.servers = [{
 
   if (process.env.NODE_ENV === 'production') {
     const option = {
-
-      ca: fs.readFileSync(path.resolve(process.cwd(),path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem'),'utf8')).toString(),
-      key: fs.readFileSync(path.resolve(process.cwd(),path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem'),'utf8')).toString(),
-      cert: fs.readFileSync(path.resolve(process.cwd(),path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'cert.pem'),'utf8')).toString(),
+      ca: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')), 'utf8'),
+      key: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem')), 'utf8'),
+      cert: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'cert.pem')), 'utf8'),
     }
-    HTTPS.createServer(option, app).listen(port, () => {
+    https.createServer(option, app).listen(port, () => {
       console.log('HTTPS 서버가 실행되었습니다.. 포트 :: ' + port);
     });
     app.use(morgan('combined')); //로깅하는 것을 배포모드
