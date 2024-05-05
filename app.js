@@ -43,8 +43,8 @@ const port = process.env.PORT || 8000;
     
     const option = {
       ca: fs.readFileSync('./key/fullchain.pem'),
-      key: fs.readFileSync('./privkey.pem'),
-      cert: fs.readFileSync('./cert.pem')
+      key: fs.readFileSync('./key/privkey.pem'),
+      cert: fs.readFileSync('./key/cert.pem')
     }
     https.createServer(option, app).listen(port, () => {
       console.log('HTTPS 서버가 실행되었습니다... 포트 :: ' + port);
