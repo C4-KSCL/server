@@ -30,6 +30,7 @@ services:
     restart : always
     volumes:
       - "./nginx.conf:/etc/nginx/nginx.conf"
+      - /home/api/api_back/key:/etc/nginx/ssl
     
 networks:
   your_network_name:
