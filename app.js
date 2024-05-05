@@ -40,22 +40,19 @@ swaggerDocument.servers = [{
   let httpServer;
 
   if (process.env.NODE_ENV === 'production11') {
-    const options = {
-      key: fs.readFileSync('/etc/letsencrypt/live/soulmbti.shop/privkey.pem'),
-      cert: fs.readFileSync('/etc/letsencrypt/live/soulmbti.shop/fullchain.pem')
-    };
-    httpServer =https.createServer(options, app);
+    const option = {
+      ca: fs.readFileSync('/etc/letsencrypt/live/{myurl}/fullchain.pem'),
+      key: fs.readFileSync('/etc/letsencrypt/live/{myurl}/privkey.pem'),
+      cert: fs.readFileSync('/etc/letsencrypt/live/{myurl}/cert.pem')
+    }
+    HTTPS.createServer(option, app).listen(port, () => {
+      console.log('HTTPS 서버가 실행되었습니다. 포트 :: ' + port);
+    });
     app.use(morgan('combined')); //로깅하는 것을 배포모드
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
     app.use(hpp()); //보안 취약점 보호
     console.log("hello https");
         // HTTP 요청을 HTTPS로 리디렉션
-    app.use((req, res, next) => {
-      if (!req.secure) {
-        return res.redirect(`https://${req.headers.host}${req.url}`);
-      }
-      next();
-    });
   } else {
     morgan.token('formattedDate', formatDate); // 현재 시간이 나타나도록 추가
     app.use(morgan(':formattedDate :method :url :status :response-time ms - :res[content-length]'));
