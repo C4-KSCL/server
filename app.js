@@ -42,8 +42,26 @@ swaggerDocument.servers = [{
   if (process.env.NODE_ENV === 'production') {
     console.log('Running as user ID:', process.getuid());
     console.log('Running as user Name:', require('os').userInfo().username);
-
+    path = path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'fullchain2.pem';
+    fs.access(path, fs.constants.F_OK, (err) => {
+      console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
+    });
+    
+    // 파일 읽기 권한 확인
+    fs.access(path, fs.constants.R_OK, (err) => {
+      console.log(`${path} ${err ? 'is not readable' : 'is readable'}`);
+    });
+    
+    // 파일 내용 읽기 시도
+    fs.readFile(path, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading file:', err);
+        return;
+      }
+      console.log('File content:', data.substring(0, 100)); // 파일 내용의 일부를 출력
+    });
     const option = {
+
       ca: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'fullchain2.pem')),
       key: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'privkey2.pem')),
       cert: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'cert2.pem')),
