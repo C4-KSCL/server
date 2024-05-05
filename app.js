@@ -52,8 +52,6 @@ const port = process.env.PORT || 8000;
     app.use(morgan('combined')); //로깅하는 것을 배포모드
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
     app.use(hpp()); //보안 취약점 보호
-    console.log("hello https");
-        // HTTP 요청을 HTTPS로 리디렉션
   } else {
     morgan.token('formattedDate', formatDate); // 현재 시간이 나타나도록 추가
     app.use(morgan(':formattedDate :method :url :status :response-time ms - :res[content-length]'));
