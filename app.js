@@ -44,9 +44,9 @@ swaggerDocument.servers = [{
     console.log('Running as user Name:', require('os').userInfo().username);
 
     const option = {
-      ca: fs.readFileSync(path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')),
-      key: fs.readFileSync(path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem')),
-      cert: fs.readFileSync(path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'cert.pem')),
+      ca: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'fullchain2.pem')),
+      key: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'privkey2.pem')),
+      cert: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'cert2.pem')),
     }
     HTTPS.createServer(option, app).listen(port, () => {
       console.log('HTTPS 서버가 실행되었습니다.. 포트 :: ' + port);
