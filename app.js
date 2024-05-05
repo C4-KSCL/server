@@ -41,9 +41,9 @@ swaggerDocument.servers = [{
 
   if (process.env.NODE_ENV === 'production11') {
     const option = {
-      ca: fs.readFileSync('/etc/letsencrypt/live/{myurl}/fullchain.pem'),
-      key: fs.readFileSync('/etc/letsencrypt/live/{myurl}/privkey.pem'),
-      cert: fs.readFileSync('/etc/letsencrypt/live/{myurl}/cert.pem')
+      ca: fs.readFileSync(path.join('/etc/letsencrypt/live', domain, 'fullchain.pem')),
+      key: fs.readFileSync(path.join('/etc/letsencrypt/live', domain, 'privkey.pem')),
+      cert: fs.readFileSync(path.join('/etc/letsencrypt/live', domain, 'cert.pem')),
     }
     HTTPS.createServer(option, app).listen(port, () => {
       console.log('HTTPS 서버가 실행되었습니다. 포트 :: ' + port);
