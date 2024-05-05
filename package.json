@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "nodemonConfig": {
+    "ignore": [
+      "data/*"
+    ]
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=production PORT=8001 nodemon app.js",
     "dev": "nodemon --exec babel-node app.js",
