@@ -41,7 +41,7 @@ const port = process.env.PORT || 8000;
 
   if (process.env.NODE_ENV === 'production') {
     const option = {
-      ca: fs.readFileSync(path.resolve(process.cwd(), path.join('../../../etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')), 'utf8'),
+      ca: fs.readFileSync(path.resolve(process.cwd(), path.join('../../../../etc/letsencrypt/live', process.env.MY_ADDRESS, 'fullchain.pem')), 'utf8'),
       key: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'privkey.pem')), 'utf8'),
       cert: fs.readFileSync(path.resolve(process.cwd(), path.join('/etc/letsencrypt/live', process.env.MY_ADDRESS, 'cert.pem')), 'utf8'),
     }
