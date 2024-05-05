@@ -58,6 +58,10 @@ const port = process.env.PORT || 8000;
     morgan.token('formattedDate', formatDate); // 현재 시간이 나타나도록 추가
     app.use(morgan(':formattedDate :method :url :status :response-time ms - :res[content-length]'));
     httpServer = http.createServer(app);
+      
+    httpServer.listen(8000, () => {
+      console.log('hi start server 8000!!!!!!');
+    });   
   }
 
   app.use(express.static(path.join(__dirname, 'public'))); // public 폴더를 static으로
@@ -118,10 +122,6 @@ const port = process.env.PORT || 8000;
     res.locals.error = process.env.NODE_ENV !== 'production' ? err : {}; // 배포모드일때, 아닐때 구분
     res.status(err.status || 500).json({msg : err.msg || "error"});
     next();
-  });
-
-  httpServer.listen(8000, () => {
-    console.log('hi start server 8000!!!!!!');
   });
 })();
 
