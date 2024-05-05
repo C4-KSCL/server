@@ -39,10 +39,10 @@ swaggerDocument.servers = [{
 
   let httpServer;
 
-  if (process.env.NODE_ENV === 'production11') {
+  if (process.env.NODE_ENV === 'production1') {
     const options = {
-      key: fs.readFileSync('/etc/letsencrypt/live/soulmbti.shop/privkey.pem'),
-      cert: fs.readFileSync('/etc/letsencrypt/live/soulmbti.shop/fullchain.pem')
+      key: fs.readFileSync(path.resolve(process.cwd(),'/etc/letsencrypt/live/soulmbti.shop/privkey.pem'), 'utf8').toString(),
+      cert: fs.readFileSync(path.resolve(process.cwd(),'/etc/letsencrypt/live/soulmbti.shop/fullchain.pem'), 'utf8').toString()
     };
     httpServer =https.createServer(options, app);
     app.use(morgan('combined')); //로깅하는 것을 배포모드
