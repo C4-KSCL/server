@@ -39,7 +39,7 @@ swaggerDocument.servers = [{
 
   let httpServer;
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production1') {
     const option = {
 
       ca: fs.readFileSync(path.join('/etc/letsencrypt/archive', process.env.MY_ADDRESS, 'fullchain2.pem'),'utf8'),
