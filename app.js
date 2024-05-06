@@ -46,22 +46,22 @@ const port = process.env.PORT || 8000;
       key: fs.readFileSync('./key/privkey.pem'),
       cert: fs.readFileSync('./key/cert.pem')
     }
-    https.createServer(option, app).listen(port, () => {
-      console.log('HTTPS 서버가 실행되었습니다... 포트 :: ' + port);
-    });
+    httpServer = https.createServer(option,app);
+    httpServer.listen(8000, () => {
+      console.log('hi start server https 8000!!!!!!');
+    })
     app.use(morgan('combined')); //로깅하는 것을 배포모드
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
     app.use(hpp()); //보안 취약점 보호
   } else {
-    morgan.token('formattedDate', formatDate); // 현재 시간이 나타나도록 추가
-    app.use(morgan(':formattedDate :method :url :status :response-time ms - :res[content-length]'));
     httpServer = http.createServer(app);
-      
     httpServer.listen(8000, () => {
-      console.log('hi start server 8000!!!!!!');
+      console.log('hi start server http 8000!!!!!!');
     });   
   }
 
+  morgan.token('formattedDate', formatDate); // 현재 시간이 나타나도록 추가
+  app.use(morgan(':formattedDate :method :url :status :response-time ms - :res[content-length]'));
   app.use(express.static(path.join(__dirname, 'public'))); // public 폴더를 static으로
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
