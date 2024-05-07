@@ -50,7 +50,7 @@ const port = process.env.PORT || 8000;
     httpServer.listen(8000, () => {
       console.log('hi start server https 8000!!!!!!');
     })
-    app.use(morgan('combined')); //로깅하는 것을 배포모드
+    //app.use(morgan('combined')); //로깅하는 것을 배포모드 추후 적용
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
     app.use(hpp()); //보안 취약점 보호
   } else {
