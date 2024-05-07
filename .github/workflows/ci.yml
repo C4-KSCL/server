@@ -50,19 +50,19 @@ jobs:    # 작업들을 정의
           echo "DEPLOYMENT_GROUP_NAME=${{ secrets.DEPLOYMENT_GROUP_NAME }}" >> .env
 
           touch fcm_config.json
-          echo "{
-            "type": "",
-            "project_id": "",
-            "private_key_id": "",
-            "private_key": "",
-            "client_email": "",
-            "client_id": "",
-            "auth_uri": "",
-            "token_uri": "",
-            "auth_provider_x509_cert_url": "",
-            "client_x509_cert_url": "",
-            "universe_domain": ""
-          }" >> fcm_config.json
+          echo  "{" >> fcm_config.json
+          echo  "\"type\": \"${{ secrets.FCM_TYPE }}\"," >> fcm_config.json
+          echo  "\"project_id\": \"${{ secrets.FCM_PROJECT_ID }}\", " >> fcm_config.json
+          echo  "\"private_key_id\": \"${{ secrets.FCM_PRIVATE_KEY_ID }}\"," >> fcm_config.json
+          echo  "\"private_key\": \"${{ secrets.FCM_PRIVATE_KEY }}\"," >> fcm_config.json
+          echo  "\"client_email\": \"${{ secrets.FCM_CLIENT_EMAIL }}\"," >> fcm_config.json
+          echo  "\"client_id\": \"${{ secrets.FCM_CLIENT_ID }}\"," >> fcm_config.json
+          echo  "\"auth_uri\": \"${{ secrets.FCM_AUTH_URI }}\"," >> fcm_config.json
+          echo  "\"token_uri\": \"${{ secrets.FCM_TOKEN_URI }}\"," >> fcm_config.json
+          echo  "\"auth_provider_x509_cert_url\": \"${{ secrets.FCM_AUTH_PROVIDER }}\"," >> fcm_config.json
+          echo  "\"client_x509_cert_url\": \"${{ secrets.FCM_CLIENT_X509 }}\"," >> fcm_config.json
+          echo  "\"universe_domain\": \"${{ secrets.FCM_UNIVERSE_DOMAIN }}\"" >> fcm_config.json
+          echo  "}" >> fcm_config.json
 
           # 파일 압축
       - name: 📦 Zip project files

@@ -42,7 +42,7 @@ export default class TokenService {
 
     // payload : user
     async patchNullToken(payload) {
-        await database.userSocketToken.update({
+        const token = await database.userSocketToken.update({
             where: {
                 userEmail: payload.user,
             },
@@ -50,6 +50,8 @@ export default class TokenService {
                 token: null,
             },
         });
+
+        if(token.token !== null) throw { status : 500, msg : "failed changing to null in patch null token" };
     }
 
     async checkOrCreateSocketToken(payload) {

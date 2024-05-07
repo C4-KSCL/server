@@ -1,16 +1,14 @@
 import admin from "firebase-admin";
 import serAccount from '../../fcm_config.json';
 
+admin.initializeApp({
+  credential: admin.credential.cert(serAccount),
+});
 
 // payload : tokens, sendUserName, content
-export async function pushAlam(payload, type) {
+export async function pushAlarm(payload, type) {
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serAccount),
-  });
-
-  // const tokens = payload.tokens;
-  const tokens = "eA7rPUWhRKCudTNAQkmaAQ:APA91bH4CYsjSKx22k_-T8-rQ_xBIbgGeLIc3JLmrMItraD-0ZUvPKoLD3IwJeCQw22kN4-TnuCCqKdCr4NQhHnZAeJHCYxr234E5GSYMou1HZ8guQTMv1IAtSmKenFhT0MGqH4ifwDD";
+  const tokens = payload.tokens;
 
   let message;
 

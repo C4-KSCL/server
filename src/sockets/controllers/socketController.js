@@ -2,7 +2,7 @@ import { SocketService } from "../services/socketService";
 import { CreateChatDTO } from "../../models/chats/dto/create-chat.dto";
 import { RoomService } from "../../models/rooms/services";
 import { RandomChoice } from "../../utils/choiceSmall";
-import { pushAlam } from "../../utils/pushAlam";
+import { pushAlarm } from "../../utils/pushAlarm";
 
 import database from "../../database";
 
@@ -78,8 +78,6 @@ export class SocketController {
 
             if (oppSocket.connectRoomId === payload.roomId) joinCount--;
 
-            oppSocket.token = "eA7rPUWhRKCudTNAQkmaAQ:APA91bH4CYsjSKx22k_-T8-rQ_xBIbgGeLIc3JLmrMItraD-0ZUvPKoLD3IwJeCQw22kN4-TnuCCqKdCr4NQhHnZAeJHCYxr234E5GSYMou1HZ8guQTMv1IAtSmKenFhT0MGqH4ifwDD";
-
             // roomId, userEmail, content
             const msg = await this.service.createChat(new CreateChatDTO({
                 roomId: payload.roomId,
@@ -89,11 +87,8 @@ export class SocketController {
                 friend: friend,
             }));
 
-
-
-            if (oppSocket.connectRoomId !== payload.roomId && oppSocket.token) {
-                pushAlam({ token: oppSocket.token, msg }, "message");
-
+            if (oppSocket.connectRoomId !== payload.roomId && oppSocket.token !== null) {
+                pushAlarm({ tokens: oppSocket.token, msg }, "message");
             }
 
             this.io.to(payload.roomId).emit("new message", { msg: msg });
@@ -158,8 +153,8 @@ export class SocketController {
 
             if (!msg) this.socket.emit("error", { msg: "failed to requests" });
 
-            if (oppSocket.connectRoomId !== payload.roomId && oppSocket.token) {
-                pushAlam({ tokens: oppSocket.token, msg });
+            if (oppSocket.connectRoomId !== payload.roomId && oppSocket.token !== null) {
+                pushAlarm({ tokens: oppSocket.token, msg }, "event");
             }
 
             this.io.to(payload.roomId).emit("new event", { msg: msg });
@@ -174,6 +169,7 @@ export class SocketController {
     async updateEventAnswer(payload) {
         try {
             const { eventId, content } = payload;
+
             const user = this.socket.userEmail;
 
             const event = await this.service.updateAnswer({ id: Number(eventId), userEmail: user, content: content });
@@ -198,5 +194,3 @@ export class SocketController {
         }
     }
 }
-
-

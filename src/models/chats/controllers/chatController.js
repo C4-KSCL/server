@@ -12,7 +12,7 @@ const router = Router();
 
 router.get("/get-chats/:roomId", [
     param('roomId'),
-    query('page'),
+    query("chatId"),
     query('limit'),
     validatorErrorChecker,
 ], getChats);
@@ -28,14 +28,14 @@ async function getChats(req, res, next) {
 
         const { roomId } = req.params;
 
-        const { page, limit } = req.query;
+        const { chatId, limit } = req.query;
 
-        const { skip, take } = pagination(page, limit);
+        const { chat , take } = pagination(chatId, limit);
 
         // room 존재 확인
         // room join 확인하기
         // 채팅 받아오기
-        const chats = await service.getChats({ userEmail, roomId, skip, take });
+        const chats = await service.getChats({ userEmail, roomId, chat, take });
 
         res.status(200).json({ chats: chats });
 

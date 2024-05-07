@@ -12,13 +12,13 @@ const router = Router();
 
 export default router;
 
-router.post("init-user-token", [validatorErrorChecker], initToken);
+router.post("/init-user-token", [validatorErrorChecker], initToken);
 
-router.patch("upload-fcm-token", [body("fcmToken"), validatorErrorChecker],
+router.patch("/upload-fcm-token", [body("fcmToken"), validatorErrorChecker],
     uploadFCMToken,
 );
 
-router.patch("delete-fcm-token", deleteFCMToken);
+router.patch("/delete-fcm-token", deleteFCMToken);
 
 async function initToken(req, res, next) {
     try{
