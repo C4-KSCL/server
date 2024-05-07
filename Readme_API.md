@@ -4,7 +4,7 @@
 
 > 1. 로그인
 - URL : auth/login (POST)
-- 요청 값 : email, password
+- 요청 값 : 바디 - email, password
 - 반환 값 : user 객체, images 객체, accessToken, refreshToken
 - 응답상태 코드  
   - 200 - 로그인 성공   
@@ -16,7 +16,7 @@
 
 > 1. 이메일 인증
 - URL : :signup/emailauth (POST)
-- 요청 값 : email
+- 요청 값 : 바디 - email
 - 반환 값 : verificationCode  
 - 응답상태 코드   
   - 200 : 이메일 전송 성공   
@@ -25,7 +25,7 @@
 
 > 2. 닉네임 중복 체크
 - URL : :signup/checknickname (POST)
-- 요청 값 : nickname
+- 요청 값 : 바디 - nickname
 - 반환 값 : -   
 - 응답상태 코드  
   - 200 : 사용가능한 닉네임   
@@ -34,7 +34,7 @@
 
 > 3. 회원가입
 - URL : signup/register (POST)
-- 요청 값 : email, password, nickname, phoneNumber, age, gender, myMBTI, friendMBTI, friendMaxAge, friendMinAge, friendGender, myKeyword, friendKeyword
+- 요청 값 : 바디 - email, password, nickname, phoneNumber, age, gender, myMBTI, friendMBTI, friendMaxAge, friendMinAge, friendGender, myKeyword, friendKeyword
 - 반환 값 : -   
 - 응답상태 코드  
   - 200 : 회원가입 성공   
@@ -43,14 +43,14 @@
 
 > 4. 프로필 사진 저장
 - URL : signup/profile (POST)
-- 요청 값 : files(file타입), email(text타입) ★Form-Data 형식★
+- 요청 값 : 바디 - files(file타입), email(text타입) ★Form-Data 형식★
 - 반환 값 : -   
   - 200 : 이미지 저장 성공
   - 500~503 : 이미지 저장 실패(서버 에러)
 
 > 5. 이미지 저장
 - URL : signup/image (POST)
-- 요청 값 : files(file타입), email(text타입) ★Form-Data 형식★
+- 요청 값 : 바디 - files(file타입), email(text타입) ★Form-Data 형식★
 - 반환 값 : -   
   - 200 : 이미지 저장 성공
   - 500~503 : 이미지 저장 실패(서버 에러)
@@ -82,7 +82,7 @@
 ### 비밀번호 찾기
 > 1. 아이디 존재 여부를 위해 이메일 검증
 - URL : auth/findpw (POST)
-- 요청 값 : email
+- 요청 값 : 바디 - email
 - 반환 값 : verificationCode 
 - 응답상태 코드    
   - 200 : 정상 수행   
@@ -91,7 +91,7 @@
 
 > 2. 새로운 비밀번호 전송하여 비밀번호 업데이트
 - URL : auth/setpw (POST)
-- 요청 값 : email, password
+- 요청 값 : 바디 - email, password
 - 반환 값 : -   
 - 응답상태 코드  
   - 200 : 비밀번호 변경 성공   
@@ -106,7 +106,7 @@
 - 반환 값 : users 객체, images 객체(성공시) 
   - 200 : 매칭 성공 
   - 500 : 매칭 시간 제한 / requestTime(최근 요청시간 반환)
-  - 501 : 해당 친구 없음
+  - 404 : 해당 친구 없음
   - 500 : 매칭 실패(서버 에러)   
 
 > 2. 친구 설정 변경

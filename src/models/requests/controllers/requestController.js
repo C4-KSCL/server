@@ -6,6 +6,7 @@ import database from "../../../database";
 
 import { validatorErrorChecker } from "../../../middlewares/validator";
 import { body, param, query } from "express-validator";
+import { pushAlam } from "../../../utils/pushAlam";
 
 const service = new RequestService();
 const router = Router();
@@ -119,6 +120,11 @@ async function acceptRequest(req, res, next) {
         // UserSocketToken 테이블에 정보를 등록해준다. 
         await service.createSocketToken({ userEmail: userEmail });
 
+        const oppSocket = await service.getOppSocket({requestId : requestId});
+
+        const user = await service.getUser({userEmail : userEmail});
+
+        pushAlam({tokens : oppSocket.token, msg : { content : `${user.nickname}님이 당신의 요청을 수락했습니다.`}}, "request");
 
         res.status(201).json({ room: room });
     } catch (err) {

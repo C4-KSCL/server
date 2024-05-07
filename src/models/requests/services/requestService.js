@@ -440,4 +440,35 @@ export class RequestService {
             }            
         });
     }
+
+    // requestId
+    async getOppSocket(payload) {
+        const request = await database.addRequest.findUnique({
+            where : {
+                id : payload.requestId,
+            }
+        });
+
+        if(!request) throw { status :404, msg : "not found : request in get opp socket" };
+
+        const oppSocket = await database.userSocketToken.findUnique({
+            where : {
+                userEmail : request.reqUser,
+            }
+        });
+
+        if(!oppSocket) throw { status : 404, msg : "not found : userSocketToken in get opp socket" };
+
+        return oppSocket;
+    }
+
+    async getUser(payload){
+        const user = await database.user.findUnique({
+            where : {
+                email : payload.userEmail,
+            }
+        });
+
+        return user;
+    }
 }

@@ -1,19 +1,19 @@
 import database from "../../../database";
 
-export default class TokenService{
+export default class TokenService {
 
     // payload : user
-    async checkToken(payload){
+    async checkToken(payload) {
         const token = await database.userSocketToken.findUnique({
-            where : {
-                userEmail : payload.user
+            where: {
+                userEmail: payload.user
             }
         });
 
-        if(!token) {
+        if (!token) {
             const token = await database.userSocketToken.create({
-                data : {
-                    userEmail : payload.user
+                data: {
+                    userEmail: payload.user
                 }
             });
 
@@ -27,28 +27,47 @@ export default class TokenService{
     async patchUploadToken(payload) {
 
         const token = await database.userSocketToken.update({
-            where : {
-                userEmail : payload.user,
+            where: {
+                userEmail: payload.user,
             },
-            data : {
-                token : payload.fcmToken,
+            data: {
+                token: payload.fcmToken,
             }
         });
 
-        if(token.token !== payload.fcmToken) throw { status : 500, msg : "failed to upload token to userSocketToken table" };
+        if (token.token !== payload.fcmToken) throw { status: 500, msg: "failed to upload token to userSocketToken table" };
 
         return token;
     }
 
     // payload : user
-    async patchNullToken(payload){
+    async patchNullToken(payload) {
         await database.userSocketToken.update({
-            where : {
-                userEmail : payload.user,
+            where: {
+                userEmail: payload.user,
             },
-            data : {
-                token : null,
+            data: {
+                token: null,
             },
         });
+    }
+
+    async checkOrCreateSocketToken(payload) {
+        const socketToken = await database.userSocketToken.findUnique({
+            where : {
+                userEmail : payload.user,
+            }
+        });
+
+        if(!socketToken){
+            const socketToken = await database.userSocketToken.create({
+                data : {
+                    userEmail : payload.user,
+                }
+            });
+            return socketToken;
+        }
+
+        return socketToken;
     }
 }

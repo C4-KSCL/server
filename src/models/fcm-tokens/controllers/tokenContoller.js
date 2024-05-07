@@ -4,11 +4,15 @@ import { validatorErrorChecker } from "../../../middlewares/validator";
 import { body } from "express-validator";
 import TokenService from "../services/tokenService";
 
+// /tokens
+
 const service = new TokenService();
 
 const router = Router();
 
 export default router;
+
+router.post("init-user-token", [validatorErrorChecker], initToken);
 
 router.patch("upload-fcm-token", [body("fcmToken"), validatorErrorChecker],
     uploadFCMToken,
@@ -16,36 +20,50 @@ router.patch("upload-fcm-token", [body("fcmToken"), validatorErrorChecker],
 
 router.patch("delete-fcm-token", deleteFCMToken);
 
-async function uploadFCMToken(req,res,next){
+async function initToken(req, res, next) {
     try{
         const user = req.user;
 
-        const { fcmToken } = req.body;
+        const socketToken = await service.checkOrCreateSocketToken({user});
 
-        const token = await service.checkToken({user});
+        if(!socketToken) throw { status : 500, msg : "server error" };
 
-        if(!token) throw { status : 404, msg : "not found : userSocketToken" };
-
-        await service.patchUploadToken({user, fcmToken});
-
-        res.status(200).json({msg : "success"});
+        res.status(201).json({ msg : "create success"});
     }catch(err){
         next(err);
     }
 }
 
-async function deleteFCMToken(req,res,next){
-    try{
+async function uploadFCMToken(req, res, next) {
+    try {
         const user = req.user;
 
-        const token = await service.checkToken({user});
+        const { fcmToken } = req.body;
 
-        if(!token) throw { status : 404, msg : "not found : userSocketToken" };
+        const token = await service.checkToken({ user });
 
-        await service.patchNullToken({user});
+        if (!token) throw { status: 404, msg: "not found : userSocketToken" };
 
-        res.status(200).json({msg : "success"});
-    }catch(err){
+        await service.patchUploadToken({ user, fcmToken });
+
+        res.status(200).json({ msg: "success" });
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function deleteFCMToken(req, res, next) {
+    try {
+        const user = req.user;
+
+        const token = await service.checkToken({ user });
+
+        if (!token) throw { status: 404, msg: "not found : userSocketToken" };
+
+        await service.patchNullToken({ user });
+
+        res.status(200).json({ msg: "success" });
+    } catch (err) {
         next(err);
     }
 }
