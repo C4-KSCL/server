@@ -112,7 +112,7 @@
 > 2. 친구 MBTI 설정 변경
 - URL : findfriend/settingMBTI (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - friendMBTI, friendMaxAge, friendMinAge, friendGender
-- 반환 값 : 싹다 돌려준다
+- 반환 값 : 없음
   - 200 : 매칭 성공 
   - 500 : 매칭 실패(서버 에러)   
   
@@ -120,7 +120,7 @@
 > 3. 친구 키워드 설정 변경
 - URL : findfriend/settingKeyword (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - friendKeyword
-- 반환 값 : 싹다 돌려준다
+- 반환 값 : 없음
   - 200 : 매칭 성공 
   - 500 : 매칭 실패(서버 에러)  
   - 504 : 없는 회원일 시
