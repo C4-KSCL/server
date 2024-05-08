@@ -149,11 +149,27 @@ exports.getfriendinfo = (req, res) => {
         });
     });
 };
-exports.setting = (req, res) => {
+exports.settingMBTI = (req, res) => {
     const userEmail = req.headers['email'];
     const { friendMBTI, friendMaxAge, friendMinAge, friendGender } = req.body;
     const updateQuery = `UPDATE User SET friendMBTI = ?, friendMaxAge = ?, friendMinAge = ?, friendGender = ? WHERE email = ?`;
     req.mysqlConnection.query(updateQuery, [friendMBTI, friendMaxAge, friendMinAge, friendGender, userEmail], (err, results) => {
+        if (err) {
+            console.error('Error while updating:', err);
+            return res.status(500).send('서버 에러');
+        }
+        if (results.affectedRows === 0) {
+            return res.status(504).send('사용자를 찾을 수 없습니다.');
+        }
+        return res.status(200).send('설정 완료');
+    });
+}
+
+exports.settingKeyword = (req, res) => {
+    const userEmail = req.headers['email'];
+    const { friendKeyword} = req.body;
+    const updateQuery = `UPDATE User SET friendKeyword = ? WHERE email = ?`;
+    req.mysqlConnection.query(updateQuery, [friendKeyword, userEmail], (err, results) => {
         if (err) {
             console.error('Error while updating:', err);
             return res.status(500).send('서버 에러');
