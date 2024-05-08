@@ -2,7 +2,7 @@ import { SocketService } from "../services/socketService";
 import { CreateChatDTO } from "../../models/chats/dto/create-chat.dto";
 import { RoomService } from "../../models/rooms/services";
 import { RandomChoice } from "../../utils/choiceSmall";
-import { pushAlam } from "../../utils/pushAlam";
+import { pushAlarm } from "../../utils/pushAlarm";
 
 import database from "../../database";
 
@@ -52,7 +52,7 @@ export class SocketController {
 
         } catch (err) {
             console.log(err);
-            this.socket.emit("error", {msg: err.msg});
+            this.socket.emit("error", { msg: err.msg });
         }
 
     }
@@ -78,28 +78,24 @@ export class SocketController {
 
             if (oppSocket.connectRoomId === payload.roomId) joinCount--;
 
-
             // roomId, userEmail, content
             const msg = await this.service.createChat(new CreateChatDTO({
                 roomId: payload.roomId,
                 userEmail: payload.userEmail,
                 content: payload.content,
                 readCount: joinCount - 1,
-                friend : friend,
+                friend: friend,
             }));
 
-
-            // if(oppSocket){
-            //     const oppTokens = getTokens({roomId, userEmail});
-
-            //     pushAlam({tokens : oppTokens, ...message});
-            // }
+            if (oppSocket.connectRoomId !== payload.roomId && oppSocket.token !== null) {
+                pushAlarm({ tokens: oppSocket.token, msg }, "message");
+            }
 
             this.io.to(payload.roomId).emit("new message", { msg: msg });
 
         } catch (err) {
             console.log(err);
-            this.socket.emit("error", {msg: err.msg});
+            this.socket.emit("error", { msg: err.msg });
         }
     }
 
@@ -115,7 +111,7 @@ export class SocketController {
 
             if (!msg) this.socket.emit("failed", { msg: "failed to requests" });
 
-            this.io.to(payload.roomId).emit("delete message", {msg: msg});
+            this.io.to(payload.roomId).emit("delete message", { msg: msg });
 
         } catch (err) {
             console.log(err);
@@ -133,7 +129,7 @@ export class SocketController {
             payload.roomId = this.socket.roomId;
 
             // small category 선택하고, 채팅 만들고, 이벤트 만들고, 이미지 in 이벤트 만들어고나서, 채팅, 이벤트 아이디 정보 반환
-            const smallCategory = await this.service.checkSmall({small : payload.smallCategory});
+            const smallCategory = await this.service.checkSmall({ small: payload.smallCategory });
             // joinCount 확인
             // oppSocket 확인
             // 메시지 생성
@@ -151,39 +147,38 @@ export class SocketController {
                 userEmail: payload.userEmail,
                 categoryId: smallCategory.id,
                 readCount: --joinCount,
-                friend : friend
+                friend: friend
             });
 
 
             if (!msg) this.socket.emit("error", { msg: "failed to requests" });
 
-            // if(oppSocket){
-            //     const oppTokens = getTokens({roomId, userEmail});
+            if (oppSocket.connectRoomId !== payload.roomId && oppSocket.token !== null) {
+                pushAlarm({ tokens: oppSocket.token, msg }, "event");
+            }
 
-            //     pushAlam({tokens : oppTokens, ...message});
-            // }
-
-            this.io.to(payload.roomId).emit("new event", {msg : msg});
+            this.io.to(payload.roomId).emit("new event", { msg: msg });
 
         } catch (err) {
             console.log(err);
-            this.socket.emit("error", {msg: err.msg});
+            this.socket.emit("error", { msg: err.msg });
         }
     }
 
     // payload : { eventId, content }
-    async updateEventAnswer(payload){
-        try{
+    async updateEventAnswer(payload) {
+        try {
             const { eventId, content } = payload;
+
             const user = this.socket.userEmail;
 
-            const event = await this.service.updateAnswer({id : Number(eventId), userEmail : user, content : content});
+            const event = await this.service.updateAnswer({ id: Number(eventId), userEmail: user, content: content });
 
-            this.io.to(this.socket.roomId).emit("answer to event", {event : event});
+            this.io.to(this.socket.roomId).emit("answer to event", { event: event });
 
-        }catch(err){
+        } catch (err) {
             console.log(err);
-            this.socket.emit("error", {msg: err.msg});
+            this.socket.emit("error", { msg: err.msg });
         }
 
     }
@@ -193,11 +188,9 @@ export class SocketController {
         try {
 
             await this.service.updateUserSocketToNull({ socket: this.socket.id });
-            
+
         } catch (err) {
             console.log(err);
         }
     }
 }
-
-

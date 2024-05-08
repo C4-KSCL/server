@@ -35,6 +35,9 @@ export class ChatService {
                 roomId: payload.roomId,
                 type: "out",
                 userEmail : payload.userEmail,
+                id : {
+                    gt : payload.chat,
+                }
             }
         });
         let where;
@@ -56,6 +59,9 @@ export class ChatService {
                 
                 NOT: {
                     type: "out",
+                },
+                id : {
+                    gt : payload.chat,
                 }
             }
         }
@@ -88,7 +94,6 @@ export class ChatService {
                     }
                 },
             },
-            skip: payload.skip,
             take: payload.take,
         });
         return chats;

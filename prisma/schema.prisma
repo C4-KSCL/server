@@ -183,6 +183,7 @@ model UserSocketToken {
   socket        String? @db.VarChar(255)
   token         String? @db.VarChar(255)
   connectRoomId String? @db.VarChar(255)
+  
   room          Room?   @relation(fields: [connectRoomId], references: [id])
   user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
