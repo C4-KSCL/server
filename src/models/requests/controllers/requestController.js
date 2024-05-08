@@ -124,7 +124,7 @@ async function acceptRequest(req, res, next) {
 
         const user = await service.getUser({userEmail : userEmail});
 
-        pushAlarm({tokens : oppSocket.token, msg : { content : `${user.nickname}님이 당신의 요청을 수락했습니다.`}}, "request");
+        pushAlarm({tokens : oppSocket.token, msg : { roomId : room.id, content : `${user.nickname}님이 당신의 요청을 수락했습니다.`}}, "request");
 
         res.status(201).json({ room: room });
     } catch (err) {

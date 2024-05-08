@@ -5,7 +5,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serAccount),
 });
 
-// payload : tokens, sendUserName, content
+// payload : tokens, sendUserName, content, roomId
 export async function pushAlarm(payload, type) {
 
   const tokens = payload.tokens;
@@ -15,29 +15,42 @@ export async function pushAlarm(payload, type) {
   if (type === "request") {
     message = {
       data: {
-        title: "요청 수락!!",
-        body: payload.msg.content,
+        route : "friend",
+        roomId : payload.msg.content,
+      },
+      notification : {
+        title : "요청 수락!",
+        body : payload.msg.content
       },
       token: tokens,
     }
   } else if (type === "message") {
     message = {
       data: {
-        title: payload.msg.nickName,
-        body: payload.msg.content,
+        route : "chat",
+        roomId : payload.msg.roomId
+      },
+      notification : {
+        title : payload.msg.nickName,
+        body : payload.msg.content
       },
       token : tokens,
     }
   } else if (type === "event") {
     message = {
       data: {
-        title: payload.msg.nickName,
-        body: `퀴즈를 보냈습니다!`,
+        route : "chat",
+        roomId : payload.msg.roomId
+      },
+      notification : {
+        title : payload.msg.nickName,
+        body : "퀴즈를 보냈습니다!"
       },
       token : tokens,
     }
   }
-
+  
+  
 
 
   admin
