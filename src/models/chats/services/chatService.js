@@ -40,6 +40,7 @@ export class ChatService {
                 }
             }
         });
+
         let where;
 
         if (out) {
@@ -61,7 +62,7 @@ export class ChatService {
                     type: "out",
                 },
                 id : {
-                    gt : payload.chat,
+                    lte : payload.chat,
                 }
             }
         }
