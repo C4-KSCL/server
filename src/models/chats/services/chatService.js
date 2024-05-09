@@ -52,18 +52,23 @@ export class ChatService {
                 },
                 id: {
                     gt: out.id,
+                    lt : payload.chat
                 }
             }
         } else {
+            let idRange;
+            if(payload.chat === 0) {
+                idRange = { gte : payload.chat };
+            } else {
+                idRange = { lt : payload.chat };
+            }
             where = {
                 roomId: isExist.id,
                 
                 NOT: {
                     type: "out",
                 },
-                id : {
-                    lt : payload.chat,
-                }
+                id : idRange,
             }
         }
 
