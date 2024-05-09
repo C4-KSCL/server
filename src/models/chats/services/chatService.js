@@ -62,7 +62,7 @@ export class ChatService {
                     type: "out",
                 },
                 id : {
-                    lte : payload.chat,
+                    lt : payload.chat,
                 }
             }
         }

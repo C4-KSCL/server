@@ -109,14 +109,23 @@
   - 404 : 해당 친구 없음
   - 500 : 매칭 실패(서버 에러)   
 
-> 2. 친구 설정 변경
-- URL : findfriend/setting (POST)
+> 2. 친구 MBTI 설정 변경
+- URL : findfriend/settingMBTI (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - friendMBTI, friendMaxAge, friendMinAge, friendGender
-- 반환 값 : 싹다 돌려준다
+- 반환 값 : 없음
   - 200 : 매칭 성공 
   - 500 : 매칭 실패(서버 에러)   
+  
 
-> 3. 친구 이미지 찾기
+> 3. 친구 키워드 설정 변경
+- URL : findfriend/settingKeyword (POST)
+- 요청 값 : 헤더 - accesstoken, 바디 - friendKeyword
+- 반환 값 : 없음
+  - 200 : 매칭 성공 
+  - 500 : 매칭 실패(서버 에러)  
+  - 504 : 없는 회원일 시
+
+> 4. 친구 이미지 찾기
 - URL : findfriend/getimage (POST)
 - 요청 값 : 헤더 - accesstoken, 바디 - friendEmail
 - 반환 값 : user 객체, images 객체
@@ -124,7 +133,7 @@
   - 301 : 이메일 오류
   - 500 : 매칭 실패(서버 에러)  
 
-> 4. 이전 매칭 내역 조회
+> 5. 이전 매칭 내역 조회
 - URL : findfriend/getfriendinfo?userNumbers=1,2,3 (GET)
 - 요청 값 : 헤더 - accesstoken
 - 반환 값 : user 객체, images 객체

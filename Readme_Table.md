@@ -28,3 +28,21 @@
 이미지주소|imagePath|STRING|||
 이미지키값|imageKey|STRING|||
 이미지_생성일|imageCreated|TIMESTAMP||dafault CURRENT_TIMESTAMP|
+### 3. 고객센터 게시글 테이블 (CustomerServise)
+게시글번호|postNumber|INT|PK|AI|
+회원번호|userNumber|INT|FK||
+게시글카테고리|postCategory|STRING|||
+게시글제목|postTitle|STRING|||
+게시글내용|postContent|STRING|||
+생성시간|createdTime|TIMESTAMP||dafault CURRENT_TIMESTAMP|
+답변여부|isAnswered|bool||default false
+답변자|responderNumber|INT|FK||
+답변제목|responseTitle|STRING|||
+답변내용|responseContent|STRING|||
+답변시간|responseTime|TIMESTAMP||
+### 4.고객센터 이미지 테이블 (CustomerServiceImage)
+이미지번호|imageNumber|INT|PK|AI|
+게시글번호|postNumber|INT|FK||
+이미지주소|imagePath|STRING|||
+이미지키값|imageKey|STRING|||
+이미지_생성일|imageCreated|TIMESTAMP||dafault CURRENT_TIMESTAMP|

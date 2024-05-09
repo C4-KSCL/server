@@ -3,6 +3,7 @@ const defaultImagePath = "https://matchingimage.s3.ap-northeast-2.amazonaws.com/
 const defaultImageKey = "defalut_user.png"
 exports.profiledelete = (req, res) => {
     const deletePath = req.body.deletepath;
+    const email = req.headers.email;
     // 이미지 삭제를 위한 S3 설정
     const s3 = new aws.S3({
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -34,8 +35,8 @@ exports.profiledelete = (req, res) => {
                 return res.status(500).send('이미지 삭제에 실패했습니다.');
             }
             // 데이터베이스에서 이미지 정보 삭제
-            const deleteQuery = 'UPDATE User SET userImage = ? , userImageKey = "" WHERE userImage = ?';
-            req.mysqlConnection.query(deleteQuery, [defaultImagePath, defaultImageKey], (error, results) => {
+            const deleteQuery = 'UPDATE User SET userImage = ? , userImageKey = ? WHERE email = ?';
+            req.mysqlConnection.query(deleteQuery, [defaultImagePath, defaultImageKey, email], (error, results) => {
                 if (error) {
                     console.error('Error deleting image from database:', error);
                     return res.status(501).send('데이터베이스에서 이미지 정보 삭제에 실패했습니다.');

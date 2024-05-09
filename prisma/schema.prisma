@@ -156,6 +156,7 @@ model User {
   request                                                  AddRequest[]          @relation("request")
   chattingEmail                                            Chatting[]            @relation("Chatting_nickNameToUser")
   chattingNickName                                         Chatting[]            @relation("Chatting_userEmailToUser")
+  CustomerService                                          CustomerService[]
   eventUser1                                               Event[]               @relation("event-user-one")
   eventUser2                                               Event[]               @relation("event-user-two")
   userTwo                                                  Friend[]              @relation("userTwo")
@@ -183,7 +184,6 @@ model UserSocketToken {
   socket        String? @db.VarChar(255)
   token         String? @db.VarChar(255)
   connectRoomId String? @db.VarChar(255)
-  
   room          Room?   @relation(fields: [connectRoomId], references: [id])
   user          User    @relation(fields: [userEmail], references: [email], onDelete: Cascade)
 
@@ -254,4 +254,33 @@ model UserMatchingHistory {
 
   @@index([oppNumber], map: "oppNumber")
   @@index([userNumber], map: "userNumber")
+}
+
+model CustomerService {
+  postNumber           Int                    @id @default(autoincrement())
+  userNumber           Int
+  postCategory         String?                @db.VarChar(255)
+  postTitle            String?                @db.VarChar(255)
+  postContent          String?                @db.VarChar(2000)
+  createdTime          DateTime?              @default(now()) @db.DateTime(0)
+  isAnswered           Boolean?               @default(false)
+  responderNumber      Int?
+  responseTitle        String?                @db.VarChar(225)
+  responseContent      String?                @db.VarChar(2000)
+  responseTime         DateTime?              @db.DateTime(0)
+  User                 User                   @relation(fields: [userNumber], references: [userNumber], onDelete: Cascade, onUpdate: NoAction, map: "CustomerService_ibfk_1")
+  CustomerServiceImage CustomerServiceImage[]
+
+  @@index([userNumber], map: "userNumber")
+}
+
+model CustomerServiceImage {
+  postNumber       Int?
+  imageNumber      Int              @id @default(autoincrement())
+  imagePath        String?          @db.VarChar(255)
+  imageKey         String?          @db.VarChar(100)
+  imageCreatedTime DateTime?        @default(now()) @db.DateTime(0)
+  CustomerService  CustomerService? @relation(fields: [postNumber], references: [postNumber], onDelete: Cascade, onUpdate: NoAction, map: "CustomerServiceImage_ibfk_1")
+
+  @@index([postNumber], map: "postNumber")
 }
