@@ -14,6 +14,7 @@ const signupRouter = require('./routes/signup');
 const findfriendRouter = require('./routes/findfriend');
 const editRouter = require('./routes/edit');
 const deleteRouter = require('./routes/delete');
+const customerServiceRouter = require('./routes/customerService')
 const cors = require('cors');
 const https = require('https');
 
@@ -105,6 +106,7 @@ const port = process.env.PORT || 8000;
   app.use('/findfriend', findfriendRouter); //매칭(친구 찾기)
   app.use('/edit', editRouter); //정보 수정
   app.use('/delete', deleteRouter); //정보 수정x
+  app.use('/customerService', customerServiceRouter); //고객센터
   app.use("/", Controllers);
 
   // app.use((err, req, res, next) => { // 404 미들웨어
