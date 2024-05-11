@@ -222,7 +222,7 @@
   - 500 : 서버 에러
 
 > 4. 관리자 글 답변 작성
-- URL : customerService/readManager (get)
+- URL : customerService/readManager (post)
 - 요청 값 : 헤더 - accesstoken
 - 반환 값 : post, image (게시글 객체들과 이미지 객체들 반환)
   - 200 : 작성 성공
