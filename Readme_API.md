@@ -209,14 +209,14 @@
 > 2. 고객센터 글 조회
 - URL : customerService/readGeneral (get)
 - 요청 값 : 헤더 - accesstoken
-- 반환 값 : post, image (게시글 객체들과 이미지 객체들 반환)
+- 반환 값 : posts, images (게시글 객체들과 이미지 객체들 반환)
   - 200 : 게시글 조회 성공
   - 500 : 서버 에러
 
 > 3. 관리자 글 조회
 - URL : customerService/readManager (get)
 - 요청 값 : 헤더 - accesstoken
-- 반환 값 : post, image (게시글 객체들과 이미지 객체들 반환)
+- 반환 값 : posts, images (게시글 객체들과 이미지 객체들 반환)
   - 200 : 게시글 조회 성공
   - 301 : 관리자가 아님
   - 500 : 서버 에러

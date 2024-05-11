@@ -3,7 +3,7 @@ const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
 const moment = require('moment-timezone');
 // 중요한 포인트 text는 file을 처리한 후에 가공할 수 있다 -> 이미지를 먼저 업로드 후 db저장은 경로를 변수에 저장후 나중에 진행 방식으로 해결
-exports.imageupload = (req, res) => {
+exports.postupload = (req, res) => {
     aws.config.update({
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
