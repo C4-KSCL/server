@@ -78,6 +78,8 @@ export class RoomService {
 
         const rooms = [];
 
+        console.log(payload.userEmail);
+
         const joinRooms = await database.joinRoom.findMany({
             where: {
                 userEmail: payload.userEmail,
@@ -86,6 +88,9 @@ export class RoomService {
         });
 
         for (let join of joinRooms) {
+
+            console.log(join);
+            
             const room = await database.room.findUnique({
                 where: {
                     id: join.roomId
