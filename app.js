@@ -14,10 +14,10 @@ const signupRouter = require('./routes/signup');
 const findfriendRouter = require('./routes/findfriend');
 const editRouter = require('./routes/edit');
 const deleteRouter = require('./routes/delete');
-const customerServiceRouter = require('./routes/customerService')
+const customerServiceRouter = require('./routes/customerservice');
+const manageRouter = require('./routes/manage');
 const cors = require('cors');
 const https = require('https');
-
 import http from "http";
 import database from "./src/database";
 import Controllers from "./src/controllers.friends-chats";
@@ -49,7 +49,7 @@ const port = process.env.PORT || 8000;
     }
     httpServer = https.createServer(option,app);
     httpServer.listen(8000, () => {
-      console.log('hi start server https 8000!!!!!!');
+      console.log('hi start server https 8000!!!!!!!');
     })
     //app.use(morgan('combined')); //로깅하는 것을 배포모드 추후 적용
     app.use(helmet({ contentSecurityPolicy: false })); //보안 취약점 보호
@@ -67,7 +67,6 @@ const port = process.env.PORT || 8000;
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser(process.env.COOKIE_SECRET));
-
   const mysql = require('mysql');
 
   const connection = mysql.createConnection({
@@ -107,6 +106,7 @@ const port = process.env.PORT || 8000;
   app.use('/edit', editRouter); //정보 수정
   app.use('/delete', deleteRouter); //정보 수정x
   app.use('/customerService', customerServiceRouter); //고객센터
+  app.use('/manage', manageRouter); //고객센터
   app.use("/", Controllers);
 
   // app.use((err, req, res, next) => { // 404 미들웨어

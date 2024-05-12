@@ -59,6 +59,7 @@ exports.friendMatching = (req, res) => {
                 AND CAST(user.age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
                 AND user.gender = ?
                 AND user.email != ?
+                AND suspend = 0
         AND user.email != ?
         AND user.email NOT IN (
             SELECT oppEmail FROM Friend WHERE userEmail = ?

@@ -195,10 +195,58 @@
   - 501 : 프로필 삭제 에러
   - 502 : 회원 삭제 에러
 
+### 고객센터
 
-3월 해야할 리스트
-- 친구매칭시 나이 조건 추가
-- docker-compose 관련하여 시간 설정 알아보기
-- 백엔드 코드 병합
-- nginx 설정
+> 1. 고객센터 글 작성
+- URL : customerService/post (post)
+- 요청 값 : 헤더 - accesstoken, 바디 - postCategory,postTitle,postContent ★ Form-data 형식 ★
+- 반환 값 : -
+  - 200 : 게시글 작성 성공
+  - 500 : 서버 에러
+  - 501~3 : 이미지 업로드 에러
+  - 504 : 게시글 저장 실패
 
+> 2. 고객센터 글 조회
+- URL : customerService/readGeneral (get)
+- 요청 값 : 헤더 - accesstoken
+- 반환 값 : posts, images (게시글 객체들과 이미지 객체들 반환)
+  - 200 : 게시글 조회 성공
+  - 500 : 서버 에러
+
+> 3. 관리자 글 조회
+- URL : customerService/readManager (get)
+- 요청 값 : 헤더 - accesstoken
+- 반환 값 : posts, images (게시글 객체들과 이미지 객체들 반환)
+  - 200 : 게시글 조회 성공
+  - 301 : 관리자가 아님
+  - 500 : 서버 에러
+
+> 4. 관리자 글 답변 작성
+- URL : customerService/readManager (post)
+- 요청 값 : 헤더 - accesstoken
+- 반환 값 : post, image (게시글 객체들과 이미지 객체들 반환)
+  - 200 : 작성 성공
+  - 301 : 관리자가 아님
+  - 500 : 서버 에러
+  - 501 : 쿼리 에러
+
+### 회원 관리
+
+> 1. 회원 정지
+- URL : manage/suspend (post)
+- 요청 값 : 헤더 - accesstoken, 바디 - userNumber
+- 반환 값 : -
+  - 200 : 정지 성공
+  - 301 : 관리자가 아님
+  - 500 : 서버 에러
+
+  > 2. 회원 정지 해제
+- URL : manage/removeSuspend (post)
+- 요청 값 : 헤더 - accesstoken, 바디 - userNumber
+- 반환 값 : -
+  - 200 : 정지 성공
+  - 301 : 관리자가 아님
+  - 500 : 서버 에러
+
+논의 사항 : 정지당한 회원 로그인 어떻게 할 것인지
+-> 로그인은 되나 기능 제한인지 아니면 로그인 하면 정지당했다고 알려줄것인지
