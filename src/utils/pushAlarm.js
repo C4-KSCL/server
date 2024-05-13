@@ -10,6 +10,8 @@ export async function pushAlarm(payload, type) {
 
   const tokens = payload.tokens;
 
+  if(!tokens) return;
+
   let message;
 
   if (type === "request") {

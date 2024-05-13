@@ -46,9 +46,7 @@ export class ChatService {
             if (payload.chat === 0) {
                 idRange = { gt: out.id };
             } else {
-
-                idRange = { gt: out.id, lte: payload.chat };
-
+                idRange = { gt: out.id, lt: payload.chat };
             }
             where = {
                 roomId: isExist.id,
