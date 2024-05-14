@@ -3,6 +3,8 @@ const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
 
 exports.imageupload = (req, res) => {
+    console.log('Request received with fields:', req.body);
+    console.log('Files:', req.files);
     aws.config.update({
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
