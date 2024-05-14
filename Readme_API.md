@@ -176,7 +176,25 @@
 ### 회원정보(개인 정보) 수정
 > 1. 개인정보 수정 -> 닉네임 수정시 닉네임 확인하는 API 거쳐야함
 - URL : edit/info (POST)
-- 요청 값 : 헤더 - accesstoken, 바디 - password, nickname, phoneNumber, birthdate, gender, myMBTI, myKeyword, friendKeyword - 특정 값은 변경하지 않더라도 기존 값을 보내줘야함
+- 요청 값 : 헤더 - accesstoken, 바디 - password, nickname, phoneNumber, age - 특정 값은 변경하지 않더라도 기존 값을 보내줘야함
+- 반환 값 : user, images
+  - 200 : 업데이트 성공
+  - 300 : 값을 보내지 않은 경우
+  - 304 : 올바르지 않은 값을 보낸 경우
+  - 500~502 : 업데이트 실패(서버 에러)
+
+  > 2. 나의 MBTI 수정 
+- URL : edit/info (POST)
+- 요청 값 : 헤더 - accesstoken, 바디 - myMBTI - 특정 값은 변경하지 않더라도 기존 값을 보내줘야함
+- 반환 값 : user, images
+  - 200 : 업데이트 성공
+  - 300 : 값을 보내지 않은 경우
+  - 304 : 올바르지 않은 값을 보낸 경우
+  - 500~502 : 업데이트 실패(서버 에러)
+
+  > 3. 나의 키워드 수정 
+- URL : edit/infoKeyword (POST)
+- 요청 값 : 헤더 - accesstoken, 바디 - myKeyword - 특정 값은 변경하지 않더라도 기존 값을 보내줘야함
 - 반환 값 : user, images
   - 200 : 업데이트 성공
   - 300 : 값을 보내지 않은 경우
