@@ -4,6 +4,9 @@ const defaultImageKey = "defalut_user.png"
 exports.profiledelete = (req, res) => {
     const deletePath = req.body.deletepath;
     const email = req.headers.email;
+    if (deletePath == defaultImagePath){
+        return res.status(200).send("기본이미지 삭제입니다")
+    }
     // 이미지 삭제를 위한 S3 설정
     const s3 = new aws.S3({
         accessKeyId: process.env.S3_ACCESS_KEY_ID,

@@ -59,26 +59,32 @@ function imageDelete (email, req, res)
         }
         // 이미지 키 설정
         const deleteKey = results[0].userImageKey;
-        // S3에서 이미지 삭제
-        const s3Params = {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: deleteKey,
-        };
-        s3.deleteObject(s3Params, (err, data) => {
-            console.log('Deleted image from S3:', data); // 추가
-            if (err) {
-                console.error('Error deleting image from S3:', err);
-                return res.status(501).send('이미지 삭제에 실패했습니다.');
-            }
-            // 데이터베이스에서 이미지 정보 삭제
-            const deleteQuery = 'UPDATE User SET userImage = ? , userImageKey = ? WHERE email = ?';
-            req.mysqlConnection.query(deleteQuery, [defaultImagePath, defaultImageKey, email], (error, results) => {
-                if (error) {
-                    console.error('Error deleting image from database:', error);
-                    return res.status(501).send('데이터베이스에서 이미지 정보 삭제에 실패했습니다.');
+        if (deleteKey == defaultImageKey){
+            console.log("삭제 생략")
+        }
+        else
+        {
+            // S3에서 이미지 삭제
+            const s3Params = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: deleteKey,
+            };
+            s3.deleteObject(s3Params, (err, data) => {
+                console.log('Deleted image from S3:', data); // 추가
+                if (err) {
+                    console.error('Error deleting image from S3:', err);
+                    return res.status(501).send('이미지 삭제에 실패했습니다.');
                 }
+                // 데이터베이스에서 이미지 정보 삭제
+                const deleteQuery = 'UPDATE User SET userImage = ? , userImageKey = ? WHERE email = ?';
+                req.mysqlConnection.query(deleteQuery, [defaultImagePath, defaultImageKey, email], (error, results) => {
+                    if (error) {
+                        console.error('Error deleting image from database:', error);
+                        return res.status(501).send('데이터베이스에서 이미지 정보 삭제에 실패했습니다.');
+                    }
+                });
             });
-        });
+        }
     });
 };
 
