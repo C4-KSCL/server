@@ -441,7 +441,7 @@ export class RequestService {
         });
     }
 
-    // requestId
+    // requestId, req, res
     async getOppSocket(payload) {
         const request = await database.addRequest.findUnique({
             where : {
@@ -451,10 +451,16 @@ export class RequestService {
 
         if(!request) throw { status :404, msg : "not found : request in get opp socket" };
 
+        let where;
+
+        if(payload.req) {
+            where = { userEmail : request.recUser };
+        } else if(payload.rec) {
+            where = { userEmail : request.reqUser };
+        }
+
         const oppSocket = await database.userSocketToken.findUnique({
-            where : {
-                userEmail : request.reqUser,
-            }
+            where : where
         });
 
         if(!oppSocket) throw { status : 404, msg : "not found : userSocketToken in get opp socket" };

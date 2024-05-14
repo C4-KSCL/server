@@ -64,6 +64,12 @@ async function sendRequest(req, res, next) {
 
         if (!request) throw { status: 400, msg: "fail to send request" };
 
+        const oppSocket = await service.getOppSocket({requestId : request.id, req : true});
+
+        const user = await service.getUser({userEmail : userEmail});
+
+        pushAlarm({tokens : oppSocket.token, msg : { roomId : request.roomId, content : `${user.nickname}님이 당신의 요청을 수락했습니다.`}}, "request");
+
         res.status(201).json({ msg: "true" });
 
     } catch (err) {
@@ -120,7 +126,7 @@ async function acceptRequest(req, res, next) {
         // UserSocketToken 테이블에 정보를 등록해준다. 
         await service.createSocketToken({ userEmail: userEmail });
 
-        const oppSocket = await service.getOppSocket({requestId : requestId});
+        const oppSocket = await service.getOppSocket({requestId : requestId, rec : true});
 
         const user = await service.getUser({userEmail : userEmail});
 

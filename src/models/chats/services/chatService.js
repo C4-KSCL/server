@@ -22,53 +22,54 @@ export class ChatService {
             where: {
                 roomId: isExist.id,
                 userEmail: payload.userEmail,
+                join: true,
             }
         });
 
         if (!isExist || !join) throw { status: 404, msg: "not found : join in get-chats" };
 
         const out = await database.chatting.findFirst({
-            orderBy : {
-                createdAt : "desc"
+            orderBy: {
+                createdAt: "desc"
             },
             where: {
                 roomId: payload.roomId,
                 type: "out",
-                userEmail : payload.userEmail,
-                id : {
-                    gt : payload.chat,
-                }
+                userEmail: payload.userEmail,
             }
         });
 
         let where;
 
         if (out) {
-            where = {
-                roomId: isExist.id,
-                
-                NOT: {
-                    type: "out",
-                },
-                id: {
-                    gt: out.id,
-                    lt : payload.chat
-                }
-            }
-        } else {
             let idRange;
-            if(payload.chat === 0) {
-                idRange = { gte : payload.chat };
+            if (payload.chat === 0) {
+                idRange = { gt: out.id };
             } else {
-                idRange = { lt : payload.chat };
+                idRange = { gt: out.id, lt: payload.chat };
             }
             where = {
                 roomId: isExist.id,
-                
+
                 NOT: {
                     type: "out",
                 },
                 id : idRange,
+            }
+        } else {
+            let idRange;
+            if (payload.chat === 0) {
+                idRange = { gte: payload.chat };
+            } else {
+                idRange = { lt: payload.chat };
+            }
+            where = {
+                roomId: isExist.id,
+
+                NOT: {
+                    type: "out",
+                },
+                id: idRange,
             }
         }
 
@@ -85,7 +86,7 @@ export class ChatService {
                 createdAt: true,
                 content: true,
                 readCount: true,
-                type : true,
+                type: true,
                 event: {
                     include: {
                         smallCategory: {
@@ -213,35 +214,35 @@ export class ChatService {
                     }
                 });
 
-                if(!chat) continue;
+                if (!chat) continue;
 
                 if (chat.room.publishing === "deleted") continue;
-                if(out){
+                if (out) {
                     where = {
                         roomId: join.roomId,
                         readCount: 1,
                         NOT: {
                             userEmail: userEmail,
-                            type : "out"
+                            type: "out"
                         },
-                        id : {
+                        id: {
                             gt: out.id,
                         }
                     }
-                }else{
+                } else {
                     where = {
                         roomId: join.roomId,
                         readCount: 1,
                         NOT: {
                             userEmail: userEmail,
-                            type : "out"
+                            type: "out"
                         }
                     }
                 }
-                
+
                 const count = await db.chatting.count({
-                    orderBy : {
-                        createdAt : "desc"
+                    orderBy: {
+                        createdAt: "desc"
                     },
                     where: where
                 });

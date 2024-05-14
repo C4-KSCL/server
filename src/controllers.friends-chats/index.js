@@ -11,7 +11,7 @@ import { verifyAccessToken } from "../../middleware/auth";
 
 const router = Router();
 
-if(process.env.NODE_ENV === "dev"){
+if(process.env.NODE_ENV !== "production"){
     router.use("/users", userController);
 }
 router.use("/requests", verifyAccessToken, requestController);
