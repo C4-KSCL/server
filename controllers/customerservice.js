@@ -32,7 +32,6 @@ exports.postupload = (req, res) => {
             return res.status(502).send('이미지 업로드에 실패했습니다.');
         }
         const { postCategory, postTitle, postContent } = req.body;
-        console.log(postCategory, postTitle, postContent); // 로그로 값 확인
         const userEmail = req.headers['email'];
         let userNumber = 0;
         let postNumber = 0;
