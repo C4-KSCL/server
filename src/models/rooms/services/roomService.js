@@ -58,7 +58,7 @@ export class RoomService {
                 }
             });
 
-            return room;
+            return userJoin;
         });
 
         return createdRoom;
@@ -158,7 +158,7 @@ export class RoomService {
     async leaveRoom(payload) {
 
         const message = await database.$transaction(async (db) => {
-            await db.joinRoom.update({
+            const join = await db.joinRoom.update({
                 where: {
                     id: payload.joinId
                 },
@@ -166,6 +166,8 @@ export class RoomService {
                     join: false
                 }
             });
+            
+            if(join.join === true) throw { status : 500, msg : "fail to change to false" };
 
             const msg = await db.chatting.create({
                 data: {
