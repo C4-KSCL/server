@@ -214,6 +214,8 @@ export class SocketService {
                     user1: user.nickname,
                     user2: oppUser.user.nickname,
                     createdAt: getNowTime(),
+                    user1Choice : "아직 선택하지 않았습니다",
+                    user2Choice : "아직 선택하지 않았습니다",
                 }
             });
 
