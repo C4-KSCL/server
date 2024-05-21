@@ -67,9 +67,9 @@
 > 2. AccessToken,RefreshToken만 전송
   > 2-1. AccessToekn 만료 O , RefreshToekn 만료 X
   - 응답상태 코드 : 300
-  - 반환 값 : 새로운 AccessToken
+  - 반환 값 : 새로운 AccessToken, 새로운 RefreshToken
   - 해당 AccessToken으로 갱신 후 다시 전송해야함
-  > 2-2. AccessToekn 만료 O , RefreshToekn 만료 O
+  > 2-2. AccessToekn 만료 O , RefreshToekn 만료 O 
   - 응답상태 코드 : 402
   - 다시 로그인 시도해야함
 > 3. 예외 사항
