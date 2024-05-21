@@ -196,7 +196,7 @@ export class SocketService {
 
             const msg = await db.chatting.create({
                 data: {
-                    content: "content-is-random-event",
+                    content: "퀴즈를 보냈습니다.",
                     userEmail: payload.userEmail,
                     roomId: payload.roomId,
                     readCount: payload.readCount,
@@ -214,6 +214,8 @@ export class SocketService {
                     user1: user.nickname,
                     user2: oppUser.user.nickname,
                     createdAt: getNowTime(),
+                    user1Choice : "아직 선택하지 않았습니다",
+                    user2Choice : "아직 선택하지 않았습니다",
                 }
             });
 

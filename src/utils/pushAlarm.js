@@ -14,14 +14,19 @@ export async function pushAlarm(payload, type) {
 
   let message;
 
-  if (type === "request") {
+  if (type === "request-send" || type === "request-accept") {
+    let title;
+
+    if(type === "request-send") title = "친구 요청";
+    else title = "요청 수락!";
+
     message = {
       data: {
         route : "friend",
         roomId : payload.msg.content,
       },
       notification : {
-        title : "요청 수락!",
+        title : title,
         body : payload.msg.content
       },
       token: tokens,

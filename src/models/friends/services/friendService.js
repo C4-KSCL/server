@@ -52,6 +52,7 @@ export class FriendService {
                         friend.room = await db.joinRoom.findFirst({
                             select: {
                                 roomId: true,
+                                join : true,
                             },
                             where: {
                                 roomId: request.roomId,
