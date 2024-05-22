@@ -70,7 +70,6 @@ function imageDelete (email, req, res)
                 Key: deleteKey,
             };
             s3.deleteObject(s3Params, (err, data) => {
-                console.log('Deleted image from S3:', data); // 추가
                 if (err) {
                     console.error('Error deleting image from S3:', err);
                     return res.status(501).send('이미지 삭제에 실패했습니다.');

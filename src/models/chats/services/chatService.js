@@ -18,58 +18,70 @@ export class ChatService {
             }
         });
 
+        if (!isExist) throw { status: 404, msg: "not found room in getChats" };
+
         const join = await database.joinRoom.findFirst({
-            where: {
-                roomId: isExist.id,
-                userEmail: payload.userEmail,
-                join: true,
-            }
-        });
-
-        if (!isExist || !join) throw { status: 404, msg: "not found : join in get-chats" };
-
-        const out = await database.chatting.findFirst({
-            orderBy: {
-                createdAt: "desc"
+            include: {
+                room: true,
             },
             where: {
-                roomId: payload.roomId,
-                type: "out",
+                roomId: isExist.id,
                 userEmail: payload.userEmail,
             }
         });
 
         let where;
 
-        if (out) {
-            let idRange;
-            if (payload.chat === 0) {
-                idRange = { gt: out.id };
-            } else {
-                idRange = { gt: out.id, lt: payload.chat };
-            }
-            where = {
-                roomId: isExist.id,
+        if (join.room.publishing === "ing") {
 
-                NOT: {
-                    type: "out",
-                },
-                id : idRange,
-            }
-        } else {
-            let idRange;
-            if (payload.chat === 0) {
-                idRange = { gte: payload.chat };
-            } else {
-                idRange = { lt: payload.chat };
-            }
             where = {
-                roomId: isExist.id,
+                roomId : payload.roomId,
+            };
 
-                NOT: {
-                    type: "out",
+        } else if(join.room.publishing === "true"){
+            if (!join.join) throw { status: 404, msg: "not found : join in get-chats" };
+
+            const out = await database.chatting.findFirst({
+                orderBy: {
+                    createdAt: "desc"
                 },
-                id: idRange,
+                where: {
+                    roomId: payload.roomId,
+                    type: "out",
+                    userEmail: payload.userEmail,
+                }
+            });
+
+            if (out) {
+                let idRange;
+                if (payload.chat === 0) {
+                    idRange = { gt: out.id };
+                } else {
+                    idRange = { gt: out.id, lt: payload.chat };
+                }
+                where = {
+                    roomId: isExist.id,
+
+                    NOT: {
+                        type: "out",
+                    },
+                    id: idRange,
+                }
+            } else {
+                let idRange;
+                if (payload.chat === 0) {
+                    idRange = { gte: payload.chat };
+                } else {
+                    idRange = { lt: payload.chat };
+                }
+                where = {
+                    roomId: isExist.id,
+
+                    NOT: {
+                        type: "out",
+                    },
+                    id: idRange,
+                }
             }
         }
 
@@ -104,7 +116,6 @@ export class ChatService {
             take: payload.take,
         });
         return chats;
-
     }
 
     async getLastChats(userEmail) {
