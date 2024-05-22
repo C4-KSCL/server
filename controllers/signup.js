@@ -94,6 +94,19 @@ exports.register = (req, res) => {
                     console.error('Error while registering user:', error);
                     return res.status(500).send('회원가입에 실패했습니다.');
                 }
+            });
+
+            const tokenData = {
+                userEmail: email
+            };
+
+            const TokenInsertQuery = 'INSERT INTO UserSocketToken SET ?';
+
+            req.mysqlConnection.query(TokenInsertQuery, tokenData, (error, results) => {
+                if (error) {
+                    console.log(TokenInsertQuery);
+                    return res.status(500).json({ msg: "토큰생성에 실패했습니다." });
+                }
                 return res.status(200).send('회원가입에 성공하였습니다.');
             });
         }
