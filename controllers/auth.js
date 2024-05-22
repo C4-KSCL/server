@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-const accessTokenExpiryTime = '30s'; // Access Token 유효기간 30s
-const refreshTokenExpiryTime = '1m'; // Refresh Token 유효기간 1m
+const accessTokenExpiryTime = '10s'; // Access Token 유효기간
+const refreshTokenExpiryTime = '1d'; // Refresh Token 유효기간
 const nodemailer = require('nodemailer');
 
 // 로그인 처리 컨트롤러 함수
