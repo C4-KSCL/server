@@ -55,14 +55,14 @@ export const SocketServer = async (httpServer) => {
 
                 console.log(socket.userEmail);
                 next();
-            } catch (err) {
-                next(err);
+            } catch (error) {
+                console.log(error);
             }
             
         }).on('connection', async (socket) => {
             const controller = new SocketController(io, socket);
 
-            socket.broadcast.emit('hello', 'to all clients except sender');
+            socket.emit('hello', 'to all clients except sender');
 
             controller.setRoomId.bind(controller);
 

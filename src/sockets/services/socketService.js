@@ -287,6 +287,7 @@ export class SocketService {
 
         if (!isExist) {
             console.log("존재하지 않는다.");
+            return;
         }
 
         await database.userSocketToken.update({
