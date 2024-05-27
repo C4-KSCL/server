@@ -78,6 +78,7 @@ export const SocketServer = async (httpServer) => {
 
             socket.on("answer to event", controller.updateEventAnswer.bind(controller));
 
+            socket.on("leave room", controller.outRoom.bind(controller));
         });
     } catch (error) {
         console.error(`Redis 연결 오류: ${error}`);

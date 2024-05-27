@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
-const accessTokenExpiryTime = '10s'; // Access Token 유효기간
+const accessTokenExpiryTime = '10h'; // Access Token 유효기간
 const refreshTokenExpiryTime = '1d'; // Refresh Token 유효기간
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
