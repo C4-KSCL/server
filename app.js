@@ -95,8 +95,10 @@ const port = process.env.PORT || 8000;
     next();
   });
 
+  app.use(express.static(path.join(__dirname, 'admin-web/build')));
+
   app.get("/", (req, res) => {
-    res.send(`Hello World!! 현재 포트`);
+    res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
   }); //동작 확인용
   app.use(cors());
   app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
