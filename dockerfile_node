@@ -12,6 +12,8 @@ ENV DATABASE_URL=${DATABASE_URL}
 RUN apt-get update -y && apt-get install -y openssl
 RUN npm install
 RUN npx prisma generate
+# admin_web 폴더로 이동하여 build 수행
+RUN cd admin_web && npm run build && cd ..
 #RUN npx prisma migrate deploy
 #8001포트로
 EXPOSE 8000
