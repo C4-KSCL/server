@@ -24,6 +24,7 @@ exports.friendMatching = async (req, res) => {
         const myfriendMinAge = user.friendMinAge;
         const myfriendMaxAge = user.friendMaxAge;
         const myfriendGender = user.friendGender;
+        const myfriendKeywords = user.friendKeyword;
 
         // 사용자가 설정한 친구 MBTI 탐색 후 해당 MBTI를 가진 유저 조회
         const friendfindQuery = `
@@ -34,7 +35,7 @@ exports.friendMatching = async (req, res) => {
                 (
                     SELECT COUNT(*)
                     FROM (
-                        SELECT DISTINCT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(u.friendKeyword, ',', numbers.n), ',', -1)) AS keyword
+                        SELECT DISTINCT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(u.myKeyword, ',', numbers.n), ',', -1)) AS keyword
                         FROM User u
                         CROSS JOIN (
                             SELECT 1 n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 
@@ -48,10 +49,10 @@ exports.friendMatching = async (req, res) => {
                             UNION ALL SELECT 41 UNION ALL SELECT 42 UNION ALL SELECT 43 UNION ALL SELECT 44 UNION ALL SELECT 45
                             UNION ALL SELECT 46 UNION ALL SELECT 47 UNION ALL SELECT 48 UNION ALL SELECT 49 UNION ALL SELECT 50
                         ) AS numbers
-                        WHERE CHAR_LENGTH(u.friendKeyword) - CHAR_LENGTH(REPLACE(u.friendKeyword, ',', '')) >= numbers.n - 1
+                        WHERE CHAR_LENGTH(u.myKeyword) - CHAR_LENGTH(REPLACE(u.myKeyword, ',', '')) >= numbers.n - 1
                         AND u.email = user.email
                     ) AS keywords
-                    WHERE FIND_IN_SET(keywords.keyword, user.myKeyword) > 0
+                    WHERE FIND_IN_SET(keywords.keyword, ?) > 0
                 ) + 
                 -- MBTI 일치 점수 계산
                 (
@@ -63,28 +64,27 @@ exports.friendMatching = async (req, res) => {
             ) AS totalScore
         FROM User user
         WHERE user.deleteTime IS NULL 
-                AND CAST(user.age AS UNSIGNED) <= CAST(? AS UNSIGNED) 
-                AND CAST(user.age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
-                AND user.gender = ?
-                AND user.email != ?
-                AND suspend = 0
-        AND user.email != ?
-        AND user.email NOT IN (
-            SELECT oppEmail FROM Friend WHERE userEmail = ?
-        )
-        AND user.email NOT IN (
-            SELECT recUser FROM AddRequest WHERE reqUser = ? AND status = 'ing'
-        )
-        AND user.userNumber NOT IN (
-            SELECT oppNumber FROM UserMatchingHistory WHERE userNumber = (SELECT userNumber FROM User WHERE email = ?)
-        )
+            AND CAST(user.age AS UNSIGNED) <= CAST(? AS UNSIGNED) 
+            AND CAST(user.age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
+            AND user.gender = ?
+            AND user.email != ?
+            AND suspend = 0
+            AND user.email NOT IN (
+                SELECT oppEmail FROM Friend WHERE userEmail = ?
+            )
+            AND user.email NOT IN (
+                SELECT recUser FROM AddRequest WHERE reqUser = ? AND status = 'ing'
+            )
+            AND user.userNumber NOT IN (
+                SELECT oppNumber FROM UserMatchingHistory WHERE userNumber = (SELECT userNumber FROM User WHERE email = ?)
+            )
         ORDER BY totalScore DESC
-        limit 3;        
-        `;  
+        LIMIT 3;
+        `;
 
         const friendResults = await query(friendfindQuery, [
-            myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMBTI, 
-            myfriendMaxAge, myfriendMinAge, myfriendGender, 
+            myfriendKeywords, myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMBTI,
+            myfriendMaxAge, myfriendMinAge, myfriendGender,
             userEmail, userEmail, userEmail, userEmail, userEmail
         ]);
 
@@ -116,13 +116,6 @@ exports.friendMatching = async (req, res) => {
                         'Content-Type': 'application/json'
                     }
                 });
-                console.log('ChatGPT API Request:', {
-                    model: "gpt-3.5-turbo",
-                    messages: messages,
-                    max_tokens: 1500
-                });
-                console.log('ChatGPT API Response for user', user.userNumber, response.data);
-
                 return {
                     userNumber: user.userNumber,
                     analysis: response.data.choices[0].message.content.trim()
