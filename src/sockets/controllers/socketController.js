@@ -54,7 +54,25 @@ export class SocketController {
             console.log(err);
             this.socket.emit("error", { msg: err.msg });
         }
+    }
 
+    async outRoom(payload) {
+        try{
+            payload.userEmail = this.socket.userEmail;
+            payload.roomId = this.socket.roomId;
+
+            await this.service.updateNullConnectedRoom(payload);
+
+            this.socket.leave(this.socket.roomId);
+
+            let roomId = this.socket.roomId;
+
+            this.socket.roomId = null;
+            
+            this.socket.emit("leave room", { msg : `leave room ${roomId}` });
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     // 메시지를 받으면 메시지 생성 후, 메시지를 사용자에게 보낸다.

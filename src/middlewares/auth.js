@@ -12,19 +12,18 @@ export const verfiyForSocket = async (token) =>{
             }
         });
 
-        if (!user) throw { status: 404, msg: "not found : user" };
-
         return user.email;
 
     } catch (error) {
         // 인증 실패
         // 유효시간이 초과된 경우
-        if (error.name === "TokenExpiredError") {
-            console.log(err);
-        }
-        // 토큰의 비밀키가 일치하지 않는 경우
-        if (error.name === "JsonWebTokenError") {
-            console.log(err);
-        }
+        // if (error.name === "TokenExpiredError") {
+        //     console.log(error);
+        // }
+        // // 토큰의 비밀키가 일치하지 않는 경우
+        // if (error.name === "JsonWebTokenError") {
+        //     console.log(error);
+        // }
+        console.log(error.name);
     }
 }

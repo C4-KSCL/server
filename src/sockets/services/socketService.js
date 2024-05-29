@@ -84,7 +84,7 @@ export class SocketService {
         }
         const chat = await database.$transaction(async (db) => {
             // 만약 차단이 안 되어있고, join이 faluse시에 다시 참여시킴.
-            if (payload.friend.status === true) {
+            if (payload.friend && payload.friend.status === true) {
                 if (joinOpp.join === false) {
                     await db.joinRoom.update({
                         where: {
@@ -167,7 +167,7 @@ export class SocketService {
         }
 
         const message = await database.$transaction(async (db) => {
-            if (payload.friend.status === true) {
+            if (payload.friend && payload.friend.status === true) {
                 await db.joinRoom.update({
                     where: {
                         id: joinOpp.id,
@@ -183,7 +183,7 @@ export class SocketService {
                     user: {
                         select: {
                             nickname: true,
-                        }
+                        }    
                     }
                 },
                 where: {
@@ -287,6 +287,7 @@ export class SocketService {
 
         if (!isExist) {
             console.log("존재하지 않는다.");
+            return;
         }
 
         await database.userSocketToken.update({
@@ -358,10 +359,13 @@ export class SocketService {
             where: {
                 userEmail: joinOthers.userEmail,
                 oppEmail: payload.userEmail,
+                status : true,
             }
         });
 
         if (!friend) return undefined;
+
+        friend.join = joinOthers.join;
 
         return friend;
     }
@@ -458,5 +462,25 @@ export class SocketService {
         console.log(updatedEvent);
 
         return updatedEvent;
+    }
+
+    // userEmail, roomId
+    async updateNullConnectedRoom(payload) {
+        const userSocketToken = await database.userSocketToken.findUnique({
+            where : {
+                userEmail : payload.userEmail,
+            }
+        });
+
+        if(!userSocketToken) throw { msg : "not found userSocketToken : in updateNullConnectedRoom" };
+ 
+        await database.userSocketToken.update({
+            where : {
+                userEmail : userSocketToken.userEmail
+            },
+            data : {
+                connectRoomId : null
+            }
+        });
     }
 }
