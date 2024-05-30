@@ -98,7 +98,7 @@ exports.friendMatching = async (req, res) => {
             const userMBTI = user.myMBTI;
             const userKeywords = user.myKeyword.split(',');
 
-            const prompt = `너는 친구 관계를 도와주는 상담사야. 나는 ${myMBTI}이고 ${myKeywords.join(', ')} 하는 것을 좋아하는 사람이야. 친구는 ${userMBTI}이고 ${userKeywords.join(', ')} 하는 것을 좋아하는 친구야. MBTI 조합에 있어서 성격상 잘맞는 부분과 공통되어 있는 취미를 기반으로 친구와 친해질수 있는 계기나 요소 등을 섞어서 200자 이내로 구어체로 답변해줘`;
+            const prompt = `너는 친구 관계를 도와주는 상담사야. 나는 ${myMBTI}이고 ${myKeywords.join(', ')} 하는 것을 좋아하는 사람이야. 친구는 ${userMBTI}이고 ${userKeywords.join(', ')} 하는 것을 좋아하는 친구야. MBTI 조합에 있어서 성격상 잘맞는 부분과 공통되어 있는 취미를 기반으로 친구와 친해질수 있는 계기나 요소 등을 섞어서 200자 이내로 친근한 반말로 답변해줘`;
 
             const messages = [
                 { "role": "system", "content": "You are a helpful assistant." },
