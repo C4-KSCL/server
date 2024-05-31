@@ -27,6 +27,10 @@ export async function pushAlarm(payload, type) {
         title : title,
         body : payload.msg.content
       },
+      notification: {
+        title: title,
+        body: payload.msg.content
+      },
       token: tokens,
     }
   } else if (type === "message") {
@@ -36,6 +40,10 @@ export async function pushAlarm(payload, type) {
         roomId : payload.msg.roomId,
         title : payload.msg.nickName,
         body : payload.msg.content
+      },
+      notification: {
+        title: payload.msg.nickName,
+        body: payload.msg.content
       },
       token : tokens,
     }
@@ -47,18 +55,18 @@ export async function pushAlarm(payload, type) {
         title : payload.msg.nickName,
         body : "퀴즈를 보냈습니다!"
       },
+      notification: {
+        title: payload.msg.nickName,
+        body: "퀴즈를 보냈습니다!"
+      },
       token : tokens,
     }
   }
   
-  
-
-
   admin
     .messaging()
     .send(message)
     .then((response) => {
-      // Response is a message ID string.
       console.log('Successfully sent message:', response);
     })
     .catch((error) => {
