@@ -97,7 +97,7 @@ const port = process.env.PORT || 8000;
 
   app.use(express.static(path.join(__dirname, 'admin-web/build')));
 
-  app.get("/*", (req, res) => {
+  app.get("/admin/*", (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
   }); //동작 확인용
   
