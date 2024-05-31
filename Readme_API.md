@@ -103,7 +103,7 @@
 > 1. 친구 매칭
 - URL : findfriend/friend-matching (GET)
 - 요청 값 : 헤더 - accesstoken
-- 반환 값 : users 객체, images 객체(성공시) 
+- 반환 값 : users 객체 + user객체 안에 analysis(gpt)필드, images 객체(성공시) 
   - 200 : 매칭 성공 
   - 500 : 매칭 시간 제한 / requestTime(최근 요청시간 반환)
   - 404 : 해당 친구 없음
