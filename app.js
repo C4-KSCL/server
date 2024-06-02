@@ -95,11 +95,21 @@ const port = process.env.PORT || 8000;
     next();
   });
 
+  // 홈페이지
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, 'home-web', 'index.html'));
+  }); 
+
+ // 관리자 페이지
   app.use(express.static(path.join(__dirname, 'admin-web/build')));
+ 
+  app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
+  }); 
 
   app.get("/admin/*", (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
-  }); //동작 확인용
+  }); 
   
   app.use(cors());
   app.use('/matching-api-docs-by-swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

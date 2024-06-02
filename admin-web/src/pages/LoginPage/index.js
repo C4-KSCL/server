@@ -2,15 +2,18 @@ import React, {  useState } from "react";
 import UserInput from "../../components/UserInput";
 import axios from "../../api/axios";
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '../../api/authContext';
 
 export default function LoginPage() {
 	const [userInfo, setUserInfo] = useState({
 		email: "",
 		password: "",
 	});
-
+	const { updateUserInfo } = useAuth();
 	const navigate = useNavigate();
 
+	// email, password의 input칸 변화시 실행
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setUserInfo((userInfo) => ({
@@ -19,10 +22,8 @@ export default function LoginPage() {
 		}));
 	};
 
+	// 로그인 과정
 	const loginProcess = async () => {
-        console.log(axios.baseUrl);
-        console.log(userInfo.email);
-        console.log(userInfo.password);
 		await axios
 			.post("/auth/login", {
 				email: userInfo.email,
@@ -31,13 +32,33 @@ export default function LoginPage() {
 			.then(function (response) {
 				console.log(response);
 				if(response.status===200 && response.data.user.manager===1){
-					navigate('/admin');
+					navigate('/admin/service-center');
+				} else {
+					alert("관리자가 아닙니다");
 				}
 			})
 			.catch(function (error) {
 				console.log(error);
 			});
 	};
+
+
+	// 로그인 처리 : 토큰 저장, 유저 정보 저장
+	const useLogin = () =>{
+		return useMutation(loginProcess,{
+			// 200번대 응답
+			onSuccess : (data) =>{
+				// refreshToken은 cookie에 저장, 
+				document.cookie = "refreshToken=yourRefreshToken; Secure; HttpOnly"; 
+				console.log(data);
+
+			},
+			// 400, 500번대 응답
+			onError: (error) => {
+				console.error('Login failed', error);
+			  },
+		})
+	}
 
 	return (
 		<div>
@@ -70,7 +91,7 @@ export default function LoginPage() {
 						value={userInfo.password}
 					/>
 				</div>
-				<button className="btn-primary" onClick={loginProcess}>
+				<button className="btn-primary" onClick={useLogin}>
 					로그인
 				</button>
 			</div>

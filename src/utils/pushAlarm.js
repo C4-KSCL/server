@@ -24,8 +24,6 @@ export async function pushAlarm(payload, type) {
       data: {
         route : "friend",
         roomId : payload.msg.content,
-        title : title,
-        body : payload.msg.content
       },
       notification: {
         title: title,
@@ -38,8 +36,6 @@ export async function pushAlarm(payload, type) {
       data: {
         route : "chat",
         roomId : payload.msg.roomId,
-        title : payload.msg.nickName,
-        body : payload.msg.content
       },
       notification: {
         title: payload.msg.nickName,
@@ -52,8 +48,6 @@ export async function pushAlarm(payload, type) {
       data: {
         route : "chat",
         roomId : payload.msg.roomId,
-        title : payload.msg.nickName,
-        body : "퀴즈를 보냈습니다!"
       },
       notification: {
         title: payload.msg.nickName,
