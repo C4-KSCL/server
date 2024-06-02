@@ -10,7 +10,7 @@ export default function LoginPage() {
 		email: "",
 		password: "",
 	});
-	const { updateUserInfo } = useAuth();
+	const { updateUserInfo, updateAccessToken } = useAuth();
 	const navigate = useNavigate();
 
 	// email, password의 input칸 변화시 실행
@@ -23,7 +23,7 @@ export default function LoginPage() {
 	};
 
 	// 로그인 과정
-	const loginProcess = async () => {
+	const getUserInfo = async () => {
 		await axios
 			.post("/auth/login", {
 				email: userInfo.email,
@@ -32,6 +32,8 @@ export default function LoginPage() {
 			.then(function (response) {
 				console.log(response);
 				if(response.status===200 && response.data.user.manager===1){
+					updateUserInfo()
+					updateAccessToken()
 					navigate('/admin/service-center');
 				} else {
 					alert("관리자가 아닙니다");
@@ -45,11 +47,12 @@ export default function LoginPage() {
 
 	// 로그인 처리 : 토큰 저장, 유저 정보 저장
 	const useLogin = () =>{
-		return useMutation(loginProcess,{
+		return useMutation(getUserInfo,{
 			// 200번대 응답
 			onSuccess : (data) =>{
 				// refreshToken은 cookie에 저장, 
-				document.cookie = "refreshToken=yourRefreshToken; Secure; HttpOnly"; 
+				document.cookie = "refreshToken=yourRefreshToken; Secure; HttpOnly";
+				
 				console.log(data);
 
 			},

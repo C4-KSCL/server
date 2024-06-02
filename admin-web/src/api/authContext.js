@@ -1,26 +1,37 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(null);
-  const [user, setUser] = useState(null);
+	const [accessToken, setAccessToken] = useState(null);
+	const [userInfo, setUserInfo] = useState(null);
 
-  const login = (token, userInfo) => {
-    setAccessToken(token);
-    setUser(userInfo);
-  };
+	const updateAccessToken = (token) => {
+		setAccessToken(token);
+	};
 
-  const logout = () => {
-    setAccessToken(null);
-    setUser(null);
-  };
+	const updateUserInfo = (userInfo) => {
+		setUserInfo(userInfo);
+	};
 
-  return (
-    <AuthContext.Provider value={{ authToken: accessToken, user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+	const logout = () => {
+		setAccessToken(null);
+		setUserInfo(null);
+	};
+
+	return (
+		<AuthContext.Provider
+			value={{
+				accessToken: accessToken,
+				userInfo: userInfo,
+				updateAccessToken,
+				updateUserInfo,
+				logout,
+			}}
+		>
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
 export const useAuth = () => useContext(AuthContext);
