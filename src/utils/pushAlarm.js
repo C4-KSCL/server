@@ -25,9 +25,9 @@ export async function pushAlarm(payload, type) {
         route : "friend",
         roomId : payload.msg.content,
       },
-      notification : {
-        title : title,
-        body : payload.msg.content
+      notification: {
+        title: title,
+        body: payload.msg.content
       },
       token: tokens,
     }
@@ -35,11 +35,11 @@ export async function pushAlarm(payload, type) {
     message = {
       data: {
         route : "chat",
-        roomId : payload.msg.roomId
+        roomId : payload.msg.roomId,
       },
-      notification : {
-        title : payload.msg.nickName,
-        body : payload.msg.content
+      notification: {
+        title: payload.msg.nickName,
+        body: payload.msg.content
       },
       token : tokens,
     }
@@ -47,24 +47,20 @@ export async function pushAlarm(payload, type) {
     message = {
       data: {
         route : "chat",
-        roomId : payload.msg.roomId
+        roomId : payload.msg.roomId,
       },
-      notification : {
-        title : payload.msg.nickName,
-        body : "퀴즈를 보냈습니다!"
+      notification: {
+        title: payload.msg.nickName,
+        body: "퀴즈를 보냈습니다!"
       },
       token : tokens,
     }
   }
   
-  
-
-
   admin
     .messaging()
     .send(message)
     .then((response) => {
-      // Response is a message ID string.
       console.log('Successfully sent message:', response);
     })
     .catch((error) => {

@@ -1,20 +1,51 @@
-import './App.css';
+import React from "react";
+import { Outlet, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import LoginPage from "./pages/LoginPage";
+import { AuthProvider } from "./api/authContext";
+import ServiceCenterPage from "./pages/ServiceCenterPage";
+import "./App.css";
+import Sidebar from "./components/Sidebar";
+import UserMangementPage from "./pages/UserManagementPage";
+
+// QueryClient 생성
+const queryClient = new QueryClient();
+
+const Layout = () => {
+	return (
+		<div className="flex">
+			<div className="flex-grow-1">
+			<Sidebar />
+			</div>
+			
+			<div className="flex-grow-4"><Outlet /></div>
+			
+		</div>
+	);
+};
 
 function App() {
-  return (
-    <div className="App">
-      <h2>
-        SoulMBTI 관리자 페이지입니다.
-      </h2>
-      <div>
-        <p>아이디</p>
-        <input type='text'/>
-        <p>비밀번호</p>
-        <input type='password'/>
-        <button onClick={alert("aa")}>로그인</button>
-      </div>
-    </div>
-  );
+	return (
+		<QueryClientProvider client={queryClient}>
+			<AuthProvider>
+				<div className="app">
+					<Routes>
+						<Route path="/admin" element={<LoginPage />} />
+						<Route path="/admin/*" element={<Layout />}>
+							<Route
+								path="service-center"
+								element={<ServiceCenterPage />}
+							/>
+							<Route
+								path="user-management"
+								element={<UserMangementPage />}
+							/>
+						</Route>
+					</Routes>
+				</div>
+			</AuthProvider>
+		</QueryClientProvider>
+	);
 }
 
 export default App;
