@@ -13,10 +13,13 @@ const queryClient = new QueryClient();
 
 const Layout = () => {
 	return (
-		<div>
+		<div className="flex">
+			<div className="flex-grow-1">
 			<Sidebar />
-
-			<Outlet />
+			</div>
+			
+			<div className="flex-grow-4"><Outlet /></div>
+			
 		</div>
 	);
 };
