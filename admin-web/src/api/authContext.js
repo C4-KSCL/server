@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
 	const [accessToken, setAccessToken] = useState(null);
 	const [userInfo, setUserInfo] = useState(null);
+	const navigate = useNavigate();
 
 	const updateAccessToken = (token) => {
 		setAccessToken(token);
@@ -14,10 +16,12 @@ export const AuthProvider = ({ children }) => {
 		setUserInfo(userInfo);
 	};
 
+	// 로그아웃
 	const logout = () => {
 		setAccessToken(null);
 		setUserInfo(null);
-		console.log("로그아웃")
+		console.log("로그아웃");
+		navigate("/admin");
 	};
 
 	return (
