@@ -267,7 +267,7 @@
   - 500 : 서버 에러
 
     > 3. 회원 조회
-- URL : manage/search?search_string=? (get)
+- URL : manage/search?search_string=ji (get)
 - 요청 값 : 헤더 - accesstoken
 - 반환 값 : user 객체들
   - 200 : 정지 성공
