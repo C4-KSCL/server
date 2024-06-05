@@ -48,6 +48,8 @@ jobs:    # 작업들을 정의
           echo "MY_ADDRESS=${{ secrets.MY_ADDRESS }}" >> .env
           echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=${{ secrets.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE }}" >> .env
           echo "DEPLOYMENT_GROUP_NAME=${{ secrets.DEPLOYMENT_GROUP_NAME }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "REACT_APP_URL=${{ secrets.REACT_APP_URL }}" >> .env
 
           touch fcm_config.json
           echo  "{" >> fcm_config.json

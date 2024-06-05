@@ -103,7 +103,7 @@
 > 1. 친구 매칭
 - URL : findfriend/friend-matching (GET)
 - 요청 값 : 헤더 - accesstoken
-- 반환 값 : users 객체, images 객체(성공시) 
+- 반환 값 : users 객체 + user객체 안에 analysis(gpt)필드, images 객체(성공시) 
   - 200 : 매칭 성공 
   - 500 : 매칭 시간 제한 / requestTime(최근 요청시간 반환)
   - 404 : 해당 친구 없음
@@ -234,15 +234,15 @@
 > 3. 관리자 글 조회
 - URL : customerService/readManager (get)
 - 요청 값 : 헤더 - accesstoken
-- 반환 값 : posts, images (게시글 객체들과 이미지 객체들 반환)
+- 반환 값 : posts + email, images (게시글 객체들과 이미지 객체들 반환)
   - 200 : 게시글 조회 성공
   - 301 : 관리자가 아님
   - 500 : 서버 에러
 
 > 4. 관리자 글 답변 작성
-- URL : customerService/readManager (post)
-- 요청 값 : 헤더 - accesstoken
-- 반환 값 : post, image (게시글 객체들과 이미지 객체들 반환)
+- URL : customerService/responsePost (post)
+- 요청 값 : 헤더 - accesstoken, 바디 - responseTitle, responseContent, postNumber
+- 반환 값 : -
   - 200 : 작성 성공
   - 301 : 관리자가 아님
   - 500 : 서버 에러
@@ -262,6 +262,14 @@
 - URL : manage/removeSuspend (post)
 - 요청 값 : 헤더 - accesstoken, 바디 - userNumber
 - 반환 값 : -
+  - 200 : 정지 성공
+  - 301 : 관리자가 아님
+  - 500 : 서버 에러
+
+    > 3. 회원 조회
+- URL : manage/search?search_string=ji (get)
+- 요청 값 : 헤더 - accesstoken
+- 반환 값 : user 객체들
   - 200 : 정지 성공
   - 301 : 관리자가 아님
   - 500 : 서버 에러

@@ -132,7 +132,7 @@ exports.readManager = (req,res) => {
         if (results.length === 0) {
             return res.status(301).send('관리자가 아닙니다.');
         }
-        const findpostQuery = `SELECT * FROM CustomerService`;
+        const findpostQuery = `SELECT postNumber,CustomerService.userNumber,postCategory,postTitle,postContent,createdTime,isAnswered,responderNumber,responseTitle,responseContent,responseTime,email FROM CustomerService, User WHERE User.userNumber = CustomerService.userNumber ORDER BY isAnswered ASC`;
         req.mysqlConnection.query(findpostQuery, (err, postresults) => {
             if (err) {
                 console.error('Error while querying:', err);

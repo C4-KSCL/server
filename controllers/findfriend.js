@@ -1,24 +1,33 @@
 const moment = require('moment-timezone');
-
-exports.friendMatching = (req, res) => {
+const axios = require('axios');
+const util = require('util');
+exports.friendMatching = async (req, res) => {
     const userEmail = req.headers['email'];
     let friendMBTI = "";
-    //이메일 정보를 가지고 해당 유저가 설정한 친구 MBTI 정보를 찾음
+
+    // 이메일 정보를 가지고 해당 유저가 설정한 친구 MBTI 정보를 찾음
     const mbtifindQuery = `SELECT * FROM User WHERE email = ?`;
-    req.mysqlConnection.query(mbtifindQuery, [userEmail], (err, results) => {
-        if (err) {
-            console.error('Error while querying:', err);
-            return res.status(500).send('서버 에러');
+    try {
+        // promisify를 사용하여 query를 프로미스 기반으로 변환
+        const query = util.promisify(req.mysqlConnection.query).bind(req.mysqlConnection);
+        const userResults = await query(mbtifindQuery, [userEmail]);
+
+        if (userResults.length === 0) {
+            return res.status(404).send('사용자를 찾을 수 없습니다.');
         }
-        const userNumber = results[0].userNumber;
-        const myfriendMBTI = results[0].friendMBTI;
-        const myfriendMinAge = results[0].friendMinAge;
-        const myfriendMaxAge = results[0].friendMaxAge;
-        const myfriendGender = results[0].friendGender;
-        
-        //사용자가 설정한 친구MBTI 탐색 후 해당 MBTI를 가진 유저 조회
-        const friendfindQuery = 
-        `
+
+        const user = userResults[0];
+        const userNumber = user.userNumber;
+        const myMBTI = user.myMBTI;
+        const myKeywords = user.myKeyword.split(',');
+        const myfriendMBTI = user.friendMBTI;
+        const myfriendMinAge = user.friendMinAge;
+        const myfriendMaxAge = user.friendMaxAge;
+        const myfriendGender = user.friendGender;
+        const myfriendKeywords = user.friendKeyword;
+
+        // 사용자가 설정한 친구 MBTI 탐색 후 해당 MBTI를 가진 유저 조회
+        const friendfindQuery = `
         SELECT 
             user.*,
             (
@@ -26,7 +35,7 @@ exports.friendMatching = (req, res) => {
                 (
                     SELECT COUNT(*)
                     FROM (
-                        SELECT DISTINCT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(u.friendKeyword, ',', numbers.n), ',', -1)) AS keyword
+                        SELECT DISTINCT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(u.myKeyword, ',', numbers.n), ',', -1)) AS keyword
                         FROM User u
                         CROSS JOIN (
                             SELECT 1 n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 
@@ -40,10 +49,10 @@ exports.friendMatching = (req, res) => {
                             UNION ALL SELECT 41 UNION ALL SELECT 42 UNION ALL SELECT 43 UNION ALL SELECT 44 UNION ALL SELECT 45
                             UNION ALL SELECT 46 UNION ALL SELECT 47 UNION ALL SELECT 48 UNION ALL SELECT 49 UNION ALL SELECT 50
                         ) AS numbers
-                        WHERE CHAR_LENGTH(u.friendKeyword) - CHAR_LENGTH(REPLACE(u.friendKeyword, ',', '')) >= numbers.n - 1
+                        WHERE CHAR_LENGTH(u.myKeyword) - CHAR_LENGTH(REPLACE(u.myKeyword, ',', '')) >= numbers.n - 1
                         AND u.email = user.email
                     ) AS keywords
-                    WHERE FIND_IN_SET(keywords.keyword, user.myKeyword) > 0
+                    WHERE FIND_IN_SET(keywords.keyword, ?) > 0
                 ) + 
                 -- MBTI 일치 점수 계산
                 (
@@ -55,72 +64,114 @@ exports.friendMatching = (req, res) => {
             ) AS totalScore
         FROM User user
         WHERE user.deleteTime IS NULL 
-                AND CAST(user.age AS UNSIGNED) <= CAST(? AS UNSIGNED) 
-                AND CAST(user.age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
-                AND user.gender = ?
-                AND user.email != ?
-                AND suspend = 0
-        AND user.email != ?
-        AND user.email NOT IN (
-            SELECT oppEmail FROM Friend WHERE userEmail = ?
-        )
-        AND user.email NOT IN (
-            SELECT recUser FROM AddRequest WHERE reqUser = ? AND status = 'ing'
-        )
-        AND user.userNumber NOT IN (
-            SELECT oppNumber FROM UserMatchingHistory WHERE userNumber = (SELECT userNumber FROM User WHERE email = ?)
-        )
+            AND CAST(user.age AS UNSIGNED) <= CAST(? AS UNSIGNED) 
+            AND CAST(user.age AS UNSIGNED) >= CAST(? AS UNSIGNED) 
+            AND user.gender = ?
+            AND user.email != ?
+            AND suspend = 0
+            AND user.email NOT IN (
+                SELECT oppEmail FROM Friend WHERE userEmail = ?
+            )
+            AND user.email NOT IN (
+                SELECT recUser FROM AddRequest WHERE reqUser = ? AND status = 'ing'
+            )
+            AND user.userNumber NOT IN (
+                SELECT oppNumber FROM UserMatchingHistory WHERE userNumber = (SELECT userNumber FROM User WHERE email = ?)
+            )
         ORDER BY totalScore DESC
-        limit 3;        
-        `;  
-        req.mysqlConnection.query(friendfindQuery, [myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMaxAge, myfriendMinAge, myfriendGender, userEmail, userEmail, userEmail, userEmail,userEmail], (err, userResults) => {    
-            if (err) {
-                console.error('Error while querying:', err);
-                return res.status(500).send('서버 에러');
-            }
-            if (userResults.length === 0) {
-                return res.status(404).send('해당하는 사용자가 없습니다.');
-            }
-            // userResults에서 userNumber만 추출하여 배열로 만듦
-            const userNumbers = userResults.map(user => user.userNumber);
-            // userMatchingHistroy에 기록을 추가
-            userNumbers.forEach(oppNumber => {
-                const insertQuery = `
-                    INSERT INTO UserMatchingHistory (userNumber, oppNumber)
-                    VALUES (?, ?);
-                `;
-                req.mysqlConnection.query(insertQuery, [userNumber, oppNumber], (err, results) => {
-                    if (err) {
-                        console.error('Error while querying:', err);
-                        return res.status(500).send('서버 에러');
+        LIMIT 3;
+        `;
+
+        const friendResults = await query(friendfindQuery, [
+            myfriendKeywords, myfriendMBTI, myfriendMBTI, myfriendMBTI, myfriendMBTI,
+            myfriendMaxAge, myfriendMinAge, myfriendGender,
+            userEmail, userEmail, userEmail, userEmail, userEmail
+        ]);
+
+        if (friendResults.length === 0) {
+            return res.status(404).send('해당하는 사용자가 없습니다.');
+        }
+
+        const userNumbers = friendResults.map(user => user.userNumber);
+
+        const chatGPTResponses = await Promise.all(friendResults.map(async user => {
+            const userMBTI = user.myMBTI;
+            const userKeywords = user.myKeyword.split(',');
+
+            const prompt = `너는 친구 관계를 도와주는 상담사야. 나는 ${myMBTI}이고 ${myKeywords.join(', ')} 하는 것을 좋아하는 사람이야. 친구는 ${userMBTI}이고 ${userKeywords.join(', ')} 하는 것을 좋아하는 친구야. MBTI 조합에 있어서 성격상 잘맞는 부분과 공통되어 있는 취미를 기반으로 친구와 친해질수 있는 계기나 요소 등을 섞어서 200자 이내로 친근한 반말로 답변해줘`;
+
+            const messages = [
+                { "role": "system", "content": "You are a helpful assistant." },
+                { "role": "user", "content": prompt }
+            ];
+
+            try {
+                const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+                    model: "gpt-3.5-turbo",
+                    messages: messages,
+                    max_tokens: 1500
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                        'Content-Type': 'application/json'
                     }
                 });
-            });
-            // findImageQuery에 WHERE 조건에 userNumber IN (...)을 추가하여 필터링
-            const findImageQuery = `SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated, UserImage.imageKey
-            FROM UserImage, User 
-            WHERE User.userNumber = UserImage.userNumber AND UserImage.userNumber IN (${userNumbers.join(',')});`;
-            req.mysqlConnection.query(findImageQuery, [friendMBTI, userEmail], (err, imageResults) => {
-                if (err) {
-                    console.error('Error while querying:', err);
-                    return res.status(500).send('서버 에러');
-                }
-                const now = getCurrentDateTime();
-                const updateQuery = `UPDATE User SET requestTime = ? WHERE email = ?`;
-                req.mysqlConnection.query(updateQuery, [now, userEmail], (err, results) => {
-                    if (err) {
-                        console.error('Error while updating:', err);
-                        return res.status(500).send('서버 에러');
-                    }
-                    return res.status(200).json({
-                        users: userResults,
-                        images: imageResults
-                    });
-                });
-            });
+                return {
+                    userNumber: user.userNumber,
+                    analysis: response.data.choices[0].message.content.trim()
+                };
+            } catch (error) {
+                console.error('Error while calling ChatGPT API:', error.response ? error.response.data : error.message);
+                return {
+                    userNumber: user.userNumber,
+                    analysis: '분석 중 오류가 발생했습니다.'
+                };
+            }
+        }));
+
+        const userResultsWithAnalysis = friendResults.map(user => {
+            const analysis = chatGPTResponses.find(response => response.userNumber === user.userNumber).analysis;
+            return {
+                ...user,
+                analysis
+            };
         });
-    });
+
+        await Promise.all(userNumbers.map(async (oppNumber) => {
+            const insertQuery = `
+                INSERT INTO UserMatchingHistory (userNumber, oppNumber)
+                VALUES (?, ?);
+            `;
+            try {
+                await query(insertQuery, [userNumber, oppNumber]);
+            } catch (err) {
+                console.error('Error while querying:', err);
+            }
+        }));
+
+        const findImageQuery = `
+            SELECT UserImage.imageNumber, UserImage.userNumber, UserImage.imagePath, UserImage.imageCreated, UserImage.imageKey
+            FROM UserImage, User 
+            WHERE User.userNumber = UserImage.userNumber AND UserImage.userNumber IN (${userNumbers.join(',')});
+        `;
+
+        const imageResults = await query(findImageQuery);
+
+        const now = moment().format('YYYY-MM-DD HH:mm:ss');
+        const updateQuery = `UPDATE User SET requestTime = ? WHERE email = ?`;
+
+        await query(updateQuery, [now, userEmail]);
+
+        return res.status(200).json({
+            users: userResultsWithAnalysis,
+            images: imageResults
+        });
+    } catch (err) {
+        console.error('Error:', err);
+        return res.status(500).send('서버 에러');
+    }
 };
+
 exports.getfriendinfo = (req, res) => {
     let userNumbers = req.query.userNumbers;
     if (typeof userNumbers === 'string') {
@@ -150,6 +201,7 @@ exports.getfriendinfo = (req, res) => {
         });
     });
 };
+
 exports.settingMBTI = (req, res) => {
     const userEmail = req.headers['email'];
     const { friendMBTI, friendMaxAge, friendMinAge, friendGender } = req.body;
