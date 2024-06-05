@@ -240,9 +240,9 @@
   - 500 : 서버 에러
 
 > 4. 관리자 글 답변 작성
-- URL : customerService/readManager (post)
+- URL : customerService/responsePost (post)
 - 요청 값 : 헤더 - accesstoken, 바디 - responseTitle, responseContent, postNumber
-- 반환 값 : post, image (게시글 객체들과 이미지 객체들 반환)
+- 반환 값 : -
   - 200 : 작성 성공
   - 301 : 관리자가 아님
   - 500 : 서버 에러
