@@ -1,0 +1,147 @@
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+
+/*reset CSS*/
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+body {
+    background-color:whi;
+}
+
+header {
+    width: 100%;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3vh 3vw;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+}
+
+header h1 {
+    font: bold 24px/1 "Schoolbell";
+    color: white;
+}
+
+header #gnb {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+header #gnb li {
+    margin: 0px 25px;
+}
+
+header #gnb li a {
+    font: 32px/1 "Black Han Sans";
+    color: black;
+}
+
+header .sns {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+header .sns li {
+    margin: 0px 5px;
+}
+
+header .sns li a{
+    color: black;
+    font: 32px;
+}
+
+header .btnMenu {
+    color: white;
+    font-size: 24px;
+    display: none;
+}
+
+figure {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    height: 80vh;
+    z-index: 1;
+    overflow: hidden;
+    top: 0px;
+    bottom: 0px;
+}
+
+.mockup{
+    height: 90vh;
+    object-fit: cover;
+}
+
+figure  p{
+    padding: 16px;
+    font: normal 24px/1 "Black Han Sans";
+    color: black;
+}
+
+footer{
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    z-index: 2;
+    font: normal 12px/1 "arial";
+    text-align: center;
+    padding: 5vh 5vw;
+    color: gray;
+}
+
+.store-buttons {
+    display: flex;
+    justify-content: start;
+    gap: 20px;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+.store-button {
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    color: white;
+    border-radius: 5px;
+}
+.google-play {
+    background-color: #3DDC84;
+}
+.app-store {
+    background-color: #0070C9;
+}
+
+/* moble phone version */
+@media screen and (max-width:1023px){
+    header #gnb{
+        display: none;
+    }
+    header .sns{
+        display: none;
+    }
+    header .btnMenu{
+        display: block;
+    }
+    
+}
