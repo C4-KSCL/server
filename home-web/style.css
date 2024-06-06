@@ -93,20 +93,18 @@ figure {
 
 figure  p{
     padding: 16px;
-    font: normal 24px/1 "Black Han Sans";
+    font: normal 24px/1.2 "Black Han Sans";
     color: black;
 }
 
-footer{
-    width: 100%;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    z-index: 2;
-    font: normal 12px/1 "arial";
-    text-align: center;
-    padding: 5vh 5vw;
-    color: gray;
+figure  p span{
+    color: #3470d0;
+}
+
+figure div a{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .store-buttons {
@@ -130,6 +128,18 @@ footer{
 }
 .app-store {
     background-color: #0070C9;
+}
+
+footer{
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    z-index: 2;
+    font: normal 12px/1 "arial";
+    text-align: center;
+    padding: 5vh 5vw;
+    color: gray;
 }
 
 /* moble phone version */
