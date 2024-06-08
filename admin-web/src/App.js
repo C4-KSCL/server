@@ -16,7 +16,6 @@ const Layout = () => {
 	return (
 		<div>
 			<Nav />
-			<div className=" h-14"></div>
 			<Outlet/>
 		</div>
 	);

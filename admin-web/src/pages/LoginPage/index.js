@@ -58,40 +58,47 @@ export default function LoginPage() {
 		},
 	});
 
-	return (
-		<div>
-			<div className="h-screen flex flex-col justify-center items-center">
-				<p className="text-5xl mb-10">SoulMBTI 관리자 페이지입니다.</p>
-				<form>
-					<div id="id-div" className="pb-4">
-						<p htmlFor="email" className="my-2">
-							아이디(이메일)
-						</p>
-						<UserInput
-							type="text"
-							placeholder="이메일을 입력하세요."
-							name="email"
-							value={writtenUserInfo.email}
-							onChange={handleInputChange}
-						/>
-					</div>
-					<div id="pw-div">
-						<p htmlFor="password" className="my-2">
-							비밀번호
-						</p>
-						<UserInput
-							type="password"
-							placeholder="비밀번호를 입력하세요."
-							name="password"
-							value={writtenUserInfo.password}
-							onChange={handleInputChange}
-						/>
-					</div>
-				</form>
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		useLogin.mutate();
+	};
 
-				<button className="btn-blue mt-4" onClick={useLogin.mutate}>
-					로그인
-				</button>
+	return ( 
+		<div className="flex justify-center items-center h-screen w-screen">
+			<div className="flex flex-col justify-center items-start gap-4 ">
+				<img className='logo' src="https://matchingimage.s3.ap-northeast-2.amazonaws.com/logo2.png" alt="Logo" />
+				<div className="flex flex-col shadow-lg p-10">
+					<p className="text-3xl font-bold py-2">관리자 로그인</p>
+					<form className=" w-64" onSubmit={handleSubmit}>
+						<div id="id-div" className="pb-4">
+							<p htmlFor="email" className="my-2">
+								아이디(이메일)
+							</p>
+							<UserInput
+								type="text"
+								placeholder="이메일을 입력하세요."
+								name="email"
+								value={writtenUserInfo.email}
+								onChange={handleInputChange}
+							/>
+						</div>
+						<div id="pw-div">
+							<p htmlFor="password" className="my-2">
+								비밀번호
+							</p>
+							<UserInput
+								type="password"
+								placeholder="비밀번호를 입력하세요."
+								name="password"
+								value={writtenUserInfo.password}
+								onChange={handleInputChange}
+							/>
+						</div>
+						<button type="submit" className="btn-blue mt-4 w-full" >
+						로그인
+					</button>
+					</form>
+				</div>
 			</div>
 		</div>
 	);

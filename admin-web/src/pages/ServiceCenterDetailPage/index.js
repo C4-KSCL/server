@@ -68,7 +68,7 @@ export default function ServiceCenterDetailPage() {
 						<textarea
 							type="text"
 							value={post.responseContent}
-							className="text-lg bg-slate-100 h-60"
+							className="text-lg bg-slate-100 h-80"
 						/>
 					</div>
 					<div className="flex justify-end ">
@@ -95,7 +95,7 @@ export default function ServiceCenterDetailPage() {
 					<hr className="border-gray-600" />
 					<textarea
 						ref={inputContentRef}
-						className="text-field h-60 p-2"
+						className="text-field h-80 p-2"
 						type="text"
 						placeholder="답변 내용"
 					/>

@@ -37,7 +37,7 @@ export default function ServiceCenterPage() {
 	}
 
 	if (status === "error") {
-		return <span>Error: {error.message}</span>;
+		return <span>Error: {error.message}{error.name}</span>;
 	}
 
 	return (

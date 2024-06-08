@@ -17,10 +17,6 @@ a {
     text-decoration: none;
 }
 
-body {
-    background-color:whi;
-}
-
 header {
     width: 100%;
     border-bottom: 1px solid #eee;
@@ -140,18 +136,4 @@ footer{
     text-align: center;
     padding: 5vh 5vw;
     color: gray;
-}
-
-/* moble phone version */
-@media screen and (max-width:1023px){
-    header #gnb{
-        display: none;
-    }
-    header .sns{
-        display: none;
-    }
-    header .btnMenu{
-        display: block;
-    }
-    
 }
