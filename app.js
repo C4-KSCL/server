@@ -102,7 +102,7 @@ const port = process.env.PORT || 8000;
 
  // 관리자 페이지
   app.use(express.static(path.join(__dirname, 'admin-web/build')));
- 
+
   app.get("/admin", (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
   }); 
