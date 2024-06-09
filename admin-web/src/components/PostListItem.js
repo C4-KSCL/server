@@ -9,7 +9,6 @@ export default function PostListItem({
 	onClick,
 }) {
 	const renderAnswerStatus = () => {
-		console.log(isAnswered);
 		return isAnswered === 1 ? (
 			<span className="text-blue-500">답변 완료</span>
 		) : (

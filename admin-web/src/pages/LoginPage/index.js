@@ -37,15 +37,15 @@ export default function LoginPage() {
 		mutationFn: loginProcess,
 		// 200번대 응답
 		onSuccess: (response) => {
-			console.log("data", response.data);
+			// console.log("data", response.data);
 			if (response.data.user.manager === 1) {
 				// refreshToken은 cookie에 저장,
 				document.cookie =
 					"refreshToken=yourRefreshToken; Secure; HttpOnly";
 				updateAccessToken(response.data.accessToken);
-				console.log("토큰 업데이트", response.data.accessToken);
+				// console.log("토큰 업데이트", response.data.accessToken);
 				updateUserInfo(response.data.user);
-				console.log("유저정보 업데이트", response.data.user);
+				// console.log("유저정보 업데이트", response.data.user);
 				navigate("/admin/service-center");
 			} else {
 				alert("관리자가 아닙니다");
