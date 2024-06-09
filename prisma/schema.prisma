@@ -55,9 +55,9 @@ model Event {
   chattingId    Int           @unique
   category      Int
   user1         String?       @db.VarChar(100)
-  user1Choice   String?       @db.VarChar(100) 
+  user1Choice   String?       @db.VarChar(100)
   user2         String?       @db.VarChar(100)
-  user2Choice   String?       @db.VarChar(100) 
+  user2Choice   String?       @db.VarChar(100)
   createdAt     DateTime      @default(now()) @db.DateTime(0)
   smallCategory SmallCategory @relation(fields: [category], references: [id])
   chatting      Chatting      @relation(fields: [chattingId], references: [id])
@@ -70,7 +70,7 @@ model Event {
 }
 
 model EventImage {
-  filepath      String         @db.VarChar(255)
+  filepath      String         @db.Text
   createdAt     DateTime       @default(now()) @db.DateTime(0)
   filekey       String         @db.VarChar(255)
   id            Int            @id @default(autoincrement())

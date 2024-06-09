@@ -76,22 +76,16 @@ export class RequestService {
     async deleteRoomAndRejectRequest(payload) {
 
         await database.$transaction(async (db) => {
-            await db.room.update({
+
+            await db.addRequest.delete({
                 where: {
-                    id: payload.roomId,
-                },
-                data : {
-                    publishing : "deleted",
+                    id: payload.id,
                 }
             });
 
-            await db.addRequest.update({
+            await db.room.delete({
                 where: {
-                    id: payload.id,
-                },
-                data: {
-                    status: "rejected",
-                    updatedAt : getNowTime(),
+                    id: payload.roomId,
                 }
             });
         });
@@ -239,8 +233,6 @@ export class RequestService {
             },
         });
 
-        console.log(isExist);
-
         if (isExist) {
             if (isExist.status === "rejected" || isExist.status === "deleted") { return; }
             else if (isExist.status === "accepted") { throw { status: 400, msg: "already friend : request" }; }
@@ -377,8 +369,6 @@ export class RequestService {
     // { request, id(request) }
     async deleteRoomAndRequest(payload) {
         let room;
-
-        console.log(payload);
 
         const myJoin = await database.joinRoom.findFirst({
             where : {

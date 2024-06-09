@@ -5,21 +5,18 @@ import LoginPage from "./pages/LoginPage";
 import { AuthProvider } from "./api/authContext";
 import ServiceCenterPage from "./pages/ServiceCenterPage";
 import "./App.css";
-import Sidebar from "./components/Sidebar";
+import Nav from "./components/Nav";
 import UserMangementPage from "./pages/UserManagementPage";
+import ServiceCenterDetailPage from "./pages/ServiceCenterDetailPage";
 
 // QueryClient 생성
 const queryClient = new QueryClient();
 
 const Layout = () => {
 	return (
-		<div className="flex">
-			<div className="flex-grow-1">
-			<Sidebar />
-			</div>
-			
-			<div className="flex-grow-4"><Outlet /></div>
-			
+		<div>
+			<Nav />
+			<Outlet/>
 		</div>
 	);
 };
@@ -35,6 +32,10 @@ function App() {
 							<Route
 								path="service-center"
 								element={<ServiceCenterPage />}
+							/>
+							<Route
+								path="service-center/:postNumber"
+								element={<ServiceCenterDetailPage />}
 							/>
 							<Route
 								path="user-management"

@@ -3,11 +3,14 @@
 @tailwind utilities;
 
 @layer components {
-  .btn {
-    @apply px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-700;
-  }
-  .btn-primary {
+  .btn-blue {
     @apply p-2 rounded text-white bg-blue-500 hover:bg-blue-700  ;
+  }
+  .btn-red {
+    @apply p-2 rounded text-white bg-red-500 hover:bg-red-700  ;
+  }
+  .btn-gray {
+    @apply p-2 rounded text-white bg-gray-400 hover:bg-gray-600  ;
   }
   .text-field {
     @apply p-1 border border-gray-400 rounded

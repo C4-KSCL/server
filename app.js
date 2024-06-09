@@ -95,19 +95,19 @@ const port = process.env.PORT || 8000;
     next();
   });
 
+  // 홈페이지를 위한 정적 파일 제공을 위한 미들웨어 설정
+app.use(express.static(path.join(__dirname, 'home-web')));
+
   // 홈페이지
   app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, 'home-web', 'index.html'));
   }); 
 
- // 관리자 페이지
+   // 관리자 페이지를 위한 정적 파일 제공을 위한 미들웨어 설정
   app.use(express.static(path.join(__dirname, 'admin-web/build')));
-
+ 
+  // 관리자 페이지
   app.get("/admin", (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
-  }); 
-
-  app.get("/admin/*", (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-web/build', 'index.html'));
   }); 
   
